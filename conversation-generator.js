@@ -607,8 +607,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Here's the link to our online onboarding form: https://onboarding.geoswift.com It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
+            text: `To get started, please complete our online onboarding form. It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
             time: formatTime(day2, 10, 20)
+        });
+        messages.push({
+            sender: 'company',
+            text: `https://wsdglobalpay.com/onboarding.html`,
+            time: formatTime(day2, 10, 21)
         });
     } else {
         messages.push({
@@ -722,8 +727,13 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Here's the link: https://onboarding.geoswift.com Let me know once you've submitted it.`,
+            text: `Please complete the onboarding form. Let me know once you've submitted it.`,
             time: formatTime(day2, 14, 22)
+        });
+        messages.push({
+            sender: 'company',
+            text: `https://wsdglobalpay.com/onboarding.html`,
+            time: formatTime(day2, 14, 23)
         });
     } else {
         messages.push({
@@ -834,8 +844,13 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `To proceed, please complete our onboarding form: https://onboarding.geoswift.com All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
+            text: `To proceed, please complete our onboarding form. All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
             time: formatTime(day2, 13, 33)
+        });
+        messages.push({
+            sender: 'company',
+            text: `https://wsdglobalpay.com/onboarding.html`,
+            time: formatTime(day2, 13, 34)
         });
     } else {
         messages.push({
@@ -916,8 +931,13 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Here's the link: https://onboarding.geoswift.com Submit as soon as possible and we'll review it right away.`,
+            text: `Please complete the onboarding form. Submit as soon as possible and we'll review it right away.`,
             time: formatTime(day2, 9, 15)
+        });
+        messages.push({
+            sender: 'company',
+            text: `https://wsdglobalpay.com/onboarding.html`,
+            time: formatTime(day2, 9, 16)
         });
     } else {
         messages.push({
@@ -1046,8 +1066,13 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `You can access the form here: https://onboarding.geoswift.com Let me know if you have any questions while filling it out - I'm here to help!`,
+            text: `You can access the onboarding form below. Let me know if you have any questions while filling it out - I'm here to help!`,
             time: formatTime(day2, 14, 20)
+        });
+        messages.push({
+            sender: 'company',
+            text: `https://wsdglobalpay.com/onboarding.html`,
+            time: formatTime(day2, 14, 21)
         });
     } else {
         messages.push({
@@ -1152,8 +1177,13 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Please complete the onboarding form at: https://onboarding.geoswift.com Upon submission, our compliance team will review your application and initiate the verification process.`,
+            text: `Please complete the onboarding form. Upon submission, our compliance team will review your application and initiate the verification process.`,
             time: formatTime(day2, 14, 3)
+        });
+        messages.push({
+            sender: 'company',
+            text: `https://wsdglobalpay.com/onboarding.html`,
+            time: formatTime(day2, 14, 4)
         });
     } else {
         messages.push({
@@ -1460,7 +1490,7 @@ function generateCustomConversationBase(customerName, sceneDescription, customer
         
         messages.push({
             sender: 'company',
-            text: `You can reach us at support@geoswift.com or reply here anytime. We're here to help!`,
+            text: `You can reply here anytime. We're here to help!`,
             time: formatTime(day1, 10, 18)
         });
         
@@ -2892,7 +2922,7 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
 
         messages.push({
             sender: 'company',
-            text: `You can send them via email to compliance@geoswift.com. Please make sure they're clear and include all pages. Thank you for your cooperation!`,
+            text: `You can send them via email to compliance@wsdglobalpay.com. Please make sure they're clear and include all pages. Thank you for your cooperation!`,
             time: formatTime(day1, 10, 43)
         });
 
@@ -2980,7 +3010,7 @@ function generateConciseKYCConversation(customerName, customerAge, platform, add
 
         messages.push({
             sender: 'company',
-            text: `Email to compliance@geoswift.com. Thanks.`,
+            text: `Email to compliance@wsdglobalpay.com. Thanks.`,
             time: formatTime(day1, 11, 5)
         });
     } else {
@@ -3041,7 +3071,7 @@ function generateCautiousKYCConversation(customerName, customerAge, platform, ad
 
         messages.push({
             sender: 'company',
-            text: `Please email them to compliance@geoswift.com. Thank you for your cooperation.`,
+            text: `Please email them to compliance@wsdglobalpay.com. Thank you for your cooperation.`,
             time: formatTime(day1, 9, 42)
         });
     } else {
@@ -3108,7 +3138,7 @@ function generateUrgentKYCConversation(customerName, customerAge, platform, addi
 
         messages.push({
             sender: 'company',
-            text: `Great, send to compliance@geoswift.com.`,
+            text: `Great, send to compliance@wsdglobalpay.com.`,
             time: formatTime(day1, 8, 20)
         });
     } else {
@@ -3169,7 +3199,7 @@ function generateFriendlyKYCConversation(customerName, customerAge, platform, ad
 
         messages.push({
             sender: 'company',
-            text: `You can email them to compliance@geoswift.com. Thanks so much!`,
+            text: `You can email them to compliance@wsdglobalpay.com. Thanks so much!`,
             time: formatTime(day1, 10, 21)
         });
 
@@ -3242,7 +3272,7 @@ function generateProfessionalKYCConversation(customerName, customerAge, platform
 
         messages.push({
             sender: 'company',
-            text: `Please submit via email to compliance@geoswift.com. Ensure all pages are included and clearly legible.`,
+            text: `Please submit via email to compliance@wsdglobalpay.com. Ensure all pages are included and clearly legible.`,
             time: formatTime(day1, 9, 6)
         });
 
