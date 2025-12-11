@@ -1770,6 +1770,11 @@ function generateBrowserScript(conversation, platform) {
 
     // 直接生成HTML代码，不包含注释
     document.getElementById('scriptCode').textContent = htmlMessages;
+    
+    // 保存当前对话和平台，用于编辑功能
+    currentConversation = conversation;
+    currentPlatform = platform;
+    currentCustomerName = customerName;
 }
 
 // 生成邮件格式的对话（正式邮件格式，但更自然多样化）
