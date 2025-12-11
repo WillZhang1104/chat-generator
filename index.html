@@ -613,6 +613,30 @@
                 });
             }
             
+            // 绑定邮件编辑功能按钮
+            const confirmEmailBtn = document.getElementById('confirmEmailBtn');
+            const cancelEmailEditBtn = document.getElementById('cancelEmailEditBtn');
+            
+            if (confirmEmailBtn) {
+                confirmEmailBtn.addEventListener('click', function() {
+                    if (typeof confirmEmailAndGenerateHTML === 'function') {
+                        confirmEmailAndGenerateHTML();
+                    } else {
+                        alert('确认功能未加载，请刷新页面重试');
+                    }
+                });
+            }
+            
+            if (cancelEmailEditBtn) {
+                cancelEmailEditBtn.addEventListener('click', function() {
+                    if (typeof cancelEmailEdit === 'function') {
+                        cancelEmailEdit();
+                    } else {
+                        alert('取消功能未加载，请刷新页面重试');
+                    }
+                });
+            }
+            
             if (!checkAuth()) {
                 document.getElementById('passwordInput').focus();
                 // 支持回车键提交
