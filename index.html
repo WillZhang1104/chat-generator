@@ -440,6 +440,16 @@
 
         <div class="preview-section" id="previewSection" style="display: none;">
             <h2 class="preview-title">对话预览</h2>
+            <div style="margin-bottom: 15px;">
+                <button id="editConversationBtn" class="btn" style="background: #28a745; margin-right: 10px;">✏️ 编辑对话</button>
+                <button id="saveConversationBtn" class="btn" style="background: #007bff; display: none;">💾 保存并更新HTML</button>
+                <button id="cancelEditBtn" class="btn btn-secondary" style="display: none;">❌ 取消编辑</button>
+            </div>
+            <div id="conversationEditArea" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="margin-top: 0; margin-bottom: 15px;">编辑对话内容</h3>
+                <div id="editableMessages"></div>
+                <button id="addMessageBtn" class="btn" style="background: #17a2b8; margin-top: 10px; font-size: 14px; padding: 8px 15px;">+ 添加消息</button>
+            </div>
             <div class="conversation-preview" id="conversationPreview"></div>
             
             <div class="instructions" id="instructionsContent">
@@ -538,6 +548,47 @@
                 // 设置固定的最后更新时间：2025-12-11 14:15（根据实际更新时间修改）
                 const updateDate = '2025-12-11 14:15'; // 修改这里的时间来更新显示
                 lastUpdateTime.textContent = updateDate;
+            }
+            
+            // 绑定编辑功能按钮
+            const editBtn = document.getElementById('editConversationBtn');
+            const saveBtn = document.getElementById('saveConversationBtn');
+            const cancelBtn = document.getElementById('cancelEditBtn');
+            const addMsgBtn = document.getElementById('addMessageBtn');
+            
+            if (editBtn) {
+                editBtn.addEventListener('click', function() {
+                    if (currentConversation) {
+                        document.getElementById('conversationEditArea').style.display = 'block';
+                        editBtn.style.display = 'none';
+                        saveBtn.style.display = 'inline-block';
+                        cancelBtn.style.display = 'inline-block';
+                        showEditableConversation(currentConversation);
+                    } else {
+                        alert('请先生成对话');
+                    }
+                });
+            }
+            
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function() {
+                    saveEditedConversation();
+                });
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    document.getElementById('conversationEditArea').style.display = 'none';
+                    editBtn.style.display = 'inline-block';
+                    saveBtn.style.display = 'none';
+                    cancelBtn.style.display = 'none';
+                });
+            }
+            
+            if (addMsgBtn) {
+                addMsgBtn.addEventListener('click', function() {
+                    addNewMessage();
+                });
             }
             
             if (!checkAuth()) {

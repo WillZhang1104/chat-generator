@@ -448,7 +448,17 @@ function getConversationStart(customerName) {
         'customer_introduces',     // 客户自我介绍并说明目的
         'customer_referral',       // 客户说明从哪里知道我们
         'customer_product_info',   // 客户要求介绍产品
-        'customer_direct_purpose'   // 客户直接说明目的
+        'customer_direct_purpose',  // 客户直接说明目的
+        'customer_business_need',   // 客户说明业务需求
+        'customer_previous_exp',    // 客户提及之前的经验
+        'customer_quick_question',  // 客户快速提问
+        'customer_formal_inquiry',  // 客户正式询问
+        'customer_casual_chat',     // 客户随意聊天
+        'customer_urgent_need',     // 客户紧急需求
+        'customer_comparison',      // 客户对比服务
+        'customer_specific_use',   // 客户具体用途
+        'customer_partnership',     // 客户寻求合作
+        'customer_follow_up'        // 客户跟进
     ];
     
     // 根据客户名称确定开头类型（确保同一客户总是相同开头）
@@ -503,22 +513,124 @@ function buildPurposeText(purposeDetails) {
     }
 }
 
-// 生成对话开头消息
-function generateConversationStart(customerName, purposeDetails, conversationStart) {
+// 生成对话开头消息（增加更多变体）
+function generateConversationStart(customerName, purposeDetails, conversationStart, variant = 0, seed = 0) {
     const mainPurpose = purposeDetails[0].main;
     const detail = purposeDetails[0].details && purposeDetails[0].details.length > 0 
         ? purposeDetails[0].details[Math.floor(Math.random() * purposeDetails[0].details.length)]
         : '';
     
+    // 为每种开头类型提供多个变体
     const starts = {
-        'customer_asks': `Hi, I'm interested in opening an account for USD to USDT conversion. Can you tell me more about your service?`,
-        'customer_introduces': `Hello, I'm ${customerName}. I'm looking for a reliable onramp service to convert USD to USDT. ${detail ? 'Specifically, ' + detail.toLowerCase() + '.' : ''}`,
-        'customer_referral': `Hi! A friend recommended your service. I'm looking to convert USD to USDT for ${mainPurpose}. What can you tell me about your platform?`,
-        'customer_product_info': `Hi there. I'd like to learn more about your USD to USDT onramp service. Can you provide some information?`,
-        'customer_direct_purpose': `Hello, I need to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}How does your service work?`
+        'customer_asks': [
+            `Hi, I'm interested in opening an account for USD to USDT conversion. Can you tell me more about your service?`,
+            `Hello! I'd like to learn about your USD to USDT onramp service. Could you provide some details?`,
+            `Hi there, I'm looking into USD to USDT conversion services. What can you offer?`,
+            `Good morning! I'm interested in your USD to USDT conversion platform. Can you help me understand how it works?`,
+            `Hi, I need to convert USD to USDT regularly. Can you tell me about your service?`
+        ],
+        'customer_introduces': [
+            `Hello, I'm ${customerName}. I'm looking for a reliable onramp service to convert USD to USDT. ${detail ? 'Specifically, ' + detail.toLowerCase() + '.' : ''}`,
+            `Hi, this is ${customerName}. I need a USD to USDT conversion service. ${detail ? detail + '. ' : ''}Can you help?`,
+            `Hello, my name is ${customerName}. I'm exploring options for USD to USDT conversion. ${detail ? 'I need this for ' + detail.toLowerCase() + '.' : ''}`,
+            `Hi there, I'm ${customerName}. I'm in the market for a USD to USDT onramp solution. ${detail ? 'Particularly for ' + detail.toLowerCase() + '.' : ''}`,
+            `Good day, ${customerName} here. I'm looking for a USD to USDT service. ${detail ? detail + '. ' : ''}What do you offer?`
+        ],
+        'customer_referral': [
+            `Hi! A friend recommended your service. I'm looking to convert USD to USDT for ${mainPurpose}. What can you tell me about your platform?`,
+            `Hello! Someone I know suggested I check out your USD to USDT service. I need it for ${mainPurpose}. Can you help?`,
+            `Hi there! Got referred to you for USD to USDT conversion. I'm interested in using it for ${mainPurpose}. What's the process?`,
+            `Hey! A colleague mentioned your service. I need USD to USDT conversion for ${mainPurpose}. Can you provide more info?`,
+            `Hi! Heard good things about your platform. I'm looking to convert USD to USDT for ${mainPurpose}. How does it work?`
+        ],
+        'customer_product_info': [
+            `Hi there. I'd like to learn more about your USD to USDT onramp service. Can you provide some information?`,
+            `Hello, I'm researching USD to USDT conversion options. Can you tell me about your service?`,
+            `Hi! I saw your USD to USDT service online. Could you give me more details?`,
+            `Good morning! I'm interested in learning about your USD to USDT platform. What can you share?`,
+            `Hi, I came across your USD to USDT conversion service. Can you explain how it works?`
+        ],
+        'customer_direct_purpose': [
+            `Hello, I need to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}How does your service work?`,
+            `Hi, I'm looking to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}Can you help me get started?`,
+            `Hello! I need USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}What's your process?`,
+            `Hi there, I want to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}How do I begin?`,
+            `Hello, I'm seeking USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}Can you assist?`
+        ],
+        'customer_business_need': [
+            `Hi, I run a business and need USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}Do you serve businesses?`,
+            `Hello! I'm a business owner looking for USD to USDT services. I need it for ${mainPurpose}. Can you help?`,
+            `Hi there, my business requires USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}What are your business rates?`,
+            `Hello, I have a business need for USD to USDT conversion. Specifically for ${mainPurpose}. Can you accommodate?`,
+            `Hi! I'm looking for a business USD to USDT solution for ${mainPurpose}. ${detail ? detail + '. ' : ''}What do you offer?`
+        ],
+        'customer_previous_exp': [
+            `Hi! I've used other USD to USDT services before, but I'm looking for something better. Can you tell me about yours?`,
+            `Hello, I've tried a few USD to USDT platforms. What makes yours different?`,
+            `Hi there! I'm currently using another service but considering switching. What can you offer?`,
+            `Hello! I have experience with USD to USDT conversion. I'm looking for a more reliable option. Can you help?`,
+            `Hi, I've been using Coinbase/Binance for conversions, but I need something more direct. What's your process?`
+        ],
+        'customer_quick_question': [
+            `Hi! Quick question - do you offer USD to USDT conversion?`,
+            `Hello! Do you handle USD to USDT conversions?`,
+            `Hi there! Quick question about USD to USDT conversion - is that something you do?`,
+            `Hello! Can you convert USD to USDT?`,
+            `Hi! Do you provide USD to USDT services?`
+        ],
+        'customer_formal_inquiry': [
+            `Good day. I am writing to inquire about your USD to USDT conversion services. Could you please provide information?`,
+            `Hello, I am interested in learning more about your USD to USDT onramp platform. Please share details.`,
+            `Good morning. I would like to inquire about your USD to USDT conversion capabilities. Can you assist?`,
+            `Hello, I am seeking information regarding your USD to USDT services. Could you provide details?`,
+            `Good day. I am interested in your USD to USDT conversion platform. Please provide more information.`
+        ],
+        'customer_casual_chat': [
+            `Hey! So I heard you guys do USD to USDT conversion? Tell me more!`,
+            `Hi! Looking into USD to USDT stuff. What's your deal?`,
+            `Hey there! I need to convert some USD to USDT. How does your service work?`,
+            `Hi! USD to USDT conversion - is that something you do?`,
+            `Hey! I'm checking out USD to USDT options. What can you tell me?`
+        ],
+        'customer_urgent_need': [
+            `Hi! I need USD to USDT conversion ASAP for ${mainPurpose}. How quickly can you help?`,
+            `Hello! Urgent question - I need USD to USDT conversion soon. Can you accommodate?`,
+            `Hi there! I have an urgent need for USD to USDT conversion. What's your fastest option?`,
+            `Hello! I need USD to USDT conversion quickly. How fast is your process?`,
+            `Hi! Time-sensitive question - I need USD to USDT conversion. Can you help fast?`
+        ],
+        'customer_comparison': [
+            `Hi! I'm comparing different USD to USDT services. What are your rates and fees?`,
+            `Hello! I'm shopping around for USD to USDT conversion. What makes you competitive?`,
+            `Hi there! I'm evaluating USD to USDT platforms. What are your advantages?`,
+            `Hello! Comparing USD to USDT services. What should I know about yours?`,
+            `Hi! I'm looking at different USD to USDT options. What sets you apart?`
+        ],
+        'customer_specific_use': [
+            `Hi! I need USD to USDT conversion specifically for ${mainPurpose}. ${detail ? detail + '. ' : ''}Do you support this?`,
+            `Hello! I'm looking for USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}Is this something you handle?`,
+            `Hi there! I need USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}Can you help?`,
+            `Hello! My use case is ${mainPurpose}. ${detail ? detail + '. ' : ''}Do you support USD to USDT for this?`,
+            `Hi! I specifically need USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}What's your process?`
+        ],
+        'customer_partnership': [
+            `Hi! I'm exploring USD to USDT conversion services for potential partnership. Can you tell me about your platform?`,
+            `Hello! I'm interested in USD to USDT services, possibly for business partnership. What do you offer?`,
+            `Hi there! Looking into USD to USDT conversion - might be interested in partnership. Can we discuss?`,
+            `Hello! I'm considering USD to USDT services for partnership opportunities. What's available?`,
+            `Hi! I'm exploring USD to USDT options for potential collaboration. Can you provide information?`
+        ],
+        'customer_follow_up': [
+            `Hi! I reached out before about USD to USDT conversion. Following up - can you help?`,
+            `Hello! Following up on USD to USDT conversion inquiry. Are you available to discuss?`,
+            `Hi there! I inquired about USD to USDT services earlier. Can we continue the conversation?`,
+            `Hello! Following up regarding USD to USDT conversion. Can you assist?`,
+            `Hi! I had questions about USD to USDT conversion. Can we pick up where we left off?`
+        ]
     };
     
-    return starts[conversationStart] || starts['customer_asks'];
+    const variants = starts[conversationStart] || starts['customer_asks'];
+    return seededChoice(variants, seed, variant);
 }
 
 // 话多型对话 - 会问很多问题，比较详细
@@ -531,7 +643,7 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     // 使用多样化的开头
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
         time: formatTime(day1, 9, 15)
     });
 
@@ -680,7 +792,7 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
         time: formatTime(day1, 11, 30)
     });
 
@@ -773,7 +885,7 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
         time: formatTime(day1, 10, 45)
     });
 
@@ -890,7 +1002,7 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
         time: formatTime(day1, 8, 30)
     });
 
@@ -1001,7 +1113,7 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
         time: formatTime(day1, 10, 20)
     });
 
@@ -1118,7 +1230,7 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
         time: formatTime(day1, 9, 0)
     });
 
@@ -1551,7 +1663,7 @@ function generateCustomConversationBase(customerName, sceneDescription, customer
     if (messages.length > 15) {
         return messages.slice(0, 15);
     }
-    
+
     return messages;
 }
 
@@ -1612,9 +1724,20 @@ function formatTime(date, hour, minute) {
     return `${month}/${day} ${hours}:${minutes}`;
 }
 
+// 存储当前对话，用于编辑功能
+let currentConversation = null;
+let currentPlatform = null;
+let currentCustomerName = null;
+
 function displayConversation(messages) {
     const preview = document.getElementById('conversationPreview');
     preview.innerHTML = '';
+    
+    // 保存当前对话
+    currentConversation = messages;
+    const platform = document.getElementById('platform').value;
+    currentPlatform = platform;
+    currentCustomerName = document.getElementById('customerName').value;
 
     messages.forEach(msg => {
         const messageDiv = document.createElement('div');
@@ -1725,43 +1848,111 @@ function generateInitialEmailByStyle(customerName, purposeDetails, customerGreet
     return generator(customerName, purposeDetails, customerGreeting, variant, seed);
 }
 
-// 话多型初次邮件
+// 话多型初次邮件（增加更多变体）
 function generateVerboseInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0) {
     const purposeText = buildPurposeText(purposeDetails);
     
-    let body = `${customerGreeting}\n\n`;
-    body += `Thank you for reaching out. I wanted to provide you with the information you requested regarding my account opening inquiry.\n\n`;
+    // 多样化的开头段落
+    const openingParagraphs = [
+        `Thank you for reaching out. I wanted to provide you with the information you requested regarding my account opening inquiry.`,
+        `I appreciate your email and would like to provide the details you've requested about my account opening.`,
+        `Thank you for your message. I'm happy to provide you with the information needed for my account opening.`,
+        `I received your email and wanted to follow up with the details you requested.`,
+        `Thank you for contacting me. Here's the information you need regarding my account opening inquiry.`
+    ];
     
-    body += `To answer your questions:\n\n`;
-    body += `**Purpose of Transaction:** ${purposeText}\n\n`;
+    // 多样化的资金来源描述
+    const fundSources = [
+        `The funds come from my personal savings and business operations. I've been in business for several years and maintain accounts with major banks. Everything is properly documented and above board.`,
+        `My funds originate from legitimate business income and personal savings accumulated over the years. I have accounts with established financial institutions and all transactions are properly documented.`,
+        `The source of funds is primarily from my business operations, supplemented by personal savings. I maintain relationships with reputable banks and can provide documentation as needed.`,
+        `Funds are derived from my professional income and personal savings. I've maintained bank accounts for many years and all financial activities are transparent and documented.`,
+        `The capital comes from my business revenue and personal savings. I work with well-established banks and can provide complete documentation for all fund sources.`
+    ];
+    
+    // 多样化的交易细节描述
+    const transactionDetails = [
+        `I'm planning to make transactions monthly, typically around $15k-$40k per transaction. Annual volume would probably be in the $200k-$300k range.`,
+        `My transaction pattern will likely be monthly, with amounts ranging from $20k to $50k per transaction. I estimate annual volume around $300k-$400k.`,
+        `I expect to transact on a monthly basis, with transaction sizes between $10k and $35k. Annual volume should be approximately $200k-$250k.`,
+        `Transactions will occur monthly, typically in the $15k-$45k range per transaction. I anticipate annual volume of $250k-$350k.`,
+        `I plan monthly transactions, usually $20k-$40k each. My estimated annual volume is around $300k.`
+    ];
+    
+    let body = `${customerGreeting}\n\n`;
+    body += seededChoice(openingParagraphs, seed, variant * 0) + `\n\n`;
+    
+    // 根据变体选择不同的结构
+    if (variant % 3 === 0) {
+        body += `To answer your questions:\n\n`;
+        body += `**Purpose of Transaction:** ${purposeText}\n\n`;
+    } else if (variant % 3 === 1) {
+        body += `Regarding my transaction purpose: ${purposeText}\n\n`;
+    } else {
+        body += `My primary use case is ${purposeText.toLowerCase()}.\n\n`;
+    }
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        body += `I've been investing in crypto for a while now, mostly through Coinbase and Binance. I'm looking to diversify and this account will help me access USDT more efficiently for my investment strategy.\n\n`;
+        const investmentDetails = [
+            `I've been investing in crypto for a while now, mostly through Coinbase and Binance. I'm looking to diversify and this account will help me access USDT more efficiently for my investment strategy.`,
+            `I'm an active crypto investor, primarily using platforms like Coinbase and Kraken. This account will streamline my USDT access for investment purposes.`,
+            `I have experience investing in cryptocurrency through various exchanges. This service will help me manage my USDT investments more effectively.`
+        ];
+        body += seededChoice(investmentDetails, seed, variant * 1) + `\n\n`;
     }
     if (purposeDetails.some(p => p.main === 'payment')) {
-        body += `I regularly need to pay suppliers in Asia - mainly China and Singapore. USDT transactions are faster and cheaper than traditional wire transfers, which is why I'm interested in your service.\n\n`;
+        const paymentDetails = [
+            `I regularly need to pay suppliers in Asia - mainly China and Singapore. USDT transactions are faster and cheaper than traditional wire transfers, which is why I'm interested in your service.`,
+            `I frequently make payments to business partners in Southeast Asia. USDT offers faster settlement and lower fees compared to traditional banking.`,
+            `I need to pay suppliers across Asia regularly. USDT provides a more efficient payment method than conventional wire transfers.`
+        ];
+        body += seededChoice(paymentDetails, seed, variant * 2) + `\n\n`;
     }
     
-    body += `**Source of Funds:** The funds come from my personal savings and business operations. I've been in business for several years and maintain accounts with major banks. Everything is properly documented and above board.\n\n`;
-    
-    body += `**Transaction Details:** I'm planning to make transactions monthly, typically around $15k-$40k per transaction. Annual volume would probably be in the $200k-$300k range.\n\n`;
+    body += `**Source of Funds:** ` + seededChoice(fundSources, seed, variant * 3) + `\n\n`;
+    body += `**Transaction Details:** ` + seededChoice(transactionDetails, seed, variant * 4) + `\n\n`;
     
     // 使用变体系统选择不同的问题
     const questions = [
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 4),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 4 + 1),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 4 + 2),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 4 + 3)
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 5),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 5 + 1),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 5 + 2),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 5 + 3)
     ];
     
-    body += `I have a few questions about your platform:\n\n`;
+    const questionIntros = [
+        `I have a few questions about your platform:`,
+        `Before proceeding, I'd like to understand a few things:`,
+        `I have some questions I'd like to clarify:`,
+        `Could you help me understand the following:`,
+        `I'd appreciate answers to these questions:`
+    ];
+    
+    body += seededChoice(questionIntros, seed, variant * 6) + `\n\n`;
     questions.forEach((q, i) => {
         body += `- ${q}\n`;
     });
     body += `\n`;
     
-    body += `I've already submitted the onboarding form. Let me know if you need anything else!\n\n`;
-    body += `Best regards,\n${customerName}`;
+    const closings = [
+        `I've already submitted the onboarding form. Let me know if you need anything else!`,
+        `The onboarding form has been completed and submitted. Please let me know if additional information is required.`,
+        `I've submitted the onboarding documentation. Feel free to reach out if you need anything further.`,
+        `The onboarding form is complete. I'm ready to proceed once my account is approved.`,
+        `I've completed the onboarding process. Please advise if anything else is needed.`
+    ];
+    
+    body += seededChoice(closings, seed, variant * 7) + `\n\n`;
+    
+    const signatures = [
+        `Best regards,\n${customerName}`,
+        `Thank you,\n${customerName}`,
+        `Sincerely,\n${customerName}`,
+        `Regards,\n${customerName}`,
+        `Best,\n${customerName}`
+    ];
+    
+    body += seededChoice(signatures, seed, variant * 8);
     
     return body;
 }
@@ -2169,6 +2360,11 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     
     // 生成邮件格式的对话
     const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting);
+    
+    // 保存当前对话和平台，用于编辑功能
+    currentConversation = conversation;
+    currentPlatform = 'email';
+    currentCustomerName = customerName;
     
     // 生成完整的Titan.email界面HTML
     const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate);
