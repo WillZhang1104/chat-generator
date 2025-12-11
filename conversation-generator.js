@@ -1793,9 +1793,18 @@ function generateEmailConversation(customerName, purposeDetails, conversationSce
         }
         const emailBody = generateInitialEmailByStyle(customerName, purposeDetails, customerGreeting, style, variant, seed);
         
+        // 多样化的邮件主题
+        const subjects = [
+            'Re: Account Opening Inquiry - USD to USDT',
+            'Re: USD to USDT Account Opening',
+            'Re: Account Opening Request',
+            'Re: Onboarding Information',
+            'Re: Account Application Details'
+        ];
+        
         emails.push({
             sender: 'customer',
-            subject: 'Re: Account Opening Inquiry - USD to USDT',
+            subject: seededChoice(subjects, seed, variant),
             body: emailBody,
             date: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000) // 2天前
         });
