@@ -67,7 +67,7 @@ echo "4. 点击 'Save'"
 echo "5. 等待几分钟后，访问：https://${GITHUB_USERNAME}.github.io/${REPO_NAME}/"
 echo ""
 echo "🔐 密码保护："
-echo "  默认密码: geoswift2024"
+echo "  访问密码: hifi123@"
 echo "  如需修改，请编辑 index.html 中的 ACCESS_PASSWORD 变量"
 echo ""
 
