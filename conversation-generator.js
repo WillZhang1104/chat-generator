@@ -2372,16 +2372,98 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     // 生成邮件格式的对话
     const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting);
     
+    // 将邮件转换为对话格式，用于编辑功能
+    const conversationMessages = emails.map(email => ({
+        sender: email.sender,
+        text: email.body,
+        time: formatTime(email.date, email.date.getHours(), email.date.getMinutes())
+    }));
+    
     // 保存当前对话和平台，用于编辑功能
-    currentConversation = conversation;
+    currentConversation = conversationMessages;
     currentPlatform = 'email';
     currentCustomerName = customerName;
     
-    // 生成完整的Titan.email界面HTML
-    const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate);
+    // 保存邮件数据，用于后续生成HTML
+    window.pendingEmailData = {
+        emails: emails,
+        customerName: customerName,
+        senderEmail: senderEmail,
+        recipientEmail: recipientEmail,
+        conversationScene: conversationScene,
+        emailDate: emailDate
+    };
+    
+    // 显示可编辑的邮件正文文本框
+    const emailEditArea = document.getElementById('emailEditArea');
+    const emailBodyTextarea = document.getElementById('emailBodyTextarea');
+    
+    if (emailEditArea && emailBodyTextarea && emails.length > 0) {
+        // 显示邮件正文（通常是客户的第一封邮件）
+        emailBodyTextarea.value = emails[0].body;
+        emailEditArea.style.display = 'block';
+        
+        // 滚动到编辑区域
+        emailEditArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        // 如果找不到编辑区域，直接生成HTML（向后兼容）
+        const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate);
+        displayEmailHTMLDownload(html, customerName);
+    }
+}
+
+// 确认邮件内容并生成HTML
+function confirmEmailAndGenerateHTML() {
+    if (!window.pendingEmailData) {
+        alert('没有待生成的邮件数据');
+        return;
+    }
+    
+    const emailBodyTextarea = document.getElementById('emailBodyTextarea');
+    if (!emailBodyTextarea) {
+        alert('找不到邮件编辑框');
+        return;
+    }
+    
+    const editedBody = emailBodyTextarea.value.trim();
+    if (!editedBody) {
+        alert('邮件正文不能为空');
+        return;
+    }
+    
+    // 更新邮件正文
+    window.pendingEmailData.emails[0].body = editedBody;
+    
+    // 生成HTML
+    const html = generateTitanEmailHTML(
+        window.pendingEmailData.emails,
+        window.pendingEmailData.customerName,
+        window.pendingEmailData.senderEmail,
+        window.pendingEmailData.recipientEmail,
+        window.pendingEmailData.conversationScene,
+        window.pendingEmailData.emailDate
+    );
     
     // 显示下载按钮
-    displayEmailHTMLDownload(html, customerName);
+    displayEmailHTMLDownload(html, window.pendingEmailData.customerName);
+    
+    // 隐藏编辑区域
+    const emailEditArea = document.getElementById('emailEditArea');
+    if (emailEditArea) {
+        emailEditArea.style.display = 'none';
+    }
+    
+    // 清理临时数据
+    window.pendingEmailData = null;
+}
+
+// 取消邮件编辑
+function cancelEmailEdit() {
+    const emailEditArea = document.getElementById('emailEditArea');
+    if (emailEditArea) {
+        emailEditArea.style.display = 'none';
+    }
+    window.pendingEmailData = null;
 }
 
 // 生成Titan.email界面HTML
