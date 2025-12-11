@@ -532,16 +532,12 @@
 
         // 页面加载时检查
         window.addEventListener('DOMContentLoaded', function() {
-            // 显示最后更新时间
+            // 显示最后更新时间（固定时间，记录页面最后更新的时间）
             const lastUpdateTime = document.getElementById('lastUpdateTime');
             if (lastUpdateTime) {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                lastUpdateTime.textContent = `${year}-${month}-${day} ${hours}:${minutes}`;
+                // 设置固定的最后更新时间：2025-01-XX XX:XX（根据实际更新时间修改）
+                const updateDate = '2025-01-15 15:30'; // 修改这里的时间来更新显示
+                lastUpdateTime.textContent = updateDate;
             }
             
             if (!checkAuth()) {

@@ -612,7 +612,7 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
         });
         messages.push({
             sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding.html`,
+            text: `https://wsdglobalpay.com/onboarding`,
             time: formatTime(day2, 10, 21)
         });
     } else {
@@ -732,7 +732,7 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
         });
         messages.push({
             sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding.html`,
+            text: `https://wsdglobalpay.com/onboarding`,
             time: formatTime(day2, 14, 23)
         });
     } else {
@@ -849,7 +849,7 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
         });
         messages.push({
             sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding.html`,
+            text: `https://wsdglobalpay.com/onboarding`,
             time: formatTime(day2, 13, 34)
         });
     } else {
@@ -936,7 +936,7 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
         });
         messages.push({
             sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding.html`,
+            text: `https://wsdglobalpay.com/onboarding`,
             time: formatTime(day2, 9, 16)
         });
     } else {
@@ -1071,7 +1071,7 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
         });
         messages.push({
             sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding.html`,
+            text: `https://wsdglobalpay.com/onboarding`,
             time: formatTime(day2, 14, 21)
         });
     } else {
@@ -1182,7 +1182,7 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
         });
         messages.push({
             sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding.html`,
+            text: `https://wsdglobalpay.com/onboarding`,
             time: formatTime(day2, 14, 4)
         });
     } else {
@@ -2729,7 +2729,7 @@ function generateWhatsAppMessageHTML(msg, customerName, index, conversation) {
     let escapedText;
     let linkPreviewHTML = '';
     
-    if (isLinkOnly && urlMatches[0].includes('wsdglobalpay.com/onboarding.html')) {
+    if (isLinkOnly && urlMatches[0].includes('wsdglobalpay.com/onboarding')) {
         // 如果消息只包含链接，生成WhatsApp链接预览HTML
         const url = urlMatches[0];
         const domain = 'wsdglobalpay.com';
@@ -2830,13 +2830,49 @@ function generateTelegramMessageHTML(msg, customerName, index, conversation) {
     const timeParts = parseTime(msg.time);
     const timeDisplay = timeParts.timeOnly; // 如 "17:22"
     
-    // 处理链接：先转义HTML，然后识别URL并转换为链接
-    let escapedText = escapeHtml(msg.text);
+    // 检查消息是否只包含链接（用于生成链接预览）
     const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-    // 将URL替换为链接
-    escapedText = escapedText.replace(urlRegex, (url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${url}</a>`;
-    });
+    const urlMatches = msg.text.match(urlRegex);
+    const isLinkOnly = urlMatches && urlMatches.length === 1 && msg.text.trim() === urlMatches[0].trim();
+    
+    let escapedText;
+    let linkPreviewHTML = '';
+    
+    if (isLinkOnly && urlMatches[0].includes('wsdglobalpay.com/onboarding')) {
+        // 如果消息只包含链接，生成Telegram链接预览HTML
+        const url = urlMatches[0];
+        const domain = 'wsdglobalpay.com';
+        const title = 'Client Onboarding Form - 客户开户申请表';
+        
+        // Telegram链接预览的HTML结构
+        linkPreviewHTML = `
+<div class="link-preview" style="margin-top: 8px; border-radius: 8px; overflow: hidden; background: ${isCustomer ? '#ffffff' : '#e7f3ff'}; border: 1px solid ${isCustomer ? '#e0e0e0' : '#c5d9f0'};">
+    <div style="padding: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+            <div style="width: 48px; height: 48px; border-radius: 8px; background: #0066cc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <div style="color: white; font-weight: bold; font-size: 20px;">WGP</div>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 14px; font-weight: 500; color: #000000; margin-bottom: 4px; line-height: 1.3;">${title}</div>
+                <div style="font-size: 13px; color: #707579; line-height: 1.3;">${domain}</div>
+            </div>
+        </div>
+        <div style="font-size: 13px; color: #707579; word-break: break-all; padding-top: 8px; border-top: 1px solid ${isCustomer ? '#e0e0e0' : '#c5d9f0'};">
+            <a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #3390ec; text-decoration: none;">${url}</a>
+        </div>
+    </div>
+</div>`;
+        
+        // 如果只包含链接，不显示链接文本，只显示预览
+        escapedText = '';
+    } else {
+        // 处理包含文本和链接的消息
+        escapedText = escapeHtml(msg.text);
+        // 将URL替换为链接
+        escapedText = escapedText.replace(urlRegex, (url) => {
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${url}</a>`;
+        });
+    }
     
     // 生成唯一的filter ID，避免重复
     const filterId = `messageAppendix${messageId}`;
@@ -2848,7 +2884,8 @@ function generateTelegramMessageHTML(msg, customerName, index, conversation) {
     if (!isCustomer) {
         const appendixHtml = showAppendix ? `<svg width="9" height="20" class="svg-appendix"><defs><filter x="-50%" y="-14.7%" width="200%" height="141.2%" filterUnits="objectBoundingBox" id="${filterId}"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur><feColorMatrix values="0 0 0 0 0.0621962482 0 0 0 0 0.138574144 0 0 0 0 0.185037364 0 0 0 0.15 0" in="shadowBlurOuter1"></feColorMatrix></filter></defs><g fill="none" fill-rule="evenodd"><path d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z" fill="#000" filter="url(#${filterId})"></path><path d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z" fill="#EEFFDE" class="corner"></path></g></svg>` : '';
         const hasAppendixClass = showAppendix ? 'has-appendix' : '';
-        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta with-outgoing-icon" dir="auto">${escapedText}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span><div class="MessageOutgoingStatus"><div class="Transition"><div class="Transition_slide Transition_slide-active"><i class="icon icon-message-read" aria-hidden="true"></i></div></div></div></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
+        const messageContent = isLinkOnly && linkPreviewHTML ? linkPreviewHTML : escapedText;
+        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta with-outgoing-icon" dir="auto">${messageContent}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span><div class="MessageOutgoingStatus"><div class="Transition"><div class="Transition_slide Transition_slide-active"><i class="icon icon-message-read" aria-hidden="true"></i></div></div></div></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
     } else {
         // 客户消息的HTML结构（没有own类，没有MessageOutgoingStatus，尾巴在左边）
         const filterIdIn = `messageAppendixIn${messageId}`;
@@ -2856,7 +2893,8 @@ function generateTelegramMessageHTML(msg, customerName, index, conversation) {
         // 真实路径：M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z
         const appendixHtml = showAppendix ? `<svg width="9" height="20" class="svg-appendix"><defs><filter x="-50%" y="-14.7%" width="200%" height="141.2%" filterUnits="objectBoundingBox" id="${filterIdIn}"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur><feColorMatrix values="0 0 0 0 0.0621962482 0 0 0 0 0.138574144 0 0 0 0 0.185037364 0 0 0 0.15 0" in="shadowBlurOuter1"></feColorMatrix></filter></defs><g fill="none" fill-rule="evenodd"><path d="M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z" fill="#000" filter="url(#${filterIdIn})"></path><path d="M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z" fill="#FFF" class="corner"></path></g></svg>` : '';
         const hasAppendixClass = showAppendix ? 'has-appendix' : '';
-        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta" dir="auto">${escapedText}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
+        const messageContent = isLinkOnly && linkPreviewHTML ? linkPreviewHTML : escapedText;
+        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta" dir="auto">${messageContent}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
     }
 }
 
