@@ -1896,42 +1896,50 @@ function generateVerboseInitialEmail(customerName, purposeDetails, customerGreet
     let body = `${customerGreeting}\n\n`;
     body += seededChoice(openingParagraphs, seed, variant * 0) + `\n\n`;
     
-    // 根据变体选择不同的结构
-    if (variant % 3 === 0) {
-        body += `To answer your questions:\n\n`;
-        body += `**Purpose of Transaction:** ${purposeText}\n\n`;
-    } else if (variant % 3 === 1) {
-        body += `Regarding my transaction purpose: ${purposeText}\n\n`;
-    } else {
-        body += `My primary use case is ${purposeText.toLowerCase()}.\n\n`;
-    }
+    // 自然融入目的和背景信息
+    const purposeIntros = [
+        `I'm looking to use your service primarily for ${purposeText.toLowerCase()}.`,
+        `My main goal is ${purposeText.toLowerCase()}, and I think your platform could be a good fit.`,
+        `I need this account mainly for ${purposeText.toLowerCase()}.`,
+        `The primary reason I'm interested is ${purposeText.toLowerCase()}.`
+    ];
+    
+    body += seededChoice(purposeIntros, seed, variant * 1);
     
     if (purposeDetails.some(p => p.main === 'investment')) {
         const investmentDetails = [
-            `I've been investing in crypto for a while now, mostly through Coinbase and Binance. I'm looking to diversify and this account will help me access USDT more efficiently for my investment strategy.`,
-            `I'm an active crypto investor, primarily using platforms like Coinbase and Kraken. This account will streamline my USDT access for investment purposes.`,
-            `I have experience investing in cryptocurrency through various exchanges. This service will help me manage my USDT investments more effectively.`
+            ` I've been investing in crypto for a while now, mostly through Coinbase and Binance. I'm looking to diversify and this account will help me access USDT more efficiently for my investment strategy.`,
+            ` I'm an active crypto investor, primarily using platforms like Coinbase and Kraken. This account will streamline my USDT access for investment purposes.`,
+            ` I have experience investing in cryptocurrency through various exchanges. This service will help me manage my USDT investments more effectively.`
         ];
-        body += seededChoice(investmentDetails, seed, variant * 1) + `\n\n`;
-    }
-    if (purposeDetails.some(p => p.main === 'payment')) {
+        body += seededChoice(investmentDetails, seed, variant * 2) + `\n\n`;
+    } else if (purposeDetails.some(p => p.main === 'payment')) {
         const paymentDetails = [
-            `I regularly need to pay suppliers in Asia - mainly China and Singapore. USDT transactions are faster and cheaper than traditional wire transfers, which is why I'm interested in your service.`,
-            `I frequently make payments to business partners in Southeast Asia. USDT offers faster settlement and lower fees compared to traditional banking.`,
-            `I need to pay suppliers across Asia regularly. USDT provides a more efficient payment method than conventional wire transfers.`
+            ` I regularly need to pay suppliers in Asia - mainly China and Singapore. USDT transactions are faster and cheaper than traditional wire transfers, which is why I'm interested in your service.`,
+            ` I frequently make payments to business partners in Southeast Asia. USDT offers faster settlement and lower fees compared to traditional banking.`,
+            ` I need to pay suppliers across Asia regularly. USDT provides a more efficient payment method than conventional wire transfers.`
         ];
         body += seededChoice(paymentDetails, seed, variant * 2) + `\n\n`;
+    } else {
+        body += `\n\n`;
     }
     
-    body += `**Source of Funds:** ` + seededChoice(fundSources, seed, variant * 3) + `\n\n`;
-    body += `**Transaction Details:** ` + seededChoice(transactionDetails, seed, variant * 4) + `\n\n`;
+    // 自然地融入资金来源和交易细节
+    const naturalFlow = [
+        seededChoice(fundSources, seed, variant * 3) + ` ` + seededChoice(transactionDetails, seed, variant * 4),
+        seededChoice(transactionDetails, seed, variant * 4) + ` ` + seededChoice(fundSources, seed, variant * 3),
+        `As for the funds, ` + seededChoice(fundSources, seed, variant * 3).toLowerCase() + ` ` + seededChoice(transactionDetails, seed, variant * 4),
+        seededChoice(fundSources, seed, variant * 3) + ` In terms of transaction volume, ` + seededChoice(transactionDetails, seed, variant * 4).toLowerCase()
+    ];
     
-    // 使用变体系统选择不同的问题
+    body += seededChoice(naturalFlow, seed, variant * 5) + `\n\n`;
+    
+    // 使用变体系统选择不同的问题，自然地融入
     const questions = [
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 5),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 5 + 1),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 5 + 2),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 5 + 3)
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 6),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 6 + 1),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 6 + 2),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 6 + 3)
     ];
     
     const questionIntros = [
@@ -1942,7 +1950,7 @@ function generateVerboseInitialEmail(customerName, purposeDetails, customerGreet
         `I'd appreciate answers to these questions:`
     ];
     
-    body += seededChoice(questionIntros, seed, variant * 6) + `\n\n`;
+    body += seededChoice(questionIntros, seed, variant * 7) + `\n\n`;
     questions.forEach((q, i) => {
         body += `- ${q}\n`;
     });
@@ -1975,11 +1983,26 @@ function generateVerboseInitialEmail(customerName, purposeDetails, customerGreet
 function generateConciseInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0) {
     const purposeText = buildPurposeText(purposeDetails);
     
+    const openings = [
+        `Thanks for reaching out. I need this for ${purposeText.toLowerCase()}.`,
+        `Got your email. I'm looking to use your service for ${purposeText.toLowerCase()}.`,
+        `Hi, I'm interested in ${purposeText.toLowerCase()}.`
+    ];
+    
+    const fundInfo = [
+        `The funds are from my personal savings.`,
+        `Money comes from my savings account.`,
+        `I'll be using my personal savings.`
+    ];
+    
+    const volumeInfo = [
+        `I'm planning to do around $150k-$250k annually, monthly transactions.`,
+        `Expecting to process maybe $150k-$250k per year, monthly.`,
+        `Volume should be around $150k-$250k annually, monthly basis.`
+    ];
+    
     let body = `${customerGreeting}\n\n`;
-    body += `Per your request:\n\n`;
-    body += `- Purpose: ${purposeText}\n`;
-    body += `- Funds from personal savings\n`;
-    body += `- Expected volume: ~$150k-$250k annually\n\n`;
+    body += seededChoice(openings, seed, variant) + ` ` + seededChoice(fundInfo, seed, variant + 1) + ` ` + seededChoice(volumeInfo, seed, variant + 2) + `\n\n`;
     body += `Quick question - what are your transaction fees and processing times?\n\n`;
     body += `Onboarding form submitted.\n\n`;
     body += `Thanks,\n${customerName}`;
@@ -1991,14 +2014,16 @@ function generateConciseInitialEmail(customerName, purposeDetails, customerGreet
 function generateCautiousInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0) {
     const purposeText = buildPurposeText(purposeDetails);
     
+    const openings = [
+        `Thank you for your email. I understand you need information for compliance purposes.`,
+        `I appreciate your email requesting compliance information.`,
+        `Thank you for reaching out. I'm happy to provide the necessary information.`
+    ];
+    
     let body = `${customerGreeting}\n\n`;
-    body += `Thank you for your email. I understand you need information for compliance purposes. Below are the details:\n\n`;
+    body += seededChoice(openings, seed, variant) + `\n\n`;
     
-    body += `**Transaction Purpose:** ${purposeText}\n\n`;
-    
-    body += `**Source of Funds:** Funds originate from my personal savings accumulated over years of employment. I maintain accounts with established financial institutions and all funds are legally obtained.\n\n`;
-    
-    body += `**Transaction Pattern:** I anticipate monthly transactions ranging from $20,000 to $45,000. Annual volume estimated at $200,000 to $300,000.\n\n`;
+    body += `I'm looking to use your service primarily for ${purposeText.toLowerCase()}. The funds I'll be using originate from my personal savings accumulated over years of employment. I maintain accounts with established financial institutions and all funds are legally obtained. I anticipate conducting monthly transactions ranging from $20,000 to $45,000, with an estimated annual volume of $200,000 to $300,000.\n\n`;
     
     body += `Before proceeding, I would like to understand:\n\n`;
     body += `- What are your security protocols and insurance coverage?\n`;
@@ -2017,10 +2042,7 @@ function generateUrgentInitialEmail(customerName, purposeDetails, customerGreeti
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `Quick answers to your questions:\n\n`;
-    body += `- Purpose: ${purposeText}\n`;
-    body += `- Funds from my business/savings\n`;
-    body += `- Need to process $20k-$50k monthly\n\n`;
+    body += `I need this for ${purposeText.toLowerCase()}. The funds are from my business and personal savings. I'm looking to process around $20k-$50k monthly.\n\n`;
     body += `What are your fees and how fast can transactions go through? I need to get started ASAP.\n\n`;
     body += `Form is submitted. How quickly can we get approved?\n\n`;
     body += `Thanks,\n${customerName}`;
@@ -2035,16 +2057,13 @@ function generateFriendlyInitialEmail(customerName, purposeDetails, customerGree
     let body = `${customerGreeting}\n\n`;
     body += `Thanks for your email! Happy to provide the information you need.\n\n`;
     
-    body += `To answer your questions:\n\n`;
-    body += `**Purpose:** ${purposeText}\n\n`;
+    body += `I'm looking to use your service for ${purposeText.toLowerCase()}.`;
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        body += `I've been investing in crypto for a few years now - mostly on Coinbase and Binance. Looking to expand my options and your service seems like a good fit.\n\n`;
+        body += ` I've been investing in crypto for a few years now - mostly on Coinbase and Binance. Looking to expand my options and your service seems like a good fit.`;
     }
     
-    body += `**Source of Funds:** The money comes from my personal savings. I've been working for a while and have been building up my savings over the years.\n\n`;
-    
-    body += `**Transaction Info:** I'm planning to do transactions monthly, probably around $15k-$35k each time. So maybe $200k-$300k per year total.\n\n`;
+    body += ` The money comes from my personal savings - I've been working for a while and have been building up my savings over the years. I'm planning to do transactions monthly, probably around $15k-$35k each time, so maybe $200k-$300k per year total.\n\n`;
     
     body += `I'm curious about a few things:\n\n`;
     body += `- What are your transaction fees like? I want to make sure it's cost-effective.\n`;
@@ -2063,13 +2082,9 @@ function generateProfessionalInitialEmail(customerName, purposeDetails, customer
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `Thank you for your email. Please find below the requested information:\n\n`;
+    body += `Thank you for your email. Please find below the requested information.\n\n`;
     
-    body += `**Purpose of Transaction:** ${purposeText}\n\n`;
-    
-    body += `**Source of Funds:** Funds are derived from personal savings and business operations. All sources are legitimate and properly documented.\n\n`;
-    
-    body += `**Transaction Parameters:** Expected transaction frequency: monthly. Transaction size: $20,000-$40,000 per transaction. Estimated annual volume: $200,000-$300,000.\n\n`;
+    body += `I'm seeking to use your service for ${purposeText.toLowerCase()}. The funds are derived from personal savings and business operations, all of which are legitimate and properly documented. I expect to conduct transactions on a monthly basis, with transaction sizes ranging from $20,000 to $40,000 per transaction, resulting in an estimated annual volume of $200,000 to $300,000.\n\n`;
     
     body += `I would appreciate clarification on the following:\n\n`;
     body += `- Transaction fee structure and any applicable charges\n`;
@@ -2090,18 +2105,16 @@ function generateDetailedInitialEmail(customerName, purposeDetails, customerGree
     let body = `${customerGreeting}\n\n`;
     body += `Thank you for your email. I'm providing detailed information regarding my account opening inquiry.\n\n`;
     
-    body += `**Purpose of Transaction:**\n${purposeText}\n\n`;
+    body += `I'm looking to use your service for ${purposeText.toLowerCase()}.`;
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        body += `I've been actively investing in cryptocurrency for the past 3-4 years. I started with Coinbase and later expanded to Binance and Kraken. I'm looking to diversify my portfolio and your platform seems like a good option for accessing USDT efficiently.\n\n`;
+        body += ` I've been actively investing in cryptocurrency for the past 3-4 years. I started with Coinbase and later expanded to Binance and Kraken. I'm looking to diversify my portfolio and your platform seems like a good option for accessing USDT efficiently.`;
     }
     if (purposeDetails.some(p => p.main === 'payment')) {
-        body += `I run a business that requires regular payments to suppliers across Asia, particularly in China, Singapore, and Vietnam. Traditional wire transfers are slow and expensive, so I'm exploring crypto payment solutions.\n\n`;
+        body += ` I run a business that requires regular payments to suppliers across Asia, particularly in China, Singapore, and Vietnam. Traditional wire transfers are slow and expensive, so I'm exploring crypto payment solutions.`;
     }
     
-    body += `**Source of Funds:**\nThe funds originate from my personal savings accumulated over 8+ years of employment in the technology sector. I also have business income from my consulting practice. All funds are properly documented and maintained in accounts with major financial institutions.\n\n`;
-    
-    body += `**Transaction Details:**\nI anticipate making 8-12 transactions per year, with each transaction typically ranging from $25,000 to $50,000. My estimated annual volume would be approximately $250,000 to $400,000.\n\n`;
+    body += ` The funds originate from my personal savings accumulated over 8+ years of employment in the technology sector. I also have business income from my consulting practice. All funds are properly documented and maintained in accounts with major financial institutions. I anticipate making 8-12 transactions per year, with each transaction typically ranging from $25,000 to $50,000, resulting in an estimated annual volume of approximately $250,000 to $400,000.\n\n`;
     
     body += `I have several questions about your platform:\n\n`;
     body += `- What is your fee structure? Are there different rates for different transaction sizes?\n`;
@@ -2122,13 +2135,9 @@ function generateCasualInitialEmail(customerName, purposeDetails, customerGreeti
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `Thanks for reaching out! Here's the info you asked for:\n\n`;
+    body += `Thanks for reaching out! Here's the info you asked for.\n\n`;
     
-    body += `**Purpose:** ${purposeText}\n\n`;
-    
-    body += `**Where the money's from:** My savings mostly. I've been working for a while and have some money set aside. Also have some business income.\n\n`;
-    
-    body += `**How much I'll be using:** Probably around $20k-$40k per transaction, maybe once or twice a month. So probably $200k-$300k per year total.\n\n`;
+    body += `I'm looking to use your service for ${purposeText.toLowerCase()}. The money's from my savings mostly - I've been working for a while and have some money set aside. Also have some business income. I'm probably looking at around $20k-$40k per transaction, maybe once or twice a month, so probably $200k-$300k per year total.\n\n`;
     
     body += `A few quick questions:\n\n`;
     body += `- What are your fees? Trying to keep costs down.\n`;
@@ -2147,13 +2156,9 @@ function generateFormalInitialEmail(customerName, purposeDetails, customerGreeti
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `I am writing in response to your email dated [date] regarding my account opening inquiry. Please find the requested information below.\n\n`;
+    body += `I am writing in response to your email regarding my account opening inquiry. Please find the requested information below.\n\n`;
     
-    body += `**Transaction Purpose:**\n${purposeText}\n\n`;
-    
-    body += `**Source of Funds:**\nThe funds are derived from personal savings accumulated through years of employment and business operations. All financial activities are conducted through established banking institutions and are fully documented.\n\n`;
-    
-    body += `**Anticipated Transaction Volume:**\nI expect to conduct transactions on a monthly basis, with individual transaction amounts ranging from $25,000 to $45,000. The projected annual volume is approximately $250,000 to $350,000.\n\n`;
+    body += `I am seeking to utilize your service for ${purposeText.toLowerCase()}. The funds are derived from personal savings accumulated through years of employment and business operations. All financial activities are conducted through established banking institutions and are fully documented. I expect to conduct transactions on a monthly basis, with individual transaction amounts ranging from $25,000 to $45,000, resulting in a projected annual volume of approximately $250,000 to $350,000.\n\n`;
     
     body += `I would be grateful if you could provide information regarding:\n\n`;
     body += `- Fee structure and applicable charges\n`;
@@ -2175,11 +2180,7 @@ function generateInquisitiveInitialEmail(customerName, purposeDetails, customerG
     let body = `${customerGreeting}\n\n`;
     body += `Thanks for your email! I'm happy to provide the information you need.\n\n`;
     
-    body += `**Purpose:** ${purposeText}\n\n`;
-    
-    body += `**Source of Funds:** The funds come from my personal savings and business income. Everything is properly documented.\n\n`;
-    
-    body += `**Transaction Plans:** I'm thinking of doing transactions monthly, probably around $20k-$40k each time. Annual volume would be maybe $250k-$350k.\n\n`;
+    body += `I'm looking to use your service for ${purposeText.toLowerCase()}. The funds come from my personal savings and business income - everything is properly documented. I'm thinking of doing transactions monthly, probably around $20k-$40k each time, so annual volume would be maybe $250k-$350k.\n\n`;
     
     body += `I have quite a few questions about your platform - hope that's okay:\n\n`;
     body += `- What are your transaction fees? Is it a flat rate or percentage-based?\n`;
@@ -2202,11 +2203,9 @@ function generateStraightforwardInitialEmail(customerName, purposeDetails, custo
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `Here's the information you requested:\n\n`;
+    body += `Here's the information you requested.\n\n`;
     
-    body += `**Purpose:** ${purposeText}\n`;
-    body += `**Source:** Personal savings and business income\n`;
-    body += `**Volume:** $20k-$40k per transaction, monthly, ~$250k-$300k annually\n\n`;
+    body += `I need this for ${purposeText.toLowerCase()}. Funds are from personal savings and business income. I'm planning $20k-$40k per transaction, monthly, so around $250k-$300k annually.\n\n`;
     
     body += `Questions:\n`;
     body += `- Fees?\n`;
@@ -2227,18 +2226,16 @@ function generateElaborateInitialEmail(customerName, purposeDetails, customerGre
     let body = `${customerGreeting}\n\n`;
     body += `Thank you for your email. I appreciate the opportunity to provide detailed information regarding my account opening inquiry.\n\n`;
     
-    body += `**Purpose of Transaction:**\n${purposeText}\n\n`;
+    body += `I'm seeking to use your service for ${purposeText.toLowerCase()}.`;
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        body += `I have been actively engaged in cryptocurrency investments for several years. My investment journey began with traditional platforms such as Coinbase, where I initially started with small amounts to familiarize myself with the market. Over time, I expanded to Binance and Kraken, gradually increasing my investment portfolio. I'm now looking to diversify further and your platform appears to offer competitive rates and reliable service for USD to USDT conversions.\n\n`;
+        body += ` I have been actively engaged in cryptocurrency investments for several years. My investment journey began with traditional platforms such as Coinbase, where I initially started with small amounts to familiarize myself with the market. Over time, I expanded to Binance and Kraken, gradually increasing my investment portfolio. I'm now looking to diversify further and your platform appears to offer competitive rates and reliable service for USD to USDT conversions.`;
     }
     if (purposeDetails.some(p => p.main === 'payment')) {
-        body += `My business requires frequent international payments to suppliers located primarily in Asia. We have established relationships with vendors in China, Singapore, Malaysia, and Vietnam. Traditional banking methods, while secure, often involve significant delays and high fees. Cryptocurrency payments offer a more efficient alternative, and USDT has become widely accepted by our suppliers.\n\n`;
+        body += ` My business requires frequent international payments to suppliers located primarily in Asia. We have established relationships with vendors in China, Singapore, Malaysia, and Vietnam. Traditional banking methods, while secure, often involve significant delays and high fees. Cryptocurrency payments offer a more efficient alternative, and USDT has become widely accepted by our suppliers.`;
     }
     
-    body += `**Source of Funds:**\nThe funds I intend to use originate from multiple legitimate sources. Primarily, they come from personal savings accumulated over my 10+ year career in the technology sector. I have been consistently saving a portion of my income and have built a substantial savings account. Additionally, I operate a small consulting business on the side, which generates additional income. All funds are maintained in accounts with reputable financial institutions, including Chase Bank and Bank of America, and are fully documented.\n\n`;
-    
-    body += `**Transaction Details:**\nBased on my business needs and investment strategy, I anticipate conducting transactions on a regular monthly basis. Each transaction is expected to range from $25,000 to $50,000, depending on market conditions and specific requirements. Over the course of a year, I estimate the total volume to be approximately $300,000 to $450,000.\n\n`;
+    body += ` The funds I intend to use originate from multiple legitimate sources. Primarily, they come from personal savings accumulated over my 10+ year career in the technology sector. I have been consistently saving a portion of my income and have built a substantial savings account. Additionally, I operate a small consulting business on the side, which generates additional income. All funds are maintained in accounts with reputable financial institutions, including Chase Bank and Bank of America, and are fully documented. Based on my business needs and investment strategy, I anticipate conducting transactions on a regular monthly basis. Each transaction is expected to range from $25,000 to $50,000, depending on market conditions and specific requirements. Over the course of a year, I estimate the total volume to be approximately $300,000 to $450,000.\n\n`;
     
     body += `I would like to understand more about your platform before proceeding:\n\n`;
     body += `- **Fee Structure:** What are your transaction fees? Are they fixed or percentage-based? Are there any discounts for higher volume transactions?\n`;
