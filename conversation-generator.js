@@ -1739,6 +1739,12 @@ function displayConversation(messages) {
     currentPlatform = platform;
     currentCustomerName = document.getElementById('customerName').value;
 
+    // 如果是邮件平台，显示HTML预览而不是对话气泡
+    if (platform === 'email') {
+        // 邮件预览会在 generateEmailHTML 中处理
+        return;
+    }
+
     messages.forEach(msg => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${msg.sender}`;
@@ -2394,6 +2400,24 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
         emailDate: emailDate
     };
     
+    // 生成HTML预览
+    const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate);
+    
+    // 在预览区域显示HTML邮件界面
+    const preview = document.getElementById('conversationPreview');
+    if (preview) {
+        // 创建一个iframe来显示HTML邮件
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.height = '600px';
+        iframe.style.border = '1px solid #ddd';
+        iframe.style.borderRadius = '8px';
+        iframe.style.backgroundColor = '#fff';
+        iframe.srcdoc = html;
+        preview.innerHTML = '';
+        preview.appendChild(iframe);
+    }
+    
     // 显示可编辑的邮件正文文本框
     const emailEditArea = document.getElementById('emailEditArea');
     const emailBodyTextarea = document.getElementById('emailBodyTextarea');
@@ -2405,10 +2429,6 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
         
         // 滚动到编辑区域
         emailEditArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        // 如果找不到编辑区域，直接生成HTML（向后兼容）
-        const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate);
-        displayEmailHTMLDownload(html, customerName);
     }
 }
 
@@ -2443,6 +2463,20 @@ function confirmEmailAndGenerateHTML() {
         window.pendingEmailData.conversationScene,
         window.pendingEmailData.emailDate
     );
+    
+    // 更新预览区域的HTML
+    const preview = document.getElementById('conversationPreview');
+    if (preview) {
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.height = '600px';
+        iframe.style.border = '1px solid #ddd';
+        iframe.style.borderRadius = '8px';
+        iframe.style.backgroundColor = '#fff';
+        iframe.srcdoc = html;
+        preview.innerHTML = '';
+        preview.appendChild(iframe);
+    }
     
     // 显示下载按钮
     displayEmailHTMLDownload(html, window.pendingEmailData.customerName);
