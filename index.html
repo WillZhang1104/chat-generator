@@ -450,6 +450,15 @@
                 <div id="editableMessages"></div>
                 <button id="addMessageBtn" class="btn" style="background: #17a2b8; margin-top: 10px; font-size: 14px; padding: 8px 15px;">+ 添加消息</button>
             </div>
+            <div id="emailEditArea" style="display: none; background: #f0f8ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #007bff;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; color: #007bff;">📧 编辑邮件内容</h3>
+                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">请在下方编辑邮件正文，确认无误后点击"确认并生成HTML"按钮。</p>
+                <textarea id="emailBodyTextarea" style="width: 100%; min-height: 300px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical;"></textarea>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button id="confirmEmailBtn" class="btn" style="background: #28a745; padding: 10px 20px; font-size: 16px;">✅ 确认并生成HTML</button>
+                    <button id="cancelEmailEditBtn" class="btn btn-secondary" style="margin-left: 10px; padding: 10px 20px;">❌ 取消</button>
+                </div>
+            </div>
             <div class="conversation-preview" id="conversationPreview"></div>
             
             <div class="instructions" id="instructionsContent">
