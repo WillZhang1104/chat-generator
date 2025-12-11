@@ -3636,11 +3636,13 @@ function showEditableConversation(conversation) {
         headerDiv.style.display = 'flex';
         headerDiv.style.alignItems = 'center';
         headerDiv.style.gap = '10px';
+        headerDiv.style.flexWrap = 'wrap';
         
         const senderLabel = document.createElement('label');
         senderLabel.textContent = `发送者 (${index + 1}): `;
         senderLabel.style.fontWeight = 'bold';
         senderLabel.style.marginRight = '5px';
+        senderLabel.style.flex = '0 0 auto';
         
         const senderSelect = document.createElement('select');
         senderSelect.className = 'editable-msg-sender';
@@ -3649,6 +3651,7 @@ function showEditableConversation(conversation) {
         senderSelect.style.borderRadius = '3px';
         senderSelect.style.border = '1px solid #ccc';
         senderSelect.style.flex = '0 0 auto';
+        senderSelect.style.minWidth = '80px';
         
         const option1 = document.createElement('option');
         option1.value = 'customer';
@@ -3664,22 +3667,31 @@ function showEditableConversation(conversation) {
         senderSelect.appendChild(option2);
         
         const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '删除';
+        deleteBtn.textContent = '🗑️ 删除';
         deleteBtn.type = 'button';
         deleteBtn.className = 'delete-message-btn';
         deleteBtn.setAttribute('data-index', index);
-        deleteBtn.style.padding = '5px 10px';
+        deleteBtn.style.padding = '6px 12px';
         deleteBtn.style.backgroundColor = '#ff4444';
         deleteBtn.style.color = 'white';
         deleteBtn.style.border = 'none';
         deleteBtn.style.borderRadius = '3px';
         deleteBtn.style.cursor = 'pointer';
         deleteBtn.style.flex = '0 0 auto';
-        deleteBtn.onclick = function() {
+        deleteBtn.style.fontSize = '13px';
+        deleteBtn.style.fontWeight = 'bold';
+        deleteBtn.style.marginLeft = 'auto';
+        deleteBtn.style.display = 'inline-block';
+        deleteBtn.style.visibility = 'visible';
+        deleteBtn.style.opacity = '1';
+        deleteBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             if (confirm('确定要删除这条消息吗？')) {
                 conversation.splice(index, 1);
                 showEditableConversation(conversation);
             }
+            return false;
         };
         
         headerDiv.appendChild(senderLabel);
