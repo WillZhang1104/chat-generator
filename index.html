@@ -532,6 +532,18 @@
 
         // 页面加载时检查
         window.addEventListener('DOMContentLoaded', function() {
+            // 显示最后更新时间
+            const lastUpdateTime = document.getElementById('lastUpdateTime');
+            if (lastUpdateTime) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                lastUpdateTime.textContent = `${year}-${month}-${day} ${hours}:${minutes}`;
+            }
+            
             if (!checkAuth()) {
                 document.getElementById('passwordInput').focus();
                 // 支持回车键提交
