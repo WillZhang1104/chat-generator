@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天记录生成器</title>
+    <style>
+        /* 密码保护界面样式 */
+        #passwordProtection {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .password-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .password-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .password-container input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .password-container button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .password-container button:hover {
+            opacity: 0.9;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .tool-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .preview-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .preview-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .conversation-preview {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.customer {
+            align-items: flex-start;
+        }
+
+        .message.company {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .message.customer .message-bubble {
+            background: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.company .message-bubble {
+            background: #667eea;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            font-size: 12px;
+            padding: 8px 15px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tool-title">
+            <h1>聊天记录生成器</h1>
+            <p class="subtitle">根据客户信息生成合规的WhatsApp/Telegram/邮件对话记录</p>
+        </div>
+
+        <form id="conversationForm">
+            <div class="form-group">
+                <label for="customerName">客户名称 *</label>
+                <input type="text" id="customerName" name="customerName" required placeholder="例如：John Smith">
+            </div>
+
+            <div class="form-group" id="purposeGroup">
+                <label>交易目的 <span id="purposeRequired">*</span> (可多选)</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="purpose_investment" name="transactionPurpose" value="investment">
+                        <label for="purpose_investment" style="margin: 0; font-weight: normal;">投资</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="purpose_payment" name="transactionPurpose" value="payment">
+                        <label for="purpose_payment" style="margin: 0; font-weight: normal;">支付货款</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="purpose_remittance" name="transactionPurpose" value="remittance">
+                        <label for="purpose_remittance" style="margin: 0; font-weight: normal;">汇款</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="purpose_trading" name="transactionPurpose" value="trading">
+                        <label for="purpose_trading" style="margin: 0; font-weight: normal;">交易</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="purpose_other" name="transactionPurpose" value="other">
+                        <label for="purpose_other" style="margin: 0; font-weight: normal;">其他</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" id="customPurposeGroup" style="display: none;">
+                <label for="customPurpose">自定义交易目的</label>
+                <input type="text" id="customPurpose" name="customPurpose" placeholder="请详细说明交易目的">
+            </div>
+
+            <div class="form-group" id="formMethodGroup">
+                <label>开户表格提交方式 *</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="radio" id="onlineForm" name="formMethod" value="online" checked>
+                        <label for="onlineForm" style="margin: 0; font-weight: normal;">线上填写提交</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="radio" id="pdfEmail" name="formMethod" value="pdf">
+                        <label for="pdfEmail" style="margin: 0; font-weight: normal;">PDF附件发邮件</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="platform">对话平台 *</label>
+                <select id="platform" name="platform" required>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="telegram">Telegram</option>
+                    <option value="email">邮件 (Titan.email)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="emailConfigGroup" style="display: none;">
+                <label for="senderEmail">寄件人邮箱 *</label>
+                <input type="email" id="senderEmail" name="senderEmail" placeholder="例如：123@gmail.com">
+                
+                <label for="recipientEmail" style="margin-top: 15px; display: block;">收件人邮箱 *</label>
+                <input type="email" id="recipientEmail" name="recipientEmail" placeholder="例如：customer@example.com">
+                
+                <label for="customerGreeting" style="margin-top: 15px; display: block;">客户称呼方式 *</label>
+                <input type="text" id="customerGreeting" name="customerGreeting" placeholder="例如：Dear WSP Team 或 Hi Andy">
+                
+                <label for="emailDate" style="margin-top: 15px; display: block;">邮件日期 *</label>
+                <input type="text" id="emailDate" name="emailDate" placeholder="例如：12月9" value="">
+            </div>
+
+            <div class="form-group">
+                <label>对话场景 *</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="radio" id="scene_initial" name="conversationScene" value="initial" checked>
+                        <label for="scene_initial" style="margin: 0; font-weight: normal;">初始接触（开户咨询）</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="radio" id="scene_kyc" name="conversationScene" value="kyc">
+                        <label for="scene_kyc" style="margin: 0; font-weight: normal;">补充材料（KYC加强）</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" id="ageGroup" style="display: none;">
+                <label for="customerAge">客户年龄（补充材料场景）*</label>
+                <input type="number" id="customerAge" name="customerAge" min="60" max="120" placeholder="例如：65">
+            </div>
+
+            <div class="form-group" id="willProvideGroup" style="display: none;">
+                <label>客户是否愿意提供材料 *</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="radio" id="willProvide_yes" name="willProvide" value="yes">
+                        <label for="willProvide_yes" style="margin: 0; font-weight: normal;">愿意提供</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="radio" id="willProvide_no" name="willProvide" value="no">
+                        <label for="willProvide_no" style="margin: 0; font-weight: normal;">不愿意提供</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="additionalInfo">额外信息（可选）</label>
+                <textarea id="additionalInfo" name="additionalInfo" placeholder="可以添加其他需要体现在对话中的信息，例如：客户提到的时间、金额、投资历史、贸易伙伴等"></textarea>
+            </div>
+
+            <button type="submit" class="btn">生成对话</button>
+            <button type="button" class="btn btn-secondary" onclick="clearForm()">清空表单</button>
+        </form>
+
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <h2 class="preview-title">对话预览</h2>
+            <div class="conversation-preview" id="conversationPreview"></div>
+            
+            <div class="instructions" id="instructionsContent">
+                <h3>使用说明：</h3>
+                <div id="whatsappInstructions" style="display: none;">
+                    <ol>
+                        <li>在浏览器中打开 WhatsApp Web（https://web.whatsapp.com）</li>
+                        <li>打开与客户的对话窗口</li>
+                        <li>打开浏览器开发者工具（F12 或 右键 → 检查）</li>
+                        <li>切换到 Elements（元素）标签</li>
+                        <li>找到消息容器，定位到第一条现有消息的 <code>&lt;div class="x1n2onr6"&gt;</code> 元素</li>
+                        <li>右键点击该 div，选择 "Edit as HTML"（编辑为HTML）</li>
+                        <li>在第一条消息之前粘贴下面生成的HTML代码</li>
+                        <li>按 Ctrl+S（Windows）或 Cmd+S（Mac）保存，消息会自动显示</li>
+                    </ol>
+                    <p style="margin-top: 10px; color: #856404;"><strong>提示：</strong>如果找不到元素，可以按 Ctrl+F 搜索 "x1n2onr6" 来定位消息元素。</p>
+                </div>
+                <div id="telegramInstructions" style="display: none;">
+                    <ol>
+                        <li>在浏览器中打开 Telegram Web（https://web.telegram.org）</li>
+                        <li>打开与客户的对话窗口</li>
+                        <li>打开浏览器开发者工具（F12 或 右键 → 检查）</li>
+                        <li>切换到 Elements（元素）标签</li>
+                        <li>找到消息容器，定位到第一条现有消息的 <code>&lt;div class="Message"&gt;</code> 元素</li>
+                        <li>右键点击该 div，选择 "Edit as HTML"（编辑为HTML）</li>
+                        <li>在第一条消息之前粘贴下面生成的HTML代码</li>
+                        <li>按 Ctrl+S（Windows）或 Cmd+S（Mac）保存，消息会自动显示</li>
+                    </ol>
+                    <p style="margin-top: 10px; color: #856404;"><strong>提示：</strong>如果找不到元素，可以按 Ctrl+F 搜索 "Message message-list-item" 来定位消息元素。</p>
+                </div>
+                <div id="emailInstructions" style="display: none;">
+                    <ol>
+                        <li>点击下方"生成并下载HTML文件"按钮</li>
+                        <li>下载的HTML文件会模拟Titan.email界面</li>
+                        <li>在浏览器中打开HTML文件</li>
+                        <li>直接截图使用，或复制HTML内容</li>
+                    </ol>
+                    <p style="margin-top: 10px; color: #856404;"><strong>提示：</strong>生成的HTML文件可以直接在浏览器中打开，看起来就像真实的Titan.email界面。</p>
+                </div>
+            </div>
+
+            <div class="code-block" id="scriptCode"></div>
+            <button class="btn copy-btn" onclick="copyScript()">复制HTML代码</button>
+        </div>
+    </div>
+
+    <!-- 密码保护界面 -->
+    <div id="passwordProtection">
+        <div class="password-container">
+            <h2>🔒 访问密码</h2>
+            <p style="color: #666; margin-bottom: 20px;">请输入访问密码以使用此工具</p>
+            <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="off">
+            <button onclick="checkPassword()">进入</button>
+            <div class="error-message" id="errorMessage">密码错误，请重试</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="conversation-generator.js"></script>
+    <script>
+        // 密码保护功能
+        // 默认密码：请修改此密码
+        const ACCESS_PASSWORD = 'hifi123@';
+        
+        // 检查是否已经通过验证
+        function checkAuth() {
+            const authStatus = sessionStorage.getItem('chatGeneratorAuth');
+            if (authStatus === 'authenticated') {
+                document.getElementById('passwordProtection').style.display = 'none';
+                return true;
+            }
+            return false;
+        }
+
+        // 验证密码
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('errorMessage');
+            
+            if (input === ACCESS_PASSWORD) {
+                sessionStorage.setItem('chatGeneratorAuth', 'authenticated');
+                document.getElementById('passwordProtection').style.display = 'none';
+                errorMsg.classList.remove('show');
+            } else {
+                errorMsg.classList.add('show');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        // 页面加载时检查
+        window.addEventListener('DOMContentLoaded', function() {
+            if (!checkAuth()) {
+                document.getElementById('passwordInput').focus();
+                // 支持回车键提交
+                document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
