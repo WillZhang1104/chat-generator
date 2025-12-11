@@ -2721,82 +2721,36 @@ function generateWhatsAppMessageHTML(msg, customerName, index, conversation) {
     const timeDisplay = timeParts.display; // 如 "上午10:30"
     const timeFull = timeParts.full; // 如 "[上午10:30, 10/15/2025]"
     
-    // 检查消息是否只包含链接（用于生成链接预览）
+    // 处理链接：将URL转换为蓝色可点击链接
     const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-    const urlMatches = msg.text.match(urlRegex);
-    const isLinkOnly = urlMatches && urlMatches.length === 1 && msg.text.trim() === urlMatches[0].trim();
+    const urlPlaceholders = [];
+    let textWithPlaceholders = msg.text;
+    let match;
+    let placeholderIndex = 0;
     
-    let escapedText;
-    let linkPreviewHTML = '';
-    
-    if (isLinkOnly && urlMatches[0].includes('wsdglobalpay.com/onboarding')) {
-        // 如果消息只包含链接，生成WhatsApp链接预览HTML
-        const url = urlMatches[0];
-        const domain = 'wsdglobalpay.com';
-        const title = 'Client Onboarding Form - 客户开户申请表';
-        
-        // WhatsApp链接预览的HTML结构
-        linkPreviewHTML = `
-<div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2 x1n2onr6 x1vqgdyp x1a2a7pz" style="margin-top: 4px;">
-    <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="border-radius: 8px; overflow: hidden; background: ${isCustomer ? '#ffffff' : '#d9fdd3'};">
-        <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="padding: 12px;">
-            <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="margin-bottom: 8px;">
-                <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="align-items: center; gap: 8px;">
-                    <div style="width: 40px; height: 40px; border-radius: 8px; background: #0066cc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <div style="color: white; font-weight: bold; font-size: 18px;">WGP</div>
-                    </div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="font-size: 13px; font-weight: 500; color: #111b21; margin-bottom: 2px; line-height: 1.3;">${title}</div>
-                        <div style="font-size: 12px; color: #667781; line-height: 1.3;">${domain}</div>
-                    </div>
-                </div>
-            </div>
-            <div style="font-size: 12px; color: #667781; word-break: break-all;">${url}</div>
-        </div>
-    </div>
-</div>`;
-        
-        // 如果只包含链接，不显示链接文本，只显示预览
-        escapedText = '';
-    } else {
-        // 处理包含文本和链接的消息
-        const urlPlaceholders = [];
-        let textWithPlaceholders = msg.text;
-        let match;
-        let placeholderIndex = 0;
-        
-        // 用占位符替换所有URL
-        while ((match = urlRegex.exec(msg.text)) !== null) {
-            const url = match[1];
-            const placeholder = `__URL_PLACEHOLDER_${placeholderIndex}__`;
-            urlPlaceholders.push(url);
-            textWithPlaceholders = textWithPlaceholders.replace(url, placeholder);
-            placeholderIndex++;
-        }
-        
-        // 转义HTML
-        escapedText = escapeHtml(textWithPlaceholders);
-        
-        // 将占位符替换回链接（但保持为纯文本，让WhatsApp自动生成预览）
-        urlPlaceholders.forEach((url, index) => {
-            const placeholder = `__URL_PLACEHOLDER_${index}__`;
-            // 不转换为<a>标签，保持为纯文本URL，WhatsApp会自动识别并生成预览
-            escapedText = escapedText.replace(placeholder, escapeHtml(url));
-        });
+    // 用占位符替换所有URL
+    while ((match = urlRegex.exec(msg.text)) !== null) {
+        const url = match[1];
+        const placeholder = `__URL_PLACEHOLDER_${placeholderIndex}__`;
+        urlPlaceholders.push(url);
+        textWithPlaceholders = textWithPlaceholders.replace(url, placeholder);
+        placeholderIndex++;
     }
+    
+    // 转义HTML
+    let escapedText = escapeHtml(textWithPlaceholders);
+    
+    // 将占位符替换为蓝色链接
+    urlPlaceholders.forEach((url, index) => {
+        const placeholder = `__URL_PLACEHOLDER_${index}__`;
+        escapedText = escapedText.replace(placeholder, `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${escapeHtml(url)}</a>`);
+    });
     
     // WhatsApp在不同发送者之间需要添加间距
     // 如果前一条消息的发送者不同，在外层div之前添加一个空div来创建间距
     const spacingDiv = isDifferentSender ? '<div style="height: 8px;"></div>' : '';
     
-    // 如果消息只包含链接，生成链接预览格式的消息
-    if (isLinkOnly && linkPreviewHTML) {
-        let html = `${spacingDiv}<div class="x1n2onr6"><div tabindex="-1" class="" role="row"><div tabindex="-1" class="${className}" data-id="${messageId}"><div class="x78zum5 xdt5ytf" data-virtualized="false"><div class=""><div class="${messageClass} focusable-list-item _amjy _amjz _amjw x1klvx2g xahtqtb"><span class=""></span><div class="_amk4 false _amkd _amk5 false"><span aria-hidden="true" data-icon="${tailIcon}" class="_amk7"><svg viewBox="0 0 8 13" height="13" width="8" preserveAspectRatio="xMidYMid meet" class="" version="1.1" x="0px" y="0px" enable-background="new 0 0 8 13"><title>${tailIcon}</title>${tailPath}</svg></span><div class="_amk6 _amlo false false"><span aria-label="${ariaLabel}"></span><div><div class="x9f619 x1hx0egp x1yrsyyn xizg8k xu9hqtb xwib8y2"><div class="copyable-text" data-pre-plain-text="${timeFull} ${senderName}: "><div class="_akbu x6ikm8r x10wlt62">${linkPreviewHTML}<span class=""><span class="x3nfvp2 xxymvpz xlshs6z xqtp20y xexx8yu x1uc92m x18d9i69 x181vq82 x12lo8hy x152skdk" aria-hidden="true">${isCustomer ? '<span class="x1c4vz4f x2lah0s"></span>' : '<span class="x1c4vz4f x2lah0s xn6xy2s"></span>'}<span class="x1c4vz4f x2lah0s">${timeDisplay}</span></span></span></div></div><div class="x1n2onr6 x1n327nk x18mqm2i xhsvlbd x14z9mp xz62fqu x1wbi8v6"><div class="x1bvqhpb xx3o462 xuxw1ft x78zum5 x6s0dn4 x12lo8hy x152skdk"><span class="x1rg5ohu x16dsc37" dir="auto"><span class="x193iq5w xeuugli x13faqbe x1vvkbs xt0psk2 x1fj9vlw xhslqc4 x1hx0egp x1pg5gke xjb2p0i xo1l8bm xl2ypbo x1ic7a3i" style="--x-fontSize: 12px; --x-lineHeight: 8.5137px;">${timeDisplay}</span></span>${isCustomer ? '' : '<div class="xhslqc4 x1rg5ohu x7phf20"><span aria-hidden="false" aria-label=" Read " data-icon="msg-dblcheck" class="x1rv0e52"><svg viewBox="0 0 16 11" height="11" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>msg-dblcheck</title><path d="M11.0714 0.652832C10.991 0.585124 10.8894 0.55127 10.7667 0.55127C10.6186 0.55127 10.4916 0.610514 10.3858 0.729004L4.19688 8.36523L1.79112 6.09277C1.7488 6.04622 1.69802 6.01025 1.63877 5.98486C1.57953 5.95947 1.51817 5.94678 1.45469 5.94678C1.32351 5.94678 1.20925 5.99544 1.11192 6.09277L0.800883 6.40381C0.707784 6.49268 0.661235 6.60482 0.661235 6.74023C0.661235 6.87565 0.707784 6.98991 0.800883 7.08301L3.79698 10.0791C3.94509 10.2145 4.11224 10.2822 4.29844 10.2822C4.40424 10.2822 4.5058 10.259 4.60313 10.2124C4.70046 10.1659 4.78086 10.1003 4.84434 10.0156L11.4903 1.59863C11.5623 1.5013 11.5982 1.40186 11.5982 1.30029C11.5982 1.14372 11.5348 1.01888 11.4078 0.925781L11.0714 0.652832ZM8.6212 8.32715C8.43077 8.20866 8.2488 8.09017 8.0753 7.97168C7.99489 7.89128 7.8891 7.85107 7.75791 7.85107C7.6098 7.85107 7.4892 7.90397 7.3961 8.00977L7.10411 8.33984C7.01947 8.43717 6.97715 8.54508 6.97715 8.66357C6.97715 8.79476 7.0237 8.90902 7.1168 9.00635L8.1959 10.0791C8.33132 10.2145 8.49636 10.2822 8.69102 10.2822C8.79681 10.2822 8.89838 10.259 8.99571 10.2124C9.09304 10.1659 9.17556 10.1003 9.24327 10.0156L15.8639 1.62402C15.9358 1.53939 15.9718 1.43994 15.9718 1.32568C15.9718 1.1818 15.9125 1.05697 15.794 0.951172L15.4386 0.678223C15.3582 0.610514 15.2587 0.57666 15.1402 0.57666C14.9964 0.57666 14.8715 0.635905 14.7657 0.754395L8.6212 8.32715Z" fill="currentColor"></path></svg></span></div>'}
-</div></div></div></div><span class=""></span><div class="_amlr"></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j ${bottomDivClass} x1q0g3np x6s0dn4 _amj_"><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 xexx8yu x1im30kd x18d9i69 x1djpfga"><div></div></div></div><span aria-label="This is an auto-delete message"></span></div><div class="x78zum5 xbfrwjf x8k05lb xeq5yr9 x1n2onr6 ${bottomClass}"></div></div></div></div></div></div></div>`;
-        return html;
-    }
-    
-    // 普通消息（包含文本）
+    // 普通消息（包含文本和链接）
     let html = `${spacingDiv}<div class="x1n2onr6"><div tabindex="-1" class="" role="row"><div tabindex="-1" class="${className}" data-id="${messageId}"><div class="x78zum5 xdt5ytf" data-virtualized="false"><div class=""><div class="${messageClass} focusable-list-item _amjy _amjz _amjw x1klvx2g xahtqtb"><span class=""></span><div class="_amk4 false _amkd _amk5 false"><span aria-hidden="true" data-icon="${tailIcon}" class="_amk7"><svg viewBox="0 0 8 13" height="13" width="8" preserveAspectRatio="xMidYMid meet" class="" version="1.1" x="0px" y="0px" enable-background="new 0 0 8 13"><title>${tailIcon}</title>${tailPath}</svg></span><div class="_amk6 _amlo false false"><span aria-label="${ariaLabel}"></span><div><div class="x9f619 x1hx0egp x1yrsyyn xizg8k xu9hqtb xwib8y2"><div class="copyable-text" data-pre-plain-text="${timeFull} ${senderName}: "><div class="_akbu x6ikm8r x10wlt62"><span dir="ltr" class="x1f6kntn xjb2p0i x8r4c90 xo1l8bm x1ic7a3i x12xpedu _ao3e selectable-text copyable-text" style="min-height: 0px;"><span class="">${escapedText}</span></span><span class=""><span class="x3nfvp2 xxymvpz xlshs6z xqtp20y xexx8yu x1uc92m x18d9i69 x181vq82 x12lo8hy x152skdk" aria-hidden="true">${isCustomer ? '<span class="x1c4vz4f x2lah0s"></span>' : '<span class="x1c4vz4f x2lah0s xn6xy2s"></span>'}<span class="x1c4vz4f x2lah0s">${timeDisplay}</span></span></span></div></div><div class="x1n2onr6 x1n327nk x18mqm2i xhsvlbd x14z9mp xz62fqu x1wbi8v6"><div class="x1bvqhpb xx3o462 xuxw1ft x78zum5 x6s0dn4 x12lo8hy x152skdk"><span class="x1rg5ohu x16dsc37" dir="auto"><span class="x193iq5w xeuugli x13faqbe x1vvkbs xt0psk2 x1fj9vlw xhslqc4 x1hx0egp x1pg5gke xjb2p0i xo1l8bm xl2ypbo x1ic7a3i" style="--x-fontSize: 12px; --x-lineHeight: 8.5137px;">${timeDisplay}</span></span>${isCustomer ? '' : '<div class="xhslqc4 x1rg5ohu x7phf20"><span aria-hidden="false" aria-label=" Read " data-icon="msg-dblcheck" class="x1rv0e52"><svg viewBox="0 0 16 11" height="11" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>msg-dblcheck</title><path d="M11.0714 0.652832C10.991 0.585124 10.8894 0.55127 10.7667 0.55127C10.6186 0.55127 10.4916 0.610514 10.3858 0.729004L4.19688 8.36523L1.79112 6.09277C1.7488 6.04622 1.69802 6.01025 1.63877 5.98486C1.57953 5.95947 1.51817 5.94678 1.45469 5.94678C1.32351 5.94678 1.20925 5.99544 1.11192 6.09277L0.800883 6.40381C0.707784 6.49268 0.661235 6.60482 0.661235 6.74023C0.661235 6.87565 0.707784 6.98991 0.800883 7.08301L3.79698 10.0791C3.94509 10.2145 4.11224 10.2822 4.29844 10.2822C4.40424 10.2822 4.5058 10.259 4.60313 10.2124C4.70046 10.1659 4.78086 10.1003 4.84434 10.0156L11.4903 1.59863C11.5623 1.5013 11.5982 1.40186 11.5982 1.30029C11.5982 1.14372 11.5348 1.01888 11.4078 0.925781L11.0714 0.652832ZM8.6212 8.32715C8.43077 8.20866 8.2488 8.09017 8.0753 7.97168C7.99489 7.89128 7.8891 7.85107 7.75791 7.85107C7.6098 7.85107 7.4892 7.90397 7.3961 8.00977L7.10411 8.33984C7.01947 8.43717 6.97715 8.54508 6.97715 8.66357C6.97715 8.79476 7.0237 8.90902 7.1168 9.00635L8.1959 10.0791C8.33132 10.2145 8.49636 10.2822 8.69102 10.2822C8.79681 10.2822 8.89838 10.259 8.99571 10.2124C9.09304 10.1659 9.17556 10.1003 9.24327 10.0156L15.8639 1.62402C15.9358 1.53939 15.9718 1.43994 15.9718 1.32568C15.9718 1.1818 15.9125 1.05697 15.794 0.951172L15.4386 0.678223C15.3582 0.610514 15.2587 0.57666 15.1402 0.57666C14.9964 0.57666 14.8715 0.635905 14.7657 0.754395L8.6212 8.32715Z" fill="currentColor"></path></svg></span></div>'}
 </div></div></div></div><span class=""></span><div class="_amlr"></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j ${bottomDivClass} x1q0g3np x6s0dn4 _amj_"><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 xexx8yu x1im30kd x18d9i69 x1djpfga"><div></div></div></div><span aria-label="This is an auto-delete message"></span></div><div class="x78zum5 xbfrwjf x8k05lb xeq5yr9 x1n2onr6 ${bottomClass}"></div></div></div></div></div></div></div>`;
     
@@ -2830,49 +2784,13 @@ function generateTelegramMessageHTML(msg, customerName, index, conversation) {
     const timeParts = parseTime(msg.time);
     const timeDisplay = timeParts.timeOnly; // 如 "17:22"
     
-    // 检查消息是否只包含链接（用于生成链接预览）
+    // 处理链接：将URL转换为蓝色可点击链接
     const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-    const urlMatches = msg.text.match(urlRegex);
-    const isLinkOnly = urlMatches && urlMatches.length === 1 && msg.text.trim() === urlMatches[0].trim();
-    
-    let escapedText;
-    let linkPreviewHTML = '';
-    
-    if (isLinkOnly && urlMatches[0].includes('wsdglobalpay.com/onboarding')) {
-        // 如果消息只包含链接，生成Telegram链接预览HTML
-        const url = urlMatches[0];
-        const domain = 'wsdglobalpay.com';
-        const title = 'Client Onboarding Form - 客户开户申请表';
-        
-        // Telegram链接预览的HTML结构
-        linkPreviewHTML = `
-<div class="link-preview" style="margin-top: 8px; border-radius: 8px; overflow: hidden; background: ${isCustomer ? '#ffffff' : '#e7f3ff'}; border: 1px solid ${isCustomer ? '#e0e0e0' : '#c5d9f0'};">
-    <div style="padding: 12px;">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-            <div style="width: 48px; height: 48px; border-radius: 8px; background: #0066cc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <div style="color: white; font-weight: bold; font-size: 20px;">WGP</div>
-            </div>
-            <div style="flex: 1; min-width: 0;">
-                <div style="font-size: 14px; font-weight: 500; color: #000000; margin-bottom: 4px; line-height: 1.3;">${title}</div>
-                <div style="font-size: 13px; color: #707579; line-height: 1.3;">${domain}</div>
-            </div>
-        </div>
-        <div style="font-size: 13px; color: #707579; word-break: break-all; padding-top: 8px; border-top: 1px solid ${isCustomer ? '#e0e0e0' : '#c5d9f0'};">
-            <a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #3390ec; text-decoration: none;">${url}</a>
-        </div>
-    </div>
-</div>`;
-        
-        // 如果只包含链接，不显示链接文本，只显示预览
-        escapedText = '';
-    } else {
-        // 处理包含文本和链接的消息
-        escapedText = escapeHtml(msg.text);
-        // 将URL替换为链接
-        escapedText = escapedText.replace(urlRegex, (url) => {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${url}</a>`;
-        });
-    }
+    let escapedText = escapeHtml(msg.text);
+    // 将URL替换为蓝色链接
+    escapedText = escapedText.replace(urlRegex, (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${url}</a>`;
+    });
     
     // 生成唯一的filter ID，避免重复
     const filterId = `messageAppendix${messageId}`;
@@ -2884,8 +2802,7 @@ function generateTelegramMessageHTML(msg, customerName, index, conversation) {
     if (!isCustomer) {
         const appendixHtml = showAppendix ? `<svg width="9" height="20" class="svg-appendix"><defs><filter x="-50%" y="-14.7%" width="200%" height="141.2%" filterUnits="objectBoundingBox" id="${filterId}"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur><feColorMatrix values="0 0 0 0 0.0621962482 0 0 0 0 0.138574144 0 0 0 0 0.185037364 0 0 0 0.15 0" in="shadowBlurOuter1"></feColorMatrix></filter></defs><g fill="none" fill-rule="evenodd"><path d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z" fill="#000" filter="url(#${filterId})"></path><path d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z" fill="#EEFFDE" class="corner"></path></g></svg>` : '';
         const hasAppendixClass = showAppendix ? 'has-appendix' : '';
-        const messageContent = isLinkOnly && linkPreviewHTML ? linkPreviewHTML : escapedText;
-        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta with-outgoing-icon" dir="auto">${messageContent}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span><div class="MessageOutgoingStatus"><div class="Transition"><div class="Transition_slide Transition_slide-active"><i class="icon icon-message-read" aria-hidden="true"></i></div></div></div></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
+        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta with-outgoing-icon" dir="auto">${escapedText}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span><div class="MessageOutgoingStatus"><div class="Transition"><div class="Transition_slide Transition_slide-active"><i class="icon icon-message-read" aria-hidden="true"></i></div></div></div></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
     } else {
         // 客户消息的HTML结构（没有own类，没有MessageOutgoingStatus，尾巴在左边）
         const filterIdIn = `messageAppendixIn${messageId}`;
@@ -2893,8 +2810,7 @@ function generateTelegramMessageHTML(msg, customerName, index, conversation) {
         // 真实路径：M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z
         const appendixHtml = showAppendix ? `<svg width="9" height="20" class="svg-appendix"><defs><filter x="-50%" y="-14.7%" width="200%" height="141.2%" filterUnits="objectBoundingBox" id="${filterIdIn}"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur><feColorMatrix values="0 0 0 0 0.0621962482 0 0 0 0 0.138574144 0 0 0 0 0.185037364 0 0 0 0.15 0" in="shadowBlurOuter1"></feColorMatrix></filter></defs><g fill="none" fill-rule="evenodd"><path d="M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z" fill="#000" filter="url(#${filterIdIn})"></path><path d="M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z" fill="#FFF" class="corner"></path></g></svg>` : '';
         const hasAppendixClass = showAppendix ? 'has-appendix' : '';
-        const messageContent = isLinkOnly && linkPreviewHTML ? linkPreviewHTML : escapedText;
-        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta" dir="auto">${messageContent}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
+        return `<div id="message-${messageId}" class="${messageClasses}" data-message-id="${messageId}"><div class="bottom-marker" data-message-id="${messageId}" data-should-update-views="false"></div><div class="message-select-control no-selection"></div><div class="message-content-wrapper can-select-text"><div class="message-content peer-color-count-1 text has-shadow has-solid-background ${hasAppendixClass} has-footer" dir="auto" style=""><div class="content-inner" dir="auto"><div class="text-content clearfix with-meta" dir="auto">${escapedText}<span class="MessageMeta" dir="ltr" data-ignore-on-paste="true"><span class="message-time">${timeDisplay}</span></span></div></div><div class="message-action-buttons"></div>${appendixHtml}</div></div></div>`;
     }
 }
 
