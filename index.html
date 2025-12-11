@@ -558,12 +558,17 @@
             
             if (editBtn) {
                 editBtn.addEventListener('click', function() {
-                    if (currentConversation) {
+                    // 检查全局变量 currentConversation（在 conversation-generator.js 中定义）
+                    if (typeof currentConversation !== 'undefined' && currentConversation && currentConversation.length > 0) {
                         document.getElementById('conversationEditArea').style.display = 'block';
                         editBtn.style.display = 'none';
-                        saveBtn.style.display = 'inline-block';
-                        cancelBtn.style.display = 'inline-block';
-                        showEditableConversation(currentConversation);
+                        if (saveBtn) saveBtn.style.display = 'inline-block';
+                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                        if (typeof showEditableConversation === 'function') {
+                            showEditableConversation(currentConversation);
+                        } else {
+                            alert('编辑功能未加载，请刷新页面重试');
+                        }
                     } else {
                         alert('请先生成对话');
                     }
@@ -572,7 +577,11 @@
             
             if (saveBtn) {
                 saveBtn.addEventListener('click', function() {
-                    saveEditedConversation();
+                    if (typeof saveEditedConversation === 'function') {
+                        saveEditedConversation();
+                    } else {
+                        alert('保存功能未加载，请刷新页面重试');
+                    }
                 });
             }
             
@@ -587,7 +596,11 @@
             
             if (addMsgBtn) {
                 addMsgBtn.addEventListener('click', function() {
-                    addNewMessage();
+                    if (typeof addNewMessage === 'function') {
+                        addNewMessage();
+                    } else {
+                        alert('添加消息功能未加载，请刷新页面重试');
+                    }
                 });
             }
             
