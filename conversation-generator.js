@@ -49,17 +49,26 @@ function setupConversationSceneListeners() {
             const purposeGroup = document.getElementById('purposeGroup');
             const formMethodGroup = document.getElementById('formMethodGroup');
             const purposeRequired = document.getElementById('purposeRequired');
+            const customSceneGroup = document.getElementById('customSceneGroup');
             
             if (this.value === 'kyc') {
                 ageGroup.style.display = 'block';
                 willProvideGroup.style.display = 'block';
                 purposeGroup.style.display = 'none';
                 formMethodGroup.style.display = 'none';
+                customSceneGroup.style.display = 'none';
+            } else if (this.value === 'custom') {
+                ageGroup.style.display = 'none';
+                willProvideGroup.style.display = 'none';
+                purposeGroup.style.display = 'none';
+                formMethodGroup.style.display = 'none';
+                customSceneGroup.style.display = 'block';
             } else {
                 ageGroup.style.display = 'none';
                 willProvideGroup.style.display = 'none';
                 purposeGroup.style.display = 'block';
                 formMethodGroup.style.display = 'block';
+                customSceneGroup.style.display = 'none';
             }
         });
     });
@@ -71,6 +80,7 @@ function clearForm() {
     document.getElementById('customPurposeGroup').style.display = 'none';
     document.getElementById('ageGroup').style.display = 'none';
     document.getElementById('willProvideGroup').style.display = 'none';
+    document.getElementById('customSceneGroup').style.display = 'none';
     document.getElementById('purposeGroup').style.display = 'block';
     document.getElementById('formMethodGroup').style.display = 'block';
 }
@@ -386,6 +396,15 @@ function createKYCConversation(customerName, customerAge, platform, additionalIn
     return generateKYCConversationByStyle(customerName, customerAge, platform, additionalInfo, style, willProvide);
 }
 
+// 创建自定义场景对话
+function createCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo) {
+    const style = getConversationStyle(customerName);
+    const variant = getConversationVariant(customerName);
+    const seed = getRandomSeed(customerName);
+    
+    return generateCustomConversationByStyle(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, style, variant, seed);
+}
+
 // 根据风格生成KYC补充材料对话
 function generateKYCConversationByStyle(customerName, customerAge, platform, additionalInfo, style, willProvide) {
     const conversationTemplates = {
@@ -399,6 +418,27 @@ function generateKYCConversationByStyle(customerName, customerAge, platform, add
     
     const generator = conversationTemplates[style] || generateFriendlyKYCConversation;
     return generator(customerName, customerAge, platform, additionalInfo, willProvide);
+}
+
+// 根据风格生成自定义场景对话
+function generateCustomConversationByStyle(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, style, variant, seed) {
+    const conversationTemplates = {
+        verbose: generateVerboseCustomConversation,
+        concise: generateConciseCustomConversation,
+        cautious: generateCautiousCustomConversation,
+        urgent: generateUrgentCustomConversation,
+        friendly: generateFriendlyCustomConversation,
+        professional: generateProfessionalCustomConversation,
+        detailed: generateDetailedCustomConversation,
+        casual: generateCasualCustomConversation,
+        formal: generateFormalCustomConversation,
+        inquisitive: generateInquisitiveCustomConversation,
+        straightforward: generateStraightforwardCustomConversation,
+        elaborate: generateElaborateCustomConversation
+    };
+    
+    const generator = conversationTemplates[style] || generateFriendlyCustomConversation;
+    return generator(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
 }
 
 // 生成多样化的对话开头
@@ -1178,6 +1218,311 @@ function generateStraightforwardConversation(customerName, purposeDetails, formM
 // 详细阐述型对话
 function generateElaborateConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
     return generateVerboseConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
+}
+
+// ========== 自定义场景对话生成函数 ==========
+
+// 话多型自定义场景对话
+function generateVerboseCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
+}
+
+// 简洁型自定义场景对话
+function generateConciseCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'concise');
+    return messages;
+}
+
+// 谨慎型自定义场景对话
+function generateCautiousCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'cautious');
+    return messages;
+}
+
+// 急切型自定义场景对话
+function generateUrgentCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'urgent');
+    return messages;
+}
+
+// 友好型自定义场景对话（默认）
+function generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'friendly');
+    return messages;
+}
+
+// 专业型自定义场景对话
+function generateProfessionalCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'professional');
+    return messages;
+}
+
+// 详细型自定义场景对话
+function generateDetailedCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
+}
+
+// 随意型自定义场景对话
+function generateCasualCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
+}
+
+// 正式型自定义场景对话
+function generateFormalCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    return generateProfessionalCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
+}
+
+// 好奇型自定义场景对话
+function generateInquisitiveCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
+}
+
+// 直接型自定义场景对话
+function generateStraightforwardCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    return generateConciseCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
+}
+
+// 详细阐述型自定义场景对话
+function generateElaborateCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
+    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
+}
+
+// 生成自定义场景对话的基础函数
+function generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, tone) {
+    const messages = [];
+    const now = new Date();
+    const day1 = new Date(now);
+    day1.setDate(day1.getDate() - 2);
+    
+    // 根据场景描述和客户答复核心生成对话
+    // 场景描述通常包含：公司发起的话题/问题
+    // 客户答复核心：客户需要表达的核心内容
+    
+    // 开场：公司根据场景描述发起对话
+    const companyOpenings = [
+        `Hello ${customerName}, ${sceneDescription}`,
+        `Hi ${customerName}, ${sceneDescription}`,
+        `${customerName}, ${sceneDescription}`,
+        `Good morning ${customerName}, ${sceneDescription}`,
+        `Hi there ${customerName}, ${sceneDescription}`
+    ];
+    
+    messages.push({
+        sender: 'company',
+        text: seededChoice(companyOpenings, seed, variant * 0),
+        time: formatTime(day1, 10, 0)
+    });
+    
+    // 客户第一反应：根据客户答复核心生成
+    const customerFirstResponses = [
+        customerResponseCore,
+        `I see. ${customerResponseCore}`,
+        `Okay, ${customerResponseCore.toLowerCase()}`,
+        `I understand. ${customerResponseCore}`,
+        `Got it. ${customerResponseCore}`
+    ];
+    
+    messages.push({
+        sender: 'customer',
+        text: seededChoice(customerFirstResponses, seed, variant * 1),
+        time: formatTime(day1, 10, 3)
+    });
+    
+    // 公司进一步说明或询问
+    const companyFollowUps = [
+        `Thank you for understanding. Let me provide you with more details.`,
+        `I appreciate your response. Here's what we need to know.`,
+        `That's helpful. Let me explain the next steps.`,
+        `Perfect. Let me clarify a few things.`,
+        `Great. I'll walk you through the process.`
+    ];
+    
+    messages.push({
+        sender: 'company',
+        text: seededChoice(companyFollowUps, seed, variant * 2),
+        time: formatTime(day1, 10, 6)
+    });
+    
+    // 根据tone调整对话风格
+    if (tone === 'concise') {
+        // 简洁型：减少对话轮次
+        messages.push({
+            sender: 'customer',
+            text: `Understood. What do I need to do next?`,
+            time: formatTime(day1, 10, 9)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `Please follow the instructions we'll send you. If you have any questions, feel free to ask.`,
+            time: formatTime(day1, 10, 12)
+        });
+        
+        messages.push({
+            sender: 'customer',
+            text: `Will do. Thanks for your help.`,
+            time: formatTime(day1, 10, 15)
+        });
+    } else if (tone === 'cautious') {
+        // 谨慎型：客户会问更多问题
+        messages.push({
+            sender: 'customer',
+            text: `I want to make sure I understand everything correctly. Can you clarify a few things?`,
+            time: formatTime(day1, 10, 9)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `Of course. What would you like to know?`,
+            time: formatTime(day1, 10, 12)
+        });
+        
+        messages.push({
+            sender: 'customer',
+            text: `What information do you need exactly? And how will you protect my data?`,
+            time: formatTime(day1, 10, 15)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `We only need the information mentioned earlier. All data is encrypted and stored securely according to regulatory requirements.`,
+            time: formatTime(day1, 10, 18)
+        });
+        
+        messages.push({
+            sender: 'customer',
+            text: `Alright, that makes sense. ${customerResponseCore}`,
+            time: formatTime(day1, 10, 21)
+        });
+    } else if (tone === 'urgent') {
+        // 急切型：客户催促
+        messages.push({
+            sender: 'customer',
+            text: `How quickly can this be resolved? I need this done as soon as possible.`,
+            time: formatTime(day1, 10, 9)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `We'll process this as quickly as possible. Typically within 1-2 business days after we receive everything.`,
+            time: formatTime(day1, 10, 12)
+        });
+        
+        messages.push({
+            sender: 'customer',
+            text: `Okay, ${customerResponseCore} I'll send everything today.`,
+            time: formatTime(day1, 10, 15)
+        });
+    } else if (tone === 'professional') {
+        // 专业型：正式用语
+        messages.push({
+            sender: 'customer',
+            text: `I understand the requirements. ${customerResponseCore} What is the expected timeline for completion?`,
+            time: formatTime(day1, 10, 9)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `Thank you for your cooperation. The standard processing time is 1-2 business days after we receive all required documentation.`,
+            time: formatTime(day1, 10, 12)
+        });
+        
+        messages.push({
+            sender: 'customer',
+            text: `Understood. I will proceed accordingly and provide the necessary information.`,
+            time: formatTime(day1, 10, 15)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `Excellent. We appreciate your prompt response. Should you have any questions, please don't hesitate to contact us.`,
+            time: formatTime(day1, 10, 18)
+        });
+    } else {
+        // 友好型（默认）：自然对话
+        messages.push({
+            sender: 'customer',
+            text: `Thanks for explaining. ${customerResponseCore}`,
+            time: formatTime(day1, 10, 9)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `You're welcome! Is there anything else you'd like to know?`,
+            time: formatTime(day1, 10, 12)
+        });
+        
+        messages.push({
+            sender: 'customer',
+            text: `Not right now, but I might have questions later. How can I reach you?`,
+            time: formatTime(day1, 10, 15)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `You can reach us at support@geoswift.com or reply here anytime. We're here to help!`,
+            time: formatTime(day1, 10, 18)
+        });
+        
+        messages.push({
+            sender: 'customer',
+            text: `Perfect, thanks so much!`,
+            time: formatTime(day1, 10, 21)
+        });
+    }
+    
+    // 如果有额外信息，在对话中融入
+    if (additionalInfo && additionalInfo.trim()) {
+        const day2 = new Date(now);
+        day2.setDate(day2.getDate() - 1);
+        
+        messages.push({
+            sender: 'customer',
+            text: `By the way, ${additionalInfo}`,
+            time: formatTime(day2, 14, 0)
+        });
+        
+        messages.push({
+            sender: 'company',
+            text: `Noted. We'll take that into consideration. Thank you for letting us know.`,
+            time: formatTime(day2, 14, 3)
+        });
+    }
+    
+    // 确保对话长度在12-15条
+    // 如果少于12条，添加一些自然的对话
+    while (messages.length < 12) {
+        const lastMessage = messages[messages.length - 1];
+        const lastTimeStr = lastMessage.time;
+        // 解析时间字符串 "MM/DD HH:mm"
+        const [datePart, timePart] = lastTimeStr.split(' ');
+        const [month, day] = datePart.split('/');
+        const [hour, minute] = timePart.split(':');
+        const lastTime = new Date(now.getFullYear(), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+        const nextTime = new Date(lastTime);
+        nextTime.setMinutes(nextTime.getMinutes() + 3);
+        
+        if (lastMessage.sender === 'customer') {
+            messages.push({
+                sender: 'company',
+                text: `Thank you for your cooperation. We'll keep you updated on the progress.`,
+                time: formatTime(nextTime, nextTime.getHours(), nextTime.getMinutes())
+            });
+        } else {
+            messages.push({
+                sender: 'customer',
+                text: `Sounds good. I'll wait for your update.`,
+                time: formatTime(nextTime, nextTime.getHours(), nextTime.getMinutes())
+            });
+        }
+    }
+    
+    // 如果超过15条，截取前15条
+    if (messages.length > 15) {
+        return messages.slice(0, 15);
+    }
+    
+    return messages;
 }
 
 // 生成拒绝提供银行流水的理由

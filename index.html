@@ -392,7 +392,19 @@
                         <input type="radio" id="scene_kyc" name="conversationScene" value="kyc">
                         <label for="scene_kyc" style="margin: 0; font-weight: normal;">补充材料（KYC加强）</label>
                     </div>
+                    <div class="checkbox-item">
+                        <input type="radio" id="scene_custom" name="conversationScene" value="custom">
+                        <label for="scene_custom" style="margin: 0; font-weight: normal;">自定义场景</label>
+                    </div>
                 </div>
+            </div>
+
+            <div class="form-group" id="customSceneGroup" style="display: none;">
+                <label for="sceneDescription">场景描述 *</label>
+                <textarea id="sceneDescription" name="sceneDescription" rows="3" placeholder="请用中文描述场景背景，例如：客户询问账户被冻结的原因，需要解释并请求提供相关材料"></textarea>
+                
+                <label for="customerResponseCore" style="margin-top: 15px; display: block;">客户答复核心内容 *</label>
+                <textarea id="customerResponseCore" name="customerResponseCore" rows="3" placeholder="请用中文描述客户需要表达的核心内容，例如：客户表示理解，愿意配合提供材料，但需要时间准备"></textarea>
             </div>
 
             <div class="form-group" id="ageGroup" style="display: none;">
