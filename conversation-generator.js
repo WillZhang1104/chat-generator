@@ -2721,30 +2721,69 @@ function generateWhatsAppMessageHTML(msg, customerName, index, conversation) {
     const timeDisplay = timeParts.display; // 如 "上午10:30"
     const timeFull = timeParts.full; // 如 "[上午10:30, 10/15/2025]"
     
-    // 处理链接：先识别URL并用占位符替换，然后转义HTML，最后替换回链接
+    // 检查消息是否只包含链接（用于生成链接预览）
     const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-    const urlPlaceholders = [];
-    let textWithPlaceholders = msg.text;
-    let match;
-    let placeholderIndex = 0;
+    const urlMatches = msg.text.match(urlRegex);
+    const isLinkOnly = urlMatches && urlMatches.length === 1 && msg.text.trim() === urlMatches[0].trim();
     
-    // 用占位符替换所有URL
-    while ((match = urlRegex.exec(msg.text)) !== null) {
-        const url = match[1];
-        const placeholder = `__URL_PLACEHOLDER_${placeholderIndex}__`;
-        urlPlaceholders.push(url);
-        textWithPlaceholders = textWithPlaceholders.replace(url, placeholder);
-        placeholderIndex++;
+    let escapedText;
+    let linkPreviewHTML = '';
+    
+    if (isLinkOnly && urlMatches[0].includes('wsdglobalpay.com/onboarding.html')) {
+        // 如果消息只包含链接，生成WhatsApp链接预览HTML
+        const url = urlMatches[0];
+        const domain = 'wsdglobalpay.com';
+        const title = 'Client Onboarding Form - 客户开户申请表';
+        
+        // WhatsApp链接预览的HTML结构
+        linkPreviewHTML = `
+<div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2 x1n2onr6 x1vqgdyp x1a2a7pz" style="margin-top: 4px;">
+    <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="border-radius: 8px; overflow: hidden; background: ${isCustomer ? '#ffffff' : '#d9fdd3'};">
+        <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="padding: 12px;">
+            <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="margin-bottom: 8px;">
+                <div class="x1n2onr6 x1ey2m1c xds687c x17qophe xg01cxk x47corp x10l6tqk x1qjc9v5 x1q0q8m5 x1q0g3np x78zum5 x1iyjqo2" style="align-items: center; gap: 8px;">
+                    <div style="width: 40px; height: 40px; border-radius: 8px; background: #0066cc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <div style="color: white; font-weight: bold; font-size: 18px;">WGP</div>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 500; color: #111b21; margin-bottom: 2px; line-height: 1.3;">${title}</div>
+                        <div style="font-size: 12px; color: #667781; line-height: 1.3;">${domain}</div>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: #667781; word-break: break-all;">${url}</div>
+        </div>
+    </div>
+</div>`;
+        
+        // 如果只包含链接，不显示链接文本，只显示预览
+        escapedText = '';
+    } else {
+        // 处理包含文本和链接的消息
+        const urlPlaceholders = [];
+        let textWithPlaceholders = msg.text;
+        let match;
+        let placeholderIndex = 0;
+        
+        // 用占位符替换所有URL
+        while ((match = urlRegex.exec(msg.text)) !== null) {
+            const url = match[1];
+            const placeholder = `__URL_PLACEHOLDER_${placeholderIndex}__`;
+            urlPlaceholders.push(url);
+            textWithPlaceholders = textWithPlaceholders.replace(url, placeholder);
+            placeholderIndex++;
+        }
+        
+        // 转义HTML
+        escapedText = escapeHtml(textWithPlaceholders);
+        
+        // 将占位符替换回链接（但保持为纯文本，让WhatsApp自动生成预览）
+        urlPlaceholders.forEach((url, index) => {
+            const placeholder = `__URL_PLACEHOLDER_${index}__`;
+            // 不转换为<a>标签，保持为纯文本URL，WhatsApp会自动识别并生成预览
+            escapedText = escapedText.replace(placeholder, escapeHtml(url));
+        });
     }
-    
-    // 转义HTML
-    let escapedText = escapeHtml(textWithPlaceholders);
-    
-    // 将占位符替换回链接
-    urlPlaceholders.forEach((url, index) => {
-        const placeholder = `__URL_PLACEHOLDER_${index}__`;
-        escapedText = escapedText.replace(placeholder, `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${escapeHtml(url)}</a>`);
-    });
     
     // WhatsApp在不同发送者之间需要添加间距
     // 如果前一条消息的发送者不同，在外层div之前添加一个空div来创建间距
