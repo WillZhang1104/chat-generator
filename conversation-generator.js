@@ -2077,8 +2077,8 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             min-width: 180px;
-            width: 500px;
-            max-width: 500px;
+            width: 300px;
+            max-width: 300px;
             cursor: pointer;
             transition: box-shadow 0.2s;
         }
@@ -2285,7 +2285,7 @@ function generateAttachmentsHTML(attachments) {
                     ${fileType === 'pdf' ? iconSVG : iconSVG}
                 </div>
                 <div class="attachment-info">
-                    <div class="attachment-name">${escapeHtml(baseFileName)}${fileExtension ? '<span style="color: #999; font-weight: normal;">.' + escapeHtml(fileExtension) + '</span>' : ''}</div>
+                    <div class="attachment-name">${escapeHtml(baseFileName)}${fileExtension ? '.' + escapeHtml(fileExtension) : ''}</div>
                     <div class="attachment-size">${escapeHtml(fileSize)}</div>
                 </div>
             </div>`;
