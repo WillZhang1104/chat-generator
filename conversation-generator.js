@@ -3235,6 +3235,16 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                     text: `You're very welcome! We're here to help make this process as smooth as possible. Don't hesitate to reach out if anything comes up.`,
                     time: formatTimeWithRange(day1, 11, 7)
                 });
+                messages.push({
+                    sender: 'customer',
+                    text: `I appreciate that. One more question - will I receive updates during the review process?`,
+                    time: formatTimeWithRange(day1, 11, 10)
+                });
+                messages.push({
+                    sender: 'company',
+                    text: `Yes, absolutely. We'll send you a confirmation email when we receive the documents, and then another update once the review is complete. If we need anything additional, we'll contact you right away.`,
+                    time: formatTimeWithRange(day1, 11, 13)
+                });
             },
             // 变体2：客户确认后询问隐私和安全
             () => {
@@ -3260,33 +3270,43 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                 });
                 messages.push({
                     sender: 'customer',
-                    text: `Good to know. Alright, I'll send them over. What's the email address again?`,
+                    text: `Good to know. What about data breaches? Do you have insurance coverage?`,
                     time: formatTimeWithRange(day1, 10, 52)
                 });
                 messages.push({
                     sender: 'company',
-                    text: `compliance@geoswift.com. And please make sure the statements cover the last 2-3 months and include all pages.`,
+                    text: `Yes, we have comprehensive cyber insurance and follow industry best practices. We've never had a breach, but we're fully prepared with protocols if one were to occur.`,
                     time: formatTimeWithRange(day1, 10, 55)
                 });
                 messages.push({
                     sender: 'customer',
-                    text: `Got it. I'll send them within the next day or two. Will I receive a confirmation when you get them?`,
+                    text: `That's good to hear. Alright, I'll send them over. What's the email address again?`,
                     time: formatTimeWithRange(day1, 10, 58)
                 });
                 messages.push({
                     sender: 'company',
-                    text: `Yes, we'll send you an automated confirmation email as soon as we receive them. Then our team will review everything and get back to you within 2-3 business days.`,
+                    text: `compliance@geoswift.com. And please make sure the statements cover the last 2-3 months and include all pages.`,
                     time: formatTimeWithRange(day1, 11, 1)
                 });
                 messages.push({
                     sender: 'customer',
-                    text: `Perfect. Thanks for answering all my questions. I'll get those statements sent over soon.`,
+                    text: `Got it. I'll send them within the next day or two. Will I receive a confirmation when you get them?`,
                     time: formatTimeWithRange(day1, 11, 4)
                 });
                 messages.push({
                     sender: 'company',
-                    text: `Thank you, ${customerName}. We appreciate your cooperation and patience with this process.`,
+                    text: `Yes, we'll send you an automated confirmation email as soon as we receive them. Then our team will review everything and get back to you within 2-3 business days.`,
                     time: formatTimeWithRange(day1, 11, 7)
+                });
+                messages.push({
+                    sender: 'customer',
+                    text: `Perfect. Thanks for answering all my questions. I'll get those statements sent over soon.`,
+                    time: formatTimeWithRange(day1, 11, 10)
+                });
+                messages.push({
+                    sender: 'company',
+                    text: `Thank you, ${customerName}. We appreciate your cooperation and patience with this process.`,
+                    time: formatTimeWithRange(day1, 11, 13)
                 });
             },
             // 变体3：客户快速同意，询问后续步骤
@@ -3323,13 +3343,33 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                 });
                 messages.push({
                     sender: 'customer',
-                    text: `Perfect. I'll get those sent over right away. Thanks for the quick response.`,
+                    text: `That's reassuring. What format should the statements be in? PDF is easiest for me.`,
                     time: formatTimeWithRange(day1, 10, 58)
                 });
                 messages.push({
                     sender: 'company',
-                    text: `Thank you for your cooperation! We'll be in touch soon.`,
+                    text: `PDF is perfect! That's our preferred format. Just make sure all pages are included and the scans are clear and readable.`,
                     time: formatTimeWithRange(day1, 11, 1)
+                });
+                messages.push({
+                    sender: 'customer',
+                    text: `Got it. I'll make sure everything is clear and complete. Should I include anything specific in the email subject line?`,
+                    time: formatTimeWithRange(day1, 11, 4)
+                });
+                messages.push({
+                    sender: 'company',
+                    text: `It would be helpful if you could include your account reference number or your name in the subject line. That helps us process everything more efficiently.`,
+                    time: formatTimeWithRange(day1, 11, 7)
+                });
+                messages.push({
+                    sender: 'customer',
+                    text: `Perfect. I'll get those sent over right away. Thanks for the quick response and clear instructions.`,
+                    time: formatTimeWithRange(day1, 11, 10)
+                });
+                messages.push({
+                    sender: 'company',
+                    text: `Thank you for your cooperation! We'll be in touch soon with confirmation and updates.`,
+                    time: formatTimeWithRange(day1, 11, 13)
                 });
             },
             // 变体4：客户需要时间准备，询问具体要求
@@ -3376,13 +3416,23 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                 });
                 messages.push({
                     sender: 'customer',
-                    text: `Perfect. I'll make sure to send everything by the end of the week. Thanks for your help.`,
+                    text: `Good to know. What happens if the statements don't meet your requirements? Will you ask me to resubmit?`,
                     time: formatTimeWithRange(day1, 11, 4)
                 });
                 messages.push({
                     sender: 'company',
-                    text: `Thank you, ${customerName}. We look forward to receiving the documents and completing your account verification.`,
+                    text: `If there are any issues, we'll contact you right away to clarify what's needed. Most of the time, as long as the statements are clear and complete, everything goes smoothly.`,
                     time: formatTimeWithRange(day1, 11, 7)
+                });
+                messages.push({
+                    sender: 'customer',
+                    text: `Perfect. I'll make sure to send everything by the end of the week. Thanks for your help and patience.`,
+                    time: formatTimeWithRange(day1, 11, 10)
+                });
+                messages.push({
+                    sender: 'company',
+                    text: `Thank you, ${customerName}. We look forward to receiving the documents and completing your account verification.`,
+                    time: formatTimeWithRange(day1, 11, 13)
                 });
             }
         ];
