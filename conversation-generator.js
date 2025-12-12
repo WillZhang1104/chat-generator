@@ -3510,19 +3510,19 @@ function generateConciseKYCConversation(customerName, customerAge, platform, add
         messages.push({
             sender: 'customer',
             text: refusalReason.text,
-            time: formatTime(day1, 11, 3)
+            time: formatTimeWithRange(day1, 11, 3)
         });
 
         messages.push({
             sender: 'company',
             text: `I understand, but this is required for compliance. Your data is secure.`,
-            time: formatTime(day1, 11, 6)
+            time: formatTimeWithRange(day1, 11, 6)
         });
 
         messages.push({
             sender: 'customer',
             text: `I'll think about it.`,
-            time: formatTime(day1, 11, 9)
+            time: formatTimeWithRange(day1, 11, 9)
         });
     }
 
