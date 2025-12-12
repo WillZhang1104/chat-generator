@@ -2341,7 +2341,7 @@ function generateAttachmentsHTML(attachments) {
         let iconSVG = '';
         if (fileType === 'pdf') {
             // 使用pdf.svg文件
-            iconSVG = `<img src="pdf.svg" alt="PDF" style="width: 100%; height: 100%; object-fit: contain;">`;
+            iconSVG = `<img src="./pdf.svg" alt="PDF" style="width: 100%; height: 100%; object-fit: contain;">`;
         } else if (fileType === 'image') {
             // 图片图标 - 蓝色背景，白色矩形，中间有黄色圆点（通过CSS实现）
             iconSVG = `
