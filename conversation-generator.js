@@ -2236,8 +2236,8 @@ function generateAttachmentsHTML(attachments) {
                 <svg class="attachment-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
-                <span class="attachment-count">${attachments.length}</span>
-                <a href="#" class="attachment-download-all">Attachments Download All</a>
+                <span class="attachment-count">${attachments.length} Attachments</span>
+                <a href="#" class="attachment-download-all">Download All</a>
             </div>
             <div class="attachments-list">`;
     
@@ -2249,9 +2249,12 @@ function generateAttachmentsHTML(attachments) {
         // 根据文件类型选择图标
         let iconSVG = '';
         if (fileType === 'pdf') {
+            // PDF图标 - 红色背景，白色PDF标志
             iconSVG = `
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="16" height="20" rx="1" fill="currentColor"/>
+                    <path d="M8 8h8v1H8V8zm0 2h8v1H8v-1zm0 2h6v1H8v-1zm0 2h8v1H8v-1zm0 2h6v1H8v-1z" fill="white" opacity="0.9"/>
+                    <path d="M14 2v6h6" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>`;
         } else if (fileType === 'image') {
             // 图片图标 - 蓝色背景，白色矩形，中间有黄色圆点（通过CSS实现）
