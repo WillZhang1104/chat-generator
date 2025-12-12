@@ -299,6 +299,12 @@
                 
                 <label for="emailDate" style="margin-top: 15px; display: block;">邮件日期 *</label>
                 <input type="text" id="emailDate" name="emailDate" placeholder="例如：12月9" value="">
+                
+                <label style="margin-top: 15px; display: block;">邮件附件（可选）</label>
+                <div id="attachmentsContainer" style="margin-top: 10px;">
+                    <div id="attachmentsList"></div>
+                    <button type="button" id="addAttachmentBtn" class="btn" style="background: #28a745; padding: 8px 15px; font-size: 14px; margin-top: 10px;">+ 添加附件</button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -345,7 +351,17 @@
 
         <div class="preview-section" id="previewSection" style="display: none;">
             <h2 class="preview-title">对话预览</h2>
+            <div style="margin-bottom: 15px;">
+                <button id="editConversationBtn" class="btn" style="background: #ffc107; color: #000; display: none;">编辑对话</button>
+                <button id="saveConversationBtn" class="btn" style="background: #28a745; display: none;">保存</button>
+                <button id="cancelEditBtn" class="btn btn-secondary" style="display: none;">取消</button>
+                <button id="addMessageBtn" class="btn" style="background: #17a2b8; display: none; margin-left: 10px;">+ 新增消息</button>
+            </div>
             <div class="conversation-preview" id="conversationPreview"></div>
+            <div id="conversationEditArea" style="display: none; margin-top: 20px; padding: 20px; border: 1px solid #007bff; border-radius: 8px; background-color: #e7f3ff;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; color: #007bff;">编辑对话</h3>
+                <div id="editableMessages"></div>
+            </div>
             
             <div class="instructions" id="instructionsContent">
                 <h3>使用说明：</h3>
@@ -393,5 +409,104 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="conversation-generator.js"></script>
+    <script>
+        // 附件管理
+        let attachments = [];
+        let attachmentIdCounter = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addAttachmentBtn = document.getElementById('addAttachmentBtn');
+            const attachmentsList = document.getElementById('attachmentsList');
+            
+            if (addAttachmentBtn) {
+                addAttachmentBtn.addEventListener('click', function() {
+                    addAttachmentItem();
+                });
+            }
+        });
+
+        function addAttachmentItem() {
+            attachmentIdCounter++;
+            const attachmentId = 'attachment_' + attachmentIdCounter;
+            
+            const attachmentDiv = document.createElement('div');
+            attachmentDiv.id = attachmentId;
+            attachmentDiv.style.marginBottom = '10px';
+            attachmentDiv.style.padding = '10px';
+            attachmentDiv.style.border = '1px solid #ddd';
+            attachmentDiv.style.borderRadius = '5px';
+            attachmentDiv.style.backgroundColor = '#f9f9f9';
+            attachmentDiv.style.display = 'flex';
+            attachmentDiv.style.alignItems = 'center';
+            attachmentDiv.style.gap = '10px';
+            
+            attachmentDiv.innerHTML = `
+                <input type="text" class="attachment-name" placeholder="文件名（如：Citibank Account Dashboard.pdf）" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <select class="attachment-type" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    <option value="pdf">PDF</option>
+                    <option value="image">Image</option>
+                    <option value="other">Other</option>
+                </select>
+                <input type="text" class="attachment-size" placeholder="大小（如：43 KB）" style="width: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <button type="button" class="remove-attachment-btn" style="padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
+            `;
+            
+            const removeBtn = attachmentDiv.querySelector('.remove-attachment-btn');
+            removeBtn.addEventListener('click', function() {
+                attachmentDiv.remove();
+                updateAttachmentsArray();
+            });
+            
+            // 监听输入变化
+            const nameInput = attachmentDiv.querySelector('.attachment-name');
+            const typeSelect = attachmentDiv.querySelector('.attachment-type');
+            const sizeInput = attachmentDiv.querySelector('.attachment-size');
+            
+            [nameInput, typeSelect, sizeInput].forEach(input => {
+                input.addEventListener('change', updateAttachmentsArray);
+                input.addEventListener('input', updateAttachmentsArray);
+            });
+            
+            document.getElementById('attachmentsList').appendChild(attachmentDiv);
+            updateAttachmentsArray();
+        }
+
+        function updateAttachmentsArray() {
+            attachments = [];
+            const attachmentItems = document.querySelectorAll('#attachmentsList > div');
+            
+            attachmentItems.forEach(item => {
+                const name = item.querySelector('.attachment-name').value.trim();
+                const type = item.querySelector('.attachment-type').value;
+                const size = item.querySelector('.attachment-size').value.trim();
+                
+                if (name) {
+                    attachments.push({
+                        name: name,
+                        type: type,
+                        size: size || '0 KB'
+                    });
+                }
+            });
+        }
+
+        // 导出函数供conversation-generator.js使用
+        window.getAttachments = function() {
+            try {
+                updateAttachmentsArray();
+                return attachments || [];
+            } catch (e) {
+                console.warn('获取附件列表时出错:', e);
+                return [];
+            }
+        };
+        
+        // 确保函数在页面加载时可用
+        if (typeof window.getAttachments === 'undefined') {
+            window.getAttachments = function() {
+                return [];
+            };
+        }
+    </script>
 </body>
 </html>
