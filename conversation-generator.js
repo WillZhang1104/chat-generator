@@ -2016,8 +2016,8 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .attachment-icon-large {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2029,14 +2029,29 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
         }
         .attachment-icon-large.image {
             background: #007bff;
+            position: relative;
+        }
+        .attachment-icon-large.image::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #ffc107;
+            border-radius: 50%;
         }
         .attachment-icon-large.other {
             background: #6c757d;
         }
         .attachment-icon-large svg {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             fill: white;
+        }
+        .attachment-icon-large.image svg {
+            opacity: 0.8;
         }
         .attachment-info {
             flex: 1;
