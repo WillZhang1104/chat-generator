@@ -1266,50 +1266,6 @@ function getConversationTimeRange() {
     const timeRange = document.querySelector('input[name="conversationTime"]:checked')?.value || 'morning';
     
     if (timeRange === 'custom') {
-        const customTime = document.getElementById('customStartTime').value;
-        if (customTime && customTime.match(/^\d{1,2}:\d{2}$/)) {
-            const [hour, minute] = customTime.split(':').map(Number);
-            return {
-                startHour: hour,
-                startMinute: minute,
-                range: 'custom'
-            };
-        }
-    }
-    
-    // 默认时间段
-    const ranges = {
-        morning: { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 },
-        afternoon: { startHour: 12, startMinute: 0, endHour: 18, endMinute: 0 },
-        evening: { startHour: 18, startMinute: 0, endHour: 22, endMinute: 0 }
-    };
-    
-    return ranges[timeRange] || ranges.morning;
-}
-
-// 生成时间段内的时间
-function generateTimeInRange(baseDate, timeRange, offsetMinutes = 0) {
-    let hour, minute;
-    
-    if (timeRange.range === 'custom') {
-        hour = timeRange.startHour;
-        minute = timeRange.startMinute + offsetMinutes;
-    } else {
-        const totalMinutes = (timeRange.startHour * 60 + timeRange.startMinute) + offsetMinutes;
-        const endTotalMinutes = timeRange.endHour * 60 + timeRange.endMinute;
-        const clampedMinutes = Math.min(totalMinutes, endTotalMinutes - 5); // 确保不超过结束时间
-        hour = Math.floor(clampedMinutes / 60);
-        minute = clampedMinutes % 60;
-    }
-    
-    return formatTime(baseDate, hour, minute);
-}
-
-// 获取对话时间段设置
-function getConversationTimeRange() {
-    const timeRange = document.querySelector('input[name="conversationTime"]:checked')?.value || 'morning';
-    
-    if (timeRange === 'custom') {
         const customTime = document.getElementById('customStartTime')?.value;
         if (customTime && customTime.match(/^\d{1,2}:\d{2}$/)) {
             const [hour, minute] = customTime.split(':').map(Number);
