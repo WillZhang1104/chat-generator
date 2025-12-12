@@ -2249,12 +2249,14 @@ function generateAttachmentsHTML(attachments) {
         // 根据文件类型选择图标
         let iconSVG = '';
         if (fileType === 'pdf') {
-            // PDF图标 - 红色背景，白色PDF标志
+            // PDF图标 - 红色背景，白色PDF标志（Adobe PDF经典样式）
             iconSVG = `
-                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="4" y="4" width="16" height="20" rx="1" fill="currentColor"/>
-                    <path d="M8 8h8v1H8V8zm0 2h8v1H8v-1zm0 2h6v1H8v-1zm0 2h8v1H8v-1zm0 2h6v1H8v-1z" fill="white" opacity="0.9"/>
-                    <path d="M14 2v6h6" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="1.5" fill="#DC3545"/>
+                    <path d="M16 3h3v3h-3V3z" fill="#DC3545"/>
+                    <path d="M16 3v3h3" stroke="#DC3545" stroke-width="1" fill="none"/>
+                    <path d="M7 8h6M7 11h4M7 14h6M7 17h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M7 8h6M7 11h4M7 14h6M7 17h4" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
                 </svg>`;
         } else if (fileType === 'image') {
             // 图片图标 - 蓝色背景，白色矩形，中间有黄色圆点（通过CSS实现）
