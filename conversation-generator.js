@@ -1792,8 +1792,16 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     // 生成邮件格式的对话
     const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting);
     
-    // 获取附件列表
-    const attachments = window.getAttachments ? window.getAttachments() : [];
+    // 获取附件列表（安全获取，避免错误）
+    let attachments = [];
+    try {
+        if (typeof window !== 'undefined' && window.getAttachments && typeof window.getAttachments === 'function') {
+            attachments = window.getAttachments() || [];
+        }
+    } catch (e) {
+        console.warn('获取附件列表时出错:', e);
+        attachments = [];
+    }
     
     // 生成完整的Titan.email界面HTML
     const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments);
@@ -2186,9 +2194,10 @@ function generateAttachmentsHTML(attachments) {
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                 </svg>`;
         } else if (fileType === 'image') {
+            // 图片图标 - 蓝色背景，白色矩形，中间有黄色圆点（通过CSS实现）
             iconSVG = `
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"/>
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
                 </svg>`;
         } else {
             iconSVG = `
