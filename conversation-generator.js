@@ -75,6 +75,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 设置对话场景监听器
     setupConversationSceneListeners();
+    
+    // 监听时间段选择变化
+    document.querySelectorAll('input[name="conversationTime"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const customTimeGroup = document.getElementById('customTimeGroup');
+            if (customTimeGroup) {
+                customTimeGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+            }
+        });
+    });
 });
 
 // 监听对话场景变化（在DOMContentLoaded中调用）
