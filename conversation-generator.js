@@ -49,26 +49,17 @@ function setupConversationSceneListeners() {
             const purposeGroup = document.getElementById('purposeGroup');
             const formMethodGroup = document.getElementById('formMethodGroup');
             const purposeRequired = document.getElementById('purposeRequired');
-            const customSceneGroup = document.getElementById('customSceneGroup');
             
             if (this.value === 'kyc') {
                 ageGroup.style.display = 'block';
                 willProvideGroup.style.display = 'block';
                 purposeGroup.style.display = 'none';
                 formMethodGroup.style.display = 'none';
-                customSceneGroup.style.display = 'none';
-            } else if (this.value === 'custom') {
-                ageGroup.style.display = 'none';
-                willProvideGroup.style.display = 'none';
-                purposeGroup.style.display = 'none';
-                formMethodGroup.style.display = 'none';
-                customSceneGroup.style.display = 'block';
             } else {
                 ageGroup.style.display = 'none';
                 willProvideGroup.style.display = 'none';
                 purposeGroup.style.display = 'block';
                 formMethodGroup.style.display = 'block';
-                customSceneGroup.style.display = 'none';
             }
         });
     });
@@ -80,7 +71,6 @@ function clearForm() {
     document.getElementById('customPurposeGroup').style.display = 'none';
     document.getElementById('ageGroup').style.display = 'none';
     document.getElementById('willProvideGroup').style.display = 'none';
-    document.getElementById('customSceneGroup').style.display = 'none';
     document.getElementById('purposeGroup').style.display = 'block';
     document.getElementById('formMethodGroup').style.display = 'block';
 }
@@ -383,6 +373,33 @@ const conversationVariations = {
     ]
 };
 
+// 根据客户名称生成变体索引（用于选择同一风格下的不同变体）
+function getConversationVariant(customerName) {
+    // 使用不同的哈希算法来生成变体索引
+    let hash = 0;
+    for (let i = 0; i < customerName.length; i++) {
+        hash = ((hash << 7) - hash) + customerName.charCodeAt(i) * (i + 1);
+        hash = hash & hash;
+    }
+    return Math.abs(hash) % 5; // 每个风格有5个变体（0-4）
+}
+
+// 根据客户名称生成随机种子（用于选择随机元素）
+function getRandomSeed(customerName) {
+    let seed = 0;
+    for (let i = 0; i < customerName.length; i++) {
+        seed = ((seed << 3) - seed) + customerName.charCodeAt(i) * 17;
+        seed = seed & seed;
+    }
+    return Math.abs(seed);
+}
+
+// 基于种子的随机选择（确保同一客户总是选择相同的元素）
+function seededChoice(array, seed, index = 0) {
+    const combinedSeed = seed + index * 1000;
+    return array[combinedSeed % array.length];
+}
+
 function createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo) {
     const style = getConversationStyle(customerName);
     const conversationStart = getConversationStart(customerName);
@@ -394,15 +411,6 @@ function createKYCConversation(customerName, customerAge, platform, additionalIn
     const style = getConversationStyle(customerName);
     
     return generateKYCConversationByStyle(customerName, customerAge, platform, additionalInfo, style, willProvide);
-}
-
-// 创建自定义场景对话
-function createCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo) {
-    const style = getConversationStyle(customerName);
-    const variant = getConversationVariant(customerName);
-    const seed = getRandomSeed(customerName);
-    
-    return generateCustomConversationByStyle(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, style, variant, seed);
 }
 
 // 根据风格生成KYC补充材料对话
@@ -420,27 +428,6 @@ function generateKYCConversationByStyle(customerName, customerAge, platform, add
     return generator(customerName, customerAge, platform, additionalInfo, willProvide);
 }
 
-// 根据风格生成自定义场景对话
-function generateCustomConversationByStyle(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, style, variant, seed) {
-    const conversationTemplates = {
-        verbose: generateVerboseCustomConversation,
-        concise: generateConciseCustomConversation,
-        cautious: generateCautiousCustomConversation,
-        urgent: generateUrgentCustomConversation,
-        friendly: generateFriendlyCustomConversation,
-        professional: generateProfessionalCustomConversation,
-        detailed: generateDetailedCustomConversation,
-        casual: generateCasualCustomConversation,
-        formal: generateFormalCustomConversation,
-        inquisitive: generateInquisitiveCustomConversation,
-        straightforward: generateStraightforwardCustomConversation,
-        elaborate: generateElaborateCustomConversation
-    };
-    
-    const generator = conversationTemplates[style] || generateFriendlyCustomConversation;
-    return generator(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
 // 生成多样化的对话开头
 function getConversationStart(customerName) {
     const starts = [
@@ -448,17 +435,7 @@ function getConversationStart(customerName) {
         'customer_introduces',     // 客户自我介绍并说明目的
         'customer_referral',       // 客户说明从哪里知道我们
         'customer_product_info',   // 客户要求介绍产品
-        'customer_direct_purpose',  // 客户直接说明目的
-        'customer_business_need',   // 客户说明业务需求
-        'customer_previous_exp',    // 客户提及之前的经验
-        'customer_quick_question',  // 客户快速提问
-        'customer_formal_inquiry',  // 客户正式询问
-        'customer_casual_chat',     // 客户随意聊天
-        'customer_urgent_need',     // 客户紧急需求
-        'customer_comparison',      // 客户对比服务
-        'customer_specific_use',   // 客户具体用途
-        'customer_partnership',     // 客户寻求合作
-        'customer_follow_up'        // 客户跟进
+        'customer_direct_purpose'   // 客户直接说明目的
     ];
     
     // 根据客户名称确定开头类型（确保同一客户总是相同开头）
@@ -513,124 +490,22 @@ function buildPurposeText(purposeDetails) {
     }
 }
 
-// 生成对话开头消息（增加更多变体）
-function generateConversationStart(customerName, purposeDetails, conversationStart, variant = 0, seed = 0) {
+// 生成对话开头消息
+function generateConversationStart(customerName, purposeDetails, conversationStart) {
     const mainPurpose = purposeDetails[0].main;
     const detail = purposeDetails[0].details && purposeDetails[0].details.length > 0 
         ? purposeDetails[0].details[Math.floor(Math.random() * purposeDetails[0].details.length)]
         : '';
     
-    // 为每种开头类型提供多个变体
     const starts = {
-        'customer_asks': [
-            `Hi, I'm interested in opening an account for USD to USDT conversion. Can you tell me more about your service?`,
-            `Hello! I'd like to learn about your USD to USDT onramp service. Could you provide some details?`,
-            `Hi there, I'm looking into USD to USDT conversion services. What can you offer?`,
-            `Good morning! I'm interested in your USD to USDT conversion platform. Can you help me understand how it works?`,
-            `Hi, I need to convert USD to USDT regularly. Can you tell me about your service?`
-        ],
-        'customer_introduces': [
-            `Hello, I'm ${customerName}. I'm looking for a reliable onramp service to convert USD to USDT. ${detail ? 'Specifically, ' + detail.toLowerCase() + '.' : ''}`,
-            `Hi, this is ${customerName}. I need a USD to USDT conversion service. ${detail ? detail + '. ' : ''}Can you help?`,
-            `Hello, my name is ${customerName}. I'm exploring options for USD to USDT conversion. ${detail ? 'I need this for ' + detail.toLowerCase() + '.' : ''}`,
-            `Hi there, I'm ${customerName}. I'm in the market for a USD to USDT onramp solution. ${detail ? 'Particularly for ' + detail.toLowerCase() + '.' : ''}`,
-            `Good day, ${customerName} here. I'm looking for a USD to USDT service. ${detail ? detail + '. ' : ''}What do you offer?`
-        ],
-        'customer_referral': [
-            `Hi! A friend recommended your service. I'm looking to convert USD to USDT for ${mainPurpose}. What can you tell me about your platform?`,
-            `Hello! Someone I know suggested I check out your USD to USDT service. I need it for ${mainPurpose}. Can you help?`,
-            `Hi there! Got referred to you for USD to USDT conversion. I'm interested in using it for ${mainPurpose}. What's the process?`,
-            `Hey! A colleague mentioned your service. I need USD to USDT conversion for ${mainPurpose}. Can you provide more info?`,
-            `Hi! Heard good things about your platform. I'm looking to convert USD to USDT for ${mainPurpose}. How does it work?`
-        ],
-        'customer_product_info': [
-            `Hi there. I'd like to learn more about your USD to USDT onramp service. Can you provide some information?`,
-            `Hello, I'm researching USD to USDT conversion options. Can you tell me about your service?`,
-            `Hi! I saw your USD to USDT service online. Could you give me more details?`,
-            `Good morning! I'm interested in learning about your USD to USDT platform. What can you share?`,
-            `Hi, I came across your USD to USDT conversion service. Can you explain how it works?`
-        ],
-        'customer_direct_purpose': [
-            `Hello, I need to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}How does your service work?`,
-            `Hi, I'm looking to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}Can you help me get started?`,
-            `Hello! I need USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}What's your process?`,
-            `Hi there, I want to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}How do I begin?`,
-            `Hello, I'm seeking USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}Can you assist?`
-        ],
-        'customer_business_need': [
-            `Hi, I run a business and need USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}Do you serve businesses?`,
-            `Hello! I'm a business owner looking for USD to USDT services. I need it for ${mainPurpose}. Can you help?`,
-            `Hi there, my business requires USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}What are your business rates?`,
-            `Hello, I have a business need for USD to USDT conversion. Specifically for ${mainPurpose}. Can you accommodate?`,
-            `Hi! I'm looking for a business USD to USDT solution for ${mainPurpose}. ${detail ? detail + '. ' : ''}What do you offer?`
-        ],
-        'customer_previous_exp': [
-            `Hi! I've used other USD to USDT services before, but I'm looking for something better. Can you tell me about yours?`,
-            `Hello, I've tried a few USD to USDT platforms. What makes yours different?`,
-            `Hi there! I'm currently using another service but considering switching. What can you offer?`,
-            `Hello! I have experience with USD to USDT conversion. I'm looking for a more reliable option. Can you help?`,
-            `Hi, I've been using Coinbase/Binance for conversions, but I need something more direct. What's your process?`
-        ],
-        'customer_quick_question': [
-            `Hi! Quick question - do you offer USD to USDT conversion?`,
-            `Hello! Do you handle USD to USDT conversions?`,
-            `Hi there! Quick question about USD to USDT conversion - is that something you do?`,
-            `Hello! Can you convert USD to USDT?`,
-            `Hi! Do you provide USD to USDT services?`
-        ],
-        'customer_formal_inquiry': [
-            `Good day. I am writing to inquire about your USD to USDT conversion services. Could you please provide information?`,
-            `Hello, I am interested in learning more about your USD to USDT onramp platform. Please share details.`,
-            `Good morning. I would like to inquire about your USD to USDT conversion capabilities. Can you assist?`,
-            `Hello, I am seeking information regarding your USD to USDT services. Could you provide details?`,
-            `Good day. I am interested in your USD to USDT conversion platform. Please provide more information.`
-        ],
-        'customer_casual_chat': [
-            `Hey! So I heard you guys do USD to USDT conversion? Tell me more!`,
-            `Hi! Looking into USD to USDT stuff. What's your deal?`,
-            `Hey there! I need to convert some USD to USDT. How does your service work?`,
-            `Hi! USD to USDT conversion - is that something you do?`,
-            `Hey! I'm checking out USD to USDT options. What can you tell me?`
-        ],
-        'customer_urgent_need': [
-            `Hi! I need USD to USDT conversion ASAP for ${mainPurpose}. How quickly can you help?`,
-            `Hello! Urgent question - I need USD to USDT conversion soon. Can you accommodate?`,
-            `Hi there! I have an urgent need for USD to USDT conversion. What's your fastest option?`,
-            `Hello! I need USD to USDT conversion quickly. How fast is your process?`,
-            `Hi! Time-sensitive question - I need USD to USDT conversion. Can you help fast?`
-        ],
-        'customer_comparison': [
-            `Hi! I'm comparing different USD to USDT services. What are your rates and fees?`,
-            `Hello! I'm shopping around for USD to USDT conversion. What makes you competitive?`,
-            `Hi there! I'm evaluating USD to USDT platforms. What are your advantages?`,
-            `Hello! Comparing USD to USDT services. What should I know about yours?`,
-            `Hi! I'm looking at different USD to USDT options. What sets you apart?`
-        ],
-        'customer_specific_use': [
-            `Hi! I need USD to USDT conversion specifically for ${mainPurpose}. ${detail ? detail + '. ' : ''}Do you support this?`,
-            `Hello! I'm looking for USD to USDT conversion for ${mainPurpose}. ${detail ? detail + '. ' : ''}Is this something you handle?`,
-            `Hi there! I need USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}Can you help?`,
-            `Hello! My use case is ${mainPurpose}. ${detail ? detail + '. ' : ''}Do you support USD to USDT for this?`,
-            `Hi! I specifically need USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}What's your process?`
-        ],
-        'customer_partnership': [
-            `Hi! I'm exploring USD to USDT conversion services for potential partnership. Can you tell me about your platform?`,
-            `Hello! I'm interested in USD to USDT services, possibly for business partnership. What do you offer?`,
-            `Hi there! Looking into USD to USDT conversion - might be interested in partnership. Can we discuss?`,
-            `Hello! I'm considering USD to USDT services for partnership opportunities. What's available?`,
-            `Hi! I'm exploring USD to USDT options for potential collaboration. Can you provide information?`
-        ],
-        'customer_follow_up': [
-            `Hi! I reached out before about USD to USDT conversion. Following up - can you help?`,
-            `Hello! Following up on USD to USDT conversion inquiry. Are you available to discuss?`,
-            `Hi there! I inquired about USD to USDT services earlier. Can we continue the conversation?`,
-            `Hello! Following up regarding USD to USDT conversion. Can you assist?`,
-            `Hi! I had questions about USD to USDT conversion. Can we pick up where we left off?`
-        ]
+        'customer_asks': `Hi, I'm interested in opening an account for USD to USDT conversion. Can you tell me more about your service?`,
+        'customer_introduces': `Hello, I'm ${customerName}. I'm looking for a reliable onramp service to convert USD to USDT. ${detail ? 'Specifically, ' + detail.toLowerCase() + '.' : ''}`,
+        'customer_referral': `Hi! A friend recommended your service. I'm looking to convert USD to USDT for ${mainPurpose}. What can you tell me about your platform?`,
+        'customer_product_info': `Hi there. I'd like to learn more about your USD to USDT onramp service. Can you provide some information?`,
+        'customer_direct_purpose': `Hello, I need to convert USD to USDT for ${mainPurpose}. ${detail ? detail + '. ' : ''}How does your service work?`
     };
     
-    const variants = starts[conversationStart] || starts['customer_asks'];
-    return seededChoice(variants, seed, variant);
+    return starts[conversationStart] || starts['customer_asks'];
 }
 
 // 话多型对话 - 会问很多问题，比较详细
@@ -643,7 +518,7 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     // 使用多样化的开头
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart),
         time: formatTime(day1, 9, 15)
     });
 
@@ -719,13 +594,8 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `To get started, please complete our online onboarding form. It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
+            text: `Here's the link to our online onboarding form: https://onboarding.geoswift.com It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
             time: formatTime(day2, 10, 20)
-        });
-        messages.push({
-            sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding`,
-            time: formatTime(day2, 10, 21)
         });
     } else {
         messages.push({
@@ -792,7 +662,7 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart),
         time: formatTime(day1, 11, 30)
     });
 
@@ -839,13 +709,8 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Please complete the onboarding form. Let me know once you've submitted it.`,
+            text: `Here's the link: https://onboarding.geoswift.com Let me know once you've submitted it.`,
             time: formatTime(day2, 14, 22)
-        });
-        messages.push({
-            sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding`,
-            time: formatTime(day2, 14, 23)
         });
     } else {
         messages.push({
@@ -885,7 +750,7 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart),
         time: formatTime(day1, 10, 45)
     });
 
@@ -956,13 +821,8 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `To proceed, please complete our onboarding form. All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
+            text: `To proceed, please complete our onboarding form: https://onboarding.geoswift.com All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
             time: formatTime(day2, 13, 33)
-        });
-        messages.push({
-            sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding`,
-            time: formatTime(day2, 13, 34)
         });
     } else {
         messages.push({
@@ -1002,7 +862,7 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart),
         time: formatTime(day1, 8, 30)
     });
 
@@ -1043,13 +903,8 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Please complete the onboarding form. Submit as soon as possible and we'll review it right away.`,
+            text: `Here's the link: https://onboarding.geoswift.com Submit as soon as possible and we'll review it right away.`,
             time: formatTime(day2, 9, 15)
-        });
-        messages.push({
-            sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding`,
-            time: formatTime(day2, 9, 16)
         });
     } else {
         messages.push({
@@ -1113,7 +968,7 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart),
         time: formatTime(day1, 10, 20)
     });
 
@@ -1178,13 +1033,8 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `You can access the onboarding form below. Let me know if you have any questions while filling it out - I'm here to help!`,
+            text: `You can access the form here: https://onboarding.geoswift.com Let me know if you have any questions while filling it out - I'm here to help!`,
             time: formatTime(day2, 14, 20)
-        });
-        messages.push({
-            sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding`,
-            time: formatTime(day2, 14, 21)
         });
     } else {
         messages.push({
@@ -1230,7 +1080,7 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     
     messages.push({
         sender: 'customer',
-        text: generateConversationStart(customerName, purposeDetails, conversationStart, variant, seed),
+        text: generateConversationStart(customerName, purposeDetails, conversationStart),
         time: formatTime(day1, 9, 0)
     });
 
@@ -1289,13 +1139,8 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Please complete the onboarding form. Upon submission, our compliance team will review your application and initiate the verification process.`,
+            text: `Please complete the onboarding form at: https://onboarding.geoswift.com Upon submission, our compliance team will review your application and initiate the verification process.`,
             time: formatTime(day2, 14, 3)
-        });
-        messages.push({
-            sender: 'company',
-            text: `https://wsdglobalpay.com/onboarding`,
-            time: formatTime(day2, 14, 4)
         });
     } else {
         messages.push({
@@ -1328,341 +1173,6 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
         text: `Perfect. We look forward to working with you. Should you have any questions during the process, please don't hesitate to reach out.`,
         time: formatTime(day2, 14, 15)
     });
-
-    return messages;
-}
-
-// 详细型对话
-function generateDetailedConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
-    return generateVerboseConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
-}
-
-// 随意型对话
-function generateCasualConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
-    return generateFriendlyConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
-}
-
-// 正式型对话
-function generateFormalConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
-    return generateProfessionalConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
-}
-
-// 好奇型对话
-function generateInquisitiveConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
-    return generateVerboseConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
-}
-
-// 直接型对话
-function generateStraightforwardConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
-    return generateConciseConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
-}
-
-// 详细阐述型对话
-function generateElaborateConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
-    return generateVerboseConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
-}
-
-// ========== 自定义场景对话生成函数 ==========
-
-// 话多型自定义场景对话
-function generateVerboseCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
-// 简洁型自定义场景对话
-function generateConciseCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'concise');
-    return messages;
-}
-
-// 谨慎型自定义场景对话
-function generateCautiousCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'cautious');
-    return messages;
-}
-
-// 急切型自定义场景对话
-function generateUrgentCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'urgent');
-    return messages;
-}
-
-// 友好型自定义场景对话（默认）
-function generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'friendly');
-    return messages;
-}
-
-// 专业型自定义场景对话
-function generateProfessionalCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    const messages = generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, 'professional');
-    return messages;
-}
-
-// 详细型自定义场景对话
-function generateDetailedCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
-// 随意型自定义场景对话
-function generateCasualCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
-// 正式型自定义场景对话
-function generateFormalCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    return generateProfessionalCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
-// 好奇型自定义场景对话
-function generateInquisitiveCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
-// 直接型自定义场景对话
-function generateStraightforwardCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    return generateConciseCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
-// 详细阐述型自定义场景对话
-function generateElaborateCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant = 0, seed = 0) {
-    return generateFriendlyCustomConversation(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed);
-}
-
-// 生成自定义场景对话的基础函数
-function generateCustomConversationBase(customerName, sceneDescription, customerResponseCore, platform, additionalInfo, variant, seed, tone) {
-    const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 2);
-    
-    // 根据场景描述和客户答复核心生成对话
-    // 场景描述通常包含：公司发起的话题/问题
-    // 客户答复核心：客户需要表达的核心内容
-    
-    // 开场：公司根据场景描述发起对话
-    const companyOpenings = [
-        `Hello ${customerName}, ${sceneDescription}`,
-        `Hi ${customerName}, ${sceneDescription}`,
-        `${customerName}, ${sceneDescription}`,
-        `Good morning ${customerName}, ${sceneDescription}`,
-        `Hi there ${customerName}, ${sceneDescription}`
-    ];
-    
-    messages.push({
-        sender: 'company',
-        text: seededChoice(companyOpenings, seed, variant * 0),
-        time: formatTime(day1, 10, 0)
-    });
-    
-    // 客户第一反应：根据客户答复核心生成
-    const customerFirstResponses = [
-        customerResponseCore,
-        `I see. ${customerResponseCore}`,
-        `Okay, ${customerResponseCore.toLowerCase()}`,
-        `I understand. ${customerResponseCore}`,
-        `Got it. ${customerResponseCore}`
-    ];
-    
-    messages.push({
-        sender: 'customer',
-        text: seededChoice(customerFirstResponses, seed, variant * 1),
-        time: formatTime(day1, 10, 3)
-    });
-    
-    // 公司进一步说明或询问
-    const companyFollowUps = [
-        `Thank you for understanding. Let me provide you with more details.`,
-        `I appreciate your response. Here's what we need to know.`,
-        `That's helpful. Let me explain the next steps.`,
-        `Perfect. Let me clarify a few things.`,
-        `Great. I'll walk you through the process.`
-    ];
-    
-    messages.push({
-        sender: 'company',
-        text: seededChoice(companyFollowUps, seed, variant * 2),
-        time: formatTime(day1, 10, 6)
-    });
-    
-    // 根据tone调整对话风格
-    if (tone === 'concise') {
-        // 简洁型：减少对话轮次
-        messages.push({
-            sender: 'customer',
-            text: `Understood. What do I need to do next?`,
-            time: formatTime(day1, 10, 9)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `Please follow the instructions we'll send you. If you have any questions, feel free to ask.`,
-            time: formatTime(day1, 10, 12)
-        });
-        
-        messages.push({
-            sender: 'customer',
-            text: `Will do. Thanks for your help.`,
-            time: formatTime(day1, 10, 15)
-        });
-    } else if (tone === 'cautious') {
-        // 谨慎型：客户会问更多问题
-        messages.push({
-            sender: 'customer',
-            text: `I want to make sure I understand everything correctly. Can you clarify a few things?`,
-            time: formatTime(day1, 10, 9)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `Of course. What would you like to know?`,
-            time: formatTime(day1, 10, 12)
-        });
-        
-        messages.push({
-            sender: 'customer',
-            text: `What information do you need exactly? And how will you protect my data?`,
-            time: formatTime(day1, 10, 15)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `We only need the information mentioned earlier. All data is encrypted and stored securely according to regulatory requirements.`,
-            time: formatTime(day1, 10, 18)
-        });
-        
-        messages.push({
-            sender: 'customer',
-            text: `Alright, that makes sense. ${customerResponseCore}`,
-            time: formatTime(day1, 10, 21)
-        });
-    } else if (tone === 'urgent') {
-        // 急切型：客户催促
-        messages.push({
-            sender: 'customer',
-            text: `How quickly can this be resolved? I need this done as soon as possible.`,
-            time: formatTime(day1, 10, 9)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `We'll process this as quickly as possible. Typically within 1-2 business days after we receive everything.`,
-            time: formatTime(day1, 10, 12)
-        });
-        
-        messages.push({
-            sender: 'customer',
-            text: `Okay, ${customerResponseCore} I'll send everything today.`,
-            time: formatTime(day1, 10, 15)
-        });
-    } else if (tone === 'professional') {
-        // 专业型：正式用语
-        messages.push({
-            sender: 'customer',
-            text: `I understand the requirements. ${customerResponseCore} What is the expected timeline for completion?`,
-            time: formatTime(day1, 10, 9)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `Thank you for your cooperation. The standard processing time is 1-2 business days after we receive all required documentation.`,
-            time: formatTime(day1, 10, 12)
-        });
-        
-        messages.push({
-            sender: 'customer',
-            text: `Understood. I will proceed accordingly and provide the necessary information.`,
-            time: formatTime(day1, 10, 15)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `Excellent. We appreciate your prompt response. Should you have any questions, please don't hesitate to contact us.`,
-            time: formatTime(day1, 10, 18)
-        });
-    } else {
-        // 友好型（默认）：自然对话
-        messages.push({
-            sender: 'customer',
-            text: `Thanks for explaining. ${customerResponseCore}`,
-            time: formatTime(day1, 10, 9)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `You're welcome! Is there anything else you'd like to know?`,
-            time: formatTime(day1, 10, 12)
-        });
-        
-        messages.push({
-            sender: 'customer',
-            text: `Not right now, but I might have questions later. How can I reach you?`,
-            time: formatTime(day1, 10, 15)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `You can reply here anytime. We're here to help!`,
-            time: formatTime(day1, 10, 18)
-        });
-        
-        messages.push({
-            sender: 'customer',
-            text: `Perfect, thanks so much!`,
-            time: formatTime(day1, 10, 21)
-        });
-    }
-    
-    // 如果有额外信息，在对话中融入
-    if (additionalInfo && additionalInfo.trim()) {
-        const day2 = new Date(now);
-        day2.setDate(day2.getDate() - 1);
-        
-        messages.push({
-            sender: 'customer',
-            text: `By the way, ${additionalInfo}`,
-            time: formatTime(day2, 14, 0)
-        });
-        
-        messages.push({
-            sender: 'company',
-            text: `Noted. We'll take that into consideration. Thank you for letting us know.`,
-            time: formatTime(day2, 14, 3)
-        });
-    }
-    
-    // 确保对话长度在12-15条
-    // 如果少于12条，添加一些自然的对话
-    while (messages.length < 12) {
-        const lastMessage = messages[messages.length - 1];
-        const lastTimeStr = lastMessage.time;
-        // 解析时间字符串 "MM/DD HH:mm"
-        const [datePart, timePart] = lastTimeStr.split(' ');
-        const [month, day] = datePart.split('/');
-        const [hour, minute] = timePart.split(':');
-        const lastTime = new Date(now.getFullYear(), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
-        const nextTime = new Date(lastTime);
-        nextTime.setMinutes(nextTime.getMinutes() + 3);
-        
-        if (lastMessage.sender === 'customer') {
-            messages.push({
-                sender: 'company',
-                text: `Thank you for your cooperation. We'll keep you updated on the progress.`,
-                time: formatTime(nextTime, nextTime.getHours(), nextTime.getMinutes())
-            });
-        } else {
-            messages.push({
-                sender: 'customer',
-                text: `Sounds good. I'll wait for your update.`,
-                time: formatTime(nextTime, nextTime.getHours(), nextTime.getMinutes())
-            });
-        }
-    }
-    
-    // 如果超过15条，截取前15条
-    if (messages.length > 15) {
-        return messages.slice(0, 15);
-    }
 
     return messages;
 }
@@ -1724,26 +1234,9 @@ function formatTime(date, hour, minute) {
     return `${month}/${day} ${hours}:${minutes}`;
 }
 
-// 存储当前对话，用于编辑功能
-let currentConversation = null;
-let currentPlatform = null;
-let currentCustomerName = null;
-
 function displayConversation(messages) {
     const preview = document.getElementById('conversationPreview');
     preview.innerHTML = '';
-    
-    // 保存当前对话
-    currentConversation = messages;
-    const platform = document.getElementById('platform').value;
-    currentPlatform = platform;
-    currentCustomerName = document.getElementById('customerName').value;
-
-    // 如果是邮件平台，显示HTML预览而不是对话气泡
-    if (platform === 'email') {
-        // 邮件预览会在 generateEmailHTML 中处理
-        return;
-    }
 
     messages.forEach(msg => {
         const messageDiv = document.createElement('div');
@@ -1770,17 +1263,12 @@ function generateBrowserScript(conversation, platform) {
         if (platform === 'telegram') {
             return generateTelegramMessageHTML(msg, customerName, index, conversation);
         } else {
-            return generateWhatsAppMessageHTML(msg, customerName, index, conversation);
+            return generateWhatsAppMessageHTML(msg, customerName, index);
         }
     }).join('\n');
 
     // 直接生成HTML代码，不包含注释
     document.getElementById('scriptCode').textContent = htmlMessages;
-    
-    // 保存当前对话和平台，用于编辑功能
-    currentConversation = conversation;
-    currentPlatform = platform;
-    currentCustomerName = customerName;
 }
 
 // 生成邮件格式的对话（正式邮件格式，但更自然多样化）
@@ -1799,18 +1287,9 @@ function generateEmailConversation(customerName, purposeDetails, conversationSce
         }
         const emailBody = generateInitialEmailByStyle(customerName, purposeDetails, customerGreeting, style, variant, seed);
         
-        // 多样化的邮件主题
-        const subjects = [
-            'Re: Account Opening Inquiry - USD to USDT',
-            'Re: USD to USDT Account Opening',
-            'Re: Account Opening Request',
-            'Re: Onboarding Information',
-            'Re: Account Application Details'
-        ];
-        
         emails.push({
             sender: 'customer',
-            subject: seededChoice(subjects, seed, variant),
+            subject: 'Re: Account Opening Inquiry - USD to USDT',
             body: emailBody,
             date: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000) // 2天前
         });
@@ -1868,119 +1347,43 @@ function generateInitialEmailByStyle(customerName, purposeDetails, customerGreet
     return generator(customerName, purposeDetails, customerGreeting, variant, seed);
 }
 
-// 话多型初次邮件（增加更多变体）
+// 话多型初次邮件
 function generateVerboseInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0) {
     const purposeText = buildPurposeText(purposeDetails);
     
-    // 多样化的开头段落
-    const openingParagraphs = [
-        `Thank you for reaching out. I wanted to provide you with the information you requested regarding my account opening inquiry.`,
-        `I appreciate your email and would like to provide the details you've requested about my account opening.`,
-        `Thank you for your message. I'm happy to provide you with the information needed for my account opening.`,
-        `I received your email and wanted to follow up with the details you requested.`,
-        `Thank you for contacting me. Here's the information you need regarding my account opening inquiry.`
-    ];
-    
-    // 多样化的资金来源描述
-    const fundSources = [
-        `The funds come from my personal savings and business operations. I've been in business for several years and maintain accounts with major banks. Everything is properly documented and above board.`,
-        `My funds originate from legitimate business income and personal savings accumulated over the years. I have accounts with established financial institutions and all transactions are properly documented.`,
-        `The source of funds is primarily from my business operations, supplemented by personal savings. I maintain relationships with reputable banks and can provide documentation as needed.`,
-        `Funds are derived from my professional income and personal savings. I've maintained bank accounts for many years and all financial activities are transparent and documented.`,
-        `The capital comes from my business revenue and personal savings. I work with well-established banks and can provide complete documentation for all fund sources.`
-    ];
-    
-    // 多样化的交易细节描述
-    const transactionDetails = [
-        `I'm planning to make transactions monthly, typically around $15k-$40k per transaction. Annual volume would probably be in the $200k-$300k range.`,
-        `My transaction pattern will likely be monthly, with amounts ranging from $20k to $50k per transaction. I estimate annual volume around $300k-$400k.`,
-        `I expect to transact on a monthly basis, with transaction sizes between $10k and $35k. Annual volume should be approximately $200k-$250k.`,
-        `Transactions will occur monthly, typically in the $15k-$45k range per transaction. I anticipate annual volume of $250k-$350k.`,
-        `I plan monthly transactions, usually $20k-$40k each. My estimated annual volume is around $300k.`
-    ];
-    
     let body = `${customerGreeting}\n\n`;
-    body += seededChoice(openingParagraphs, seed, variant * 0) + `\n\n`;
+    body += `Thank you for reaching out. I wanted to provide you with the information you requested regarding my account opening inquiry.\n\n`;
     
-    // 自然融入目的和背景信息
-    const purposeIntros = [
-        `I'm looking to use your service primarily for ${purposeText.toLowerCase()}.`,
-        `My main goal is ${purposeText.toLowerCase()}, and I think your platform could be a good fit.`,
-        `I need this account mainly for ${purposeText.toLowerCase()}.`,
-        `The primary reason I'm interested is ${purposeText.toLowerCase()}.`
-    ];
-    
-    body += seededChoice(purposeIntros, seed, variant * 1);
+    body += `To answer your questions:\n\n`;
+    body += `**Purpose of Transaction:** ${purposeText}\n\n`;
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        const investmentDetails = [
-            ` I've been investing in crypto for a while now, mostly through Coinbase and Binance. I'm looking to diversify and this account will help me access USDT more efficiently for my investment strategy.`,
-            ` I'm an active crypto investor, primarily using platforms like Coinbase and Kraken. This account will streamline my USDT access for investment purposes.`,
-            ` I have experience investing in cryptocurrency through various exchanges. This service will help me manage my USDT investments more effectively.`
-        ];
-        body += seededChoice(investmentDetails, seed, variant * 2) + `\n\n`;
-    } else if (purposeDetails.some(p => p.main === 'payment')) {
-        const paymentDetails = [
-            ` I regularly need to pay suppliers in Asia - mainly China and Singapore. USDT transactions are faster and cheaper than traditional wire transfers, which is why I'm interested in your service.`,
-            ` I frequently make payments to business partners in Southeast Asia. USDT offers faster settlement and lower fees compared to traditional banking.`,
-            ` I need to pay suppliers across Asia regularly. USDT provides a more efficient payment method than conventional wire transfers.`
-        ];
-        body += seededChoice(paymentDetails, seed, variant * 2) + `\n\n`;
-    } else {
-        body += `\n\n`;
+        body += `I've been investing in crypto for a while now, mostly through Coinbase and Binance. I'm looking to diversify and this account will help me access USDT more efficiently for my investment strategy.\n\n`;
+    }
+    if (purposeDetails.some(p => p.main === 'payment')) {
+        body += `I regularly need to pay suppliers in Asia - mainly China and Singapore. USDT transactions are faster and cheaper than traditional wire transfers, which is why I'm interested in your service.\n\n`;
     }
     
-    // 自然地融入资金来源和交易细节
-    const naturalFlow = [
-        seededChoice(fundSources, seed, variant * 3) + ` ` + seededChoice(transactionDetails, seed, variant * 4),
-        seededChoice(transactionDetails, seed, variant * 4) + ` ` + seededChoice(fundSources, seed, variant * 3),
-        `As for the funds, ` + seededChoice(fundSources, seed, variant * 3).toLowerCase() + ` ` + seededChoice(transactionDetails, seed, variant * 4),
-        seededChoice(fundSources, seed, variant * 3) + ` In terms of transaction volume, ` + seededChoice(transactionDetails, seed, variant * 4).toLowerCase()
-    ];
+    body += `**Source of Funds:** The funds come from my personal savings and business operations. I've been in business for several years and maintain accounts with major banks. Everything is properly documented and above board.\n\n`;
     
-    body += seededChoice(naturalFlow, seed, variant * 5) + `\n\n`;
+    body += `**Transaction Details:** I'm planning to make transactions monthly, typically around $15k-$40k per transaction. Annual volume would probably be in the $200k-$300k range.\n\n`;
     
-    // 使用变体系统选择不同的问题，自然地融入
+    // 使用变体系统选择不同的问题
     const questions = [
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 6),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 6 + 1),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 6 + 2),
-        seededChoice(conversationVariations.customerQuestions, seed, variant * 6 + 3)
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 4),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 4 + 1),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 4 + 2),
+        seededChoice(conversationVariations.customerQuestions, seed, variant * 4 + 3)
     ];
     
-    const questionIntros = [
-        `I have a few questions about your platform:`,
-        `Before proceeding, I'd like to understand a few things:`,
-        `I have some questions I'd like to clarify:`,
-        `Could you help me understand the following:`,
-        `I'd appreciate answers to these questions:`
-    ];
-    
-    body += seededChoice(questionIntros, seed, variant * 7) + `\n\n`;
+    body += `I have a few questions about your platform:\n\n`;
     questions.forEach((q, i) => {
         body += `- ${q}\n`;
     });
     body += `\n`;
     
-    const closings = [
-        `I've already submitted the onboarding form. Let me know if you need anything else!`,
-        `The onboarding form has been completed and submitted. Please let me know if additional information is required.`,
-        `I've submitted the onboarding documentation. Feel free to reach out if you need anything further.`,
-        `The onboarding form is complete. I'm ready to proceed once my account is approved.`,
-        `I've completed the onboarding process. Please advise if anything else is needed.`
-    ];
-    
-    body += seededChoice(closings, seed, variant * 7) + `\n\n`;
-    
-    const signatures = [
-        `Best regards,\n${customerName}`,
-        `Thank you,\n${customerName}`,
-        `Sincerely,\n${customerName}`,
-        `Regards,\n${customerName}`,
-        `Best,\n${customerName}`
-    ];
-    
-    body += seededChoice(signatures, seed, variant * 8);
+    body += `I've already submitted the onboarding form. Let me know if you need anything else!\n\n`;
+    body += `Best regards,\n${customerName}`;
     
     return body;
 }
@@ -1989,26 +1392,11 @@ function generateVerboseInitialEmail(customerName, purposeDetails, customerGreet
 function generateConciseInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0) {
     const purposeText = buildPurposeText(purposeDetails);
     
-    const openings = [
-        `Thanks for reaching out. I need this for ${purposeText.toLowerCase()}.`,
-        `Got your email. I'm looking to use your service for ${purposeText.toLowerCase()}.`,
-        `Hi, I'm interested in ${purposeText.toLowerCase()}.`
-    ];
-    
-    const fundInfo = [
-        `The funds are from my personal savings.`,
-        `Money comes from my savings account.`,
-        `I'll be using my personal savings.`
-    ];
-    
-    const volumeInfo = [
-        `I'm planning to do around $150k-$250k annually, monthly transactions.`,
-        `Expecting to process maybe $150k-$250k per year, monthly.`,
-        `Volume should be around $150k-$250k annually, monthly basis.`
-    ];
-    
     let body = `${customerGreeting}\n\n`;
-    body += seededChoice(openings, seed, variant) + ` ` + seededChoice(fundInfo, seed, variant + 1) + ` ` + seededChoice(volumeInfo, seed, variant + 2) + `\n\n`;
+    body += `Per your request:\n\n`;
+    body += `- Purpose: ${purposeText}\n`;
+    body += `- Funds from personal savings\n`;
+    body += `- Expected volume: ~$150k-$250k annually\n\n`;
     body += `Quick question - what are your transaction fees and processing times?\n\n`;
     body += `Onboarding form submitted.\n\n`;
     body += `Thanks,\n${customerName}`;
@@ -2020,16 +1408,14 @@ function generateConciseInitialEmail(customerName, purposeDetails, customerGreet
 function generateCautiousInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0) {
     const purposeText = buildPurposeText(purposeDetails);
     
-    const openings = [
-        `Thank you for your email. I understand you need information for compliance purposes.`,
-        `I appreciate your email requesting compliance information.`,
-        `Thank you for reaching out. I'm happy to provide the necessary information.`
-    ];
-    
     let body = `${customerGreeting}\n\n`;
-    body += seededChoice(openings, seed, variant) + `\n\n`;
+    body += `Thank you for your email. I understand you need information for compliance purposes. Below are the details:\n\n`;
     
-    body += `I'm looking to use your service primarily for ${purposeText.toLowerCase()}. The funds I'll be using originate from my personal savings accumulated over years of employment. I maintain accounts with established financial institutions and all funds are legally obtained. I anticipate conducting monthly transactions ranging from $20,000 to $45,000, with an estimated annual volume of $200,000 to $300,000.\n\n`;
+    body += `**Transaction Purpose:** ${purposeText}\n\n`;
+    
+    body += `**Source of Funds:** Funds originate from my personal savings accumulated over years of employment. I maintain accounts with established financial institutions and all funds are legally obtained.\n\n`;
+    
+    body += `**Transaction Pattern:** I anticipate monthly transactions ranging from $20,000 to $45,000. Annual volume estimated at $200,000 to $300,000.\n\n`;
     
     body += `Before proceeding, I would like to understand:\n\n`;
     body += `- What are your security protocols and insurance coverage?\n`;
@@ -2048,7 +1434,10 @@ function generateUrgentInitialEmail(customerName, purposeDetails, customerGreeti
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `I need this for ${purposeText.toLowerCase()}. The funds are from my business and personal savings. I'm looking to process around $20k-$50k monthly.\n\n`;
+    body += `Quick answers to your questions:\n\n`;
+    body += `- Purpose: ${purposeText}\n`;
+    body += `- Funds from my business/savings\n`;
+    body += `- Need to process $20k-$50k monthly\n\n`;
     body += `What are your fees and how fast can transactions go through? I need to get started ASAP.\n\n`;
     body += `Form is submitted. How quickly can we get approved?\n\n`;
     body += `Thanks,\n${customerName}`;
@@ -2063,13 +1452,16 @@ function generateFriendlyInitialEmail(customerName, purposeDetails, customerGree
     let body = `${customerGreeting}\n\n`;
     body += `Thanks for your email! Happy to provide the information you need.\n\n`;
     
-    body += `I'm looking to use your service for ${purposeText.toLowerCase()}.`;
+    body += `To answer your questions:\n\n`;
+    body += `**Purpose:** ${purposeText}\n\n`;
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        body += ` I've been investing in crypto for a few years now - mostly on Coinbase and Binance. Looking to expand my options and your service seems like a good fit.`;
+        body += `I've been investing in crypto for a few years now - mostly on Coinbase and Binance. Looking to expand my options and your service seems like a good fit.\n\n`;
     }
     
-    body += ` The money comes from my personal savings - I've been working for a while and have been building up my savings over the years. I'm planning to do transactions monthly, probably around $15k-$35k each time, so maybe $200k-$300k per year total.\n\n`;
+    body += `**Source of Funds:** The money comes from my personal savings. I've been working for a while and have been building up my savings over the years.\n\n`;
+    
+    body += `**Transaction Info:** I'm planning to do transactions monthly, probably around $15k-$35k each time. So maybe $200k-$300k per year total.\n\n`;
     
     body += `I'm curious about a few things:\n\n`;
     body += `- What are your transaction fees like? I want to make sure it's cost-effective.\n`;
@@ -2088,9 +1480,13 @@ function generateProfessionalInitialEmail(customerName, purposeDetails, customer
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `Thank you for your email. Please find below the requested information.\n\n`;
+    body += `Thank you for your email. Please find below the requested information:\n\n`;
     
-    body += `I'm seeking to use your service for ${purposeText.toLowerCase()}. The funds are derived from personal savings and business operations, all of which are legitimate and properly documented. I expect to conduct transactions on a monthly basis, with transaction sizes ranging from $20,000 to $40,000 per transaction, resulting in an estimated annual volume of $200,000 to $300,000.\n\n`;
+    body += `**Purpose of Transaction:** ${purposeText}\n\n`;
+    
+    body += `**Source of Funds:** Funds are derived from personal savings and business operations. All sources are legitimate and properly documented.\n\n`;
+    
+    body += `**Transaction Parameters:** Expected transaction frequency: monthly. Transaction size: $20,000-$40,000 per transaction. Estimated annual volume: $200,000-$300,000.\n\n`;
     
     body += `I would appreciate clarification on the following:\n\n`;
     body += `- Transaction fee structure and any applicable charges\n`;
@@ -2111,16 +1507,18 @@ function generateDetailedInitialEmail(customerName, purposeDetails, customerGree
     let body = `${customerGreeting}\n\n`;
     body += `Thank you for your email. I'm providing detailed information regarding my account opening inquiry.\n\n`;
     
-    body += `I'm looking to use your service for ${purposeText.toLowerCase()}.`;
+    body += `**Purpose of Transaction:**\n${purposeText}\n\n`;
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        body += ` I've been actively investing in cryptocurrency for the past 3-4 years. I started with Coinbase and later expanded to Binance and Kraken. I'm looking to diversify my portfolio and your platform seems like a good option for accessing USDT efficiently.`;
+        body += `I've been actively investing in cryptocurrency for the past 3-4 years. I started with Coinbase and later expanded to Binance and Kraken. I'm looking to diversify my portfolio and your platform seems like a good option for accessing USDT efficiently.\n\n`;
     }
     if (purposeDetails.some(p => p.main === 'payment')) {
-        body += ` I run a business that requires regular payments to suppliers across Asia, particularly in China, Singapore, and Vietnam. Traditional wire transfers are slow and expensive, so I'm exploring crypto payment solutions.`;
+        body += `I run a business that requires regular payments to suppliers across Asia, particularly in China, Singapore, and Vietnam. Traditional wire transfers are slow and expensive, so I'm exploring crypto payment solutions.\n\n`;
     }
     
-    body += ` The funds originate from my personal savings accumulated over 8+ years of employment in the technology sector. I also have business income from my consulting practice. All funds are properly documented and maintained in accounts with major financial institutions. I anticipate making 8-12 transactions per year, with each transaction typically ranging from $25,000 to $50,000, resulting in an estimated annual volume of approximately $250,000 to $400,000.\n\n`;
+    body += `**Source of Funds:**\nThe funds originate from my personal savings accumulated over 8+ years of employment in the technology sector. I also have business income from my consulting practice. All funds are properly documented and maintained in accounts with major financial institutions.\n\n`;
+    
+    body += `**Transaction Details:**\nI anticipate making 8-12 transactions per year, with each transaction typically ranging from $25,000 to $50,000. My estimated annual volume would be approximately $250,000 to $400,000.\n\n`;
     
     body += `I have several questions about your platform:\n\n`;
     body += `- What is your fee structure? Are there different rates for different transaction sizes?\n`;
@@ -2141,9 +1539,13 @@ function generateCasualInitialEmail(customerName, purposeDetails, customerGreeti
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `Thanks for reaching out! Here's the info you asked for.\n\n`;
+    body += `Thanks for reaching out! Here's the info you asked for:\n\n`;
     
-    body += `I'm looking to use your service for ${purposeText.toLowerCase()}. The money's from my savings mostly - I've been working for a while and have some money set aside. Also have some business income. I'm probably looking at around $20k-$40k per transaction, maybe once or twice a month, so probably $200k-$300k per year total.\n\n`;
+    body += `**Purpose:** ${purposeText}\n\n`;
+    
+    body += `**Where the money's from:** My savings mostly. I've been working for a while and have some money set aside. Also have some business income.\n\n`;
+    
+    body += `**How much I'll be using:** Probably around $20k-$40k per transaction, maybe once or twice a month. So probably $200k-$300k per year total.\n\n`;
     
     body += `A few quick questions:\n\n`;
     body += `- What are your fees? Trying to keep costs down.\n`;
@@ -2162,9 +1564,13 @@ function generateFormalInitialEmail(customerName, purposeDetails, customerGreeti
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `I am writing in response to your email regarding my account opening inquiry. Please find the requested information below.\n\n`;
+    body += `I am writing in response to your email dated [date] regarding my account opening inquiry. Please find the requested information below.\n\n`;
     
-    body += `I am seeking to utilize your service for ${purposeText.toLowerCase()}. The funds are derived from personal savings accumulated through years of employment and business operations. All financial activities are conducted through established banking institutions and are fully documented. I expect to conduct transactions on a monthly basis, with individual transaction amounts ranging from $25,000 to $45,000, resulting in a projected annual volume of approximately $250,000 to $350,000.\n\n`;
+    body += `**Transaction Purpose:**\n${purposeText}\n\n`;
+    
+    body += `**Source of Funds:**\nThe funds are derived from personal savings accumulated through years of employment and business operations. All financial activities are conducted through established banking institutions and are fully documented.\n\n`;
+    
+    body += `**Anticipated Transaction Volume:**\nI expect to conduct transactions on a monthly basis, with individual transaction amounts ranging from $25,000 to $45,000. The projected annual volume is approximately $250,000 to $350,000.\n\n`;
     
     body += `I would be grateful if you could provide information regarding:\n\n`;
     body += `- Fee structure and applicable charges\n`;
@@ -2186,7 +1592,11 @@ function generateInquisitiveInitialEmail(customerName, purposeDetails, customerG
     let body = `${customerGreeting}\n\n`;
     body += `Thanks for your email! I'm happy to provide the information you need.\n\n`;
     
-    body += `I'm looking to use your service for ${purposeText.toLowerCase()}. The funds come from my personal savings and business income - everything is properly documented. I'm thinking of doing transactions monthly, probably around $20k-$40k each time, so annual volume would be maybe $250k-$350k.\n\n`;
+    body += `**Purpose:** ${purposeText}\n\n`;
+    
+    body += `**Source of Funds:** The funds come from my personal savings and business income. Everything is properly documented.\n\n`;
+    
+    body += `**Transaction Plans:** I'm thinking of doing transactions monthly, probably around $20k-$40k each time. Annual volume would be maybe $250k-$350k.\n\n`;
     
     body += `I have quite a few questions about your platform - hope that's okay:\n\n`;
     body += `- What are your transaction fees? Is it a flat rate or percentage-based?\n`;
@@ -2209,9 +1619,11 @@ function generateStraightforwardInitialEmail(customerName, purposeDetails, custo
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
-    body += `Here's the information you requested.\n\n`;
+    body += `Here's the information you requested:\n\n`;
     
-    body += `I need this for ${purposeText.toLowerCase()}. Funds are from personal savings and business income. I'm planning $20k-$40k per transaction, monthly, so around $250k-$300k annually.\n\n`;
+    body += `**Purpose:** ${purposeText}\n`;
+    body += `**Source:** Personal savings and business income\n`;
+    body += `**Volume:** $20k-$40k per transaction, monthly, ~$250k-$300k annually\n\n`;
     
     body += `Questions:\n`;
     body += `- Fees?\n`;
@@ -2232,16 +1644,18 @@ function generateElaborateInitialEmail(customerName, purposeDetails, customerGre
     let body = `${customerGreeting}\n\n`;
     body += `Thank you for your email. I appreciate the opportunity to provide detailed information regarding my account opening inquiry.\n\n`;
     
-    body += `I'm seeking to use your service for ${purposeText.toLowerCase()}.`;
+    body += `**Purpose of Transaction:**\n${purposeText}\n\n`;
     
     if (purposeDetails.some(p => p.main === 'investment')) {
-        body += ` I have been actively engaged in cryptocurrency investments for several years. My investment journey began with traditional platforms such as Coinbase, where I initially started with small amounts to familiarize myself with the market. Over time, I expanded to Binance and Kraken, gradually increasing my investment portfolio. I'm now looking to diversify further and your platform appears to offer competitive rates and reliable service for USD to USDT conversions.`;
+        body += `I have been actively engaged in cryptocurrency investments for several years. My investment journey began with traditional platforms such as Coinbase, where I initially started with small amounts to familiarize myself with the market. Over time, I expanded to Binance and Kraken, gradually increasing my investment portfolio. I'm now looking to diversify further and your platform appears to offer competitive rates and reliable service for USD to USDT conversions.\n\n`;
     }
     if (purposeDetails.some(p => p.main === 'payment')) {
-        body += ` My business requires frequent international payments to suppliers located primarily in Asia. We have established relationships with vendors in China, Singapore, Malaysia, and Vietnam. Traditional banking methods, while secure, often involve significant delays and high fees. Cryptocurrency payments offer a more efficient alternative, and USDT has become widely accepted by our suppliers.`;
+        body += `My business requires frequent international payments to suppliers located primarily in Asia. We have established relationships with vendors in China, Singapore, Malaysia, and Vietnam. Traditional banking methods, while secure, often involve significant delays and high fees. Cryptocurrency payments offer a more efficient alternative, and USDT has become widely accepted by our suppliers.\n\n`;
     }
     
-    body += ` The funds I intend to use originate from multiple legitimate sources. Primarily, they come from personal savings accumulated over my 10+ year career in the technology sector. I have been consistently saving a portion of my income and have built a substantial savings account. Additionally, I operate a small consulting business on the side, which generates additional income. All funds are maintained in accounts with reputable financial institutions, including Chase Bank and Bank of America, and are fully documented. Based on my business needs and investment strategy, I anticipate conducting transactions on a regular monthly basis. Each transaction is expected to range from $25,000 to $50,000, depending on market conditions and specific requirements. Over the course of a year, I estimate the total volume to be approximately $300,000 to $450,000.\n\n`;
+    body += `**Source of Funds:**\nThe funds I intend to use originate from multiple legitimate sources. Primarily, they come from personal savings accumulated over my 10+ year career in the technology sector. I have been consistently saving a portion of my income and have built a substantial savings account. Additionally, I operate a small consulting business on the side, which generates additional income. All funds are maintained in accounts with reputable financial institutions, including Chase Bank and Bank of America, and are fully documented.\n\n`;
+    
+    body += `**Transaction Details:**\nBased on my business needs and investment strategy, I anticipate conducting transactions on a regular monthly basis. Each transaction is expected to range from $25,000 to $50,000, depending on market conditions and specific requirements. Over the course of a year, I estimate the total volume to be approximately $300,000 to $450,000.\n\n`;
     
     body += `I would like to understand more about your platform before proceeding:\n\n`;
     body += `- **Fee Structure:** What are your transaction fees? Are they fixed or percentage-based? Are there any discounts for higher volume transactions?\n`;
@@ -2378,130 +1792,18 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     // 生成邮件格式的对话
     const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting);
     
-    // 将邮件转换为对话格式，用于编辑功能
-    const conversationMessages = emails.map(email => ({
-        sender: email.sender,
-        text: email.body,
-        time: formatTime(email.date, email.date.getHours(), email.date.getMinutes())
-    }));
+    // 获取附件列表
+    const attachments = window.getAttachments ? window.getAttachments() : [];
     
-    // 保存当前对话和平台，用于编辑功能
-    currentConversation = conversationMessages;
-    currentPlatform = 'email';
-    currentCustomerName = customerName;
-    
-    // 保存邮件数据，用于后续生成HTML
-    window.pendingEmailData = {
-        emails: emails,
-        customerName: customerName,
-        senderEmail: senderEmail,
-        recipientEmail: recipientEmail,
-        conversationScene: conversationScene,
-        emailDate: emailDate
-    };
-    
-    // 生成HTML预览
-    const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate);
-    
-    // 在预览区域显示HTML邮件界面
-    const preview = document.getElementById('conversationPreview');
-    if (preview) {
-        // 创建一个iframe来显示HTML邮件
-        const iframe = document.createElement('iframe');
-        iframe.style.width = '100%';
-        iframe.style.height = '600px';
-        iframe.style.border = '1px solid #ddd';
-        iframe.style.borderRadius = '8px';
-        iframe.style.backgroundColor = '#fff';
-        iframe.srcdoc = html;
-        preview.innerHTML = '';
-        preview.appendChild(iframe);
-    }
-    
-    // 显示可编辑的邮件正文文本框
-    const emailEditArea = document.getElementById('emailEditArea');
-    const emailBodyTextarea = document.getElementById('emailBodyTextarea');
-    
-    if (emailEditArea && emailBodyTextarea && emails.length > 0) {
-        // 显示邮件正文（通常是客户的第一封邮件）
-        emailBodyTextarea.value = emails[0].body;
-        emailEditArea.style.display = 'block';
-        
-        // 滚动到编辑区域
-        emailEditArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-}
-
-// 确认邮件内容并生成HTML
-function confirmEmailAndGenerateHTML() {
-    if (!window.pendingEmailData) {
-        alert('没有待生成的邮件数据');
-        return;
-    }
-    
-    const emailBodyTextarea = document.getElementById('emailBodyTextarea');
-    if (!emailBodyTextarea) {
-        alert('找不到邮件编辑框');
-        return;
-    }
-    
-    const editedBody = emailBodyTextarea.value.trim();
-    if (!editedBody) {
-        alert('邮件正文不能为空');
-        return;
-    }
-    
-    // 更新邮件正文
-    window.pendingEmailData.emails[0].body = editedBody;
-    
-    // 生成HTML
-    const html = generateTitanEmailHTML(
-        window.pendingEmailData.emails,
-        window.pendingEmailData.customerName,
-        window.pendingEmailData.senderEmail,
-        window.pendingEmailData.recipientEmail,
-        window.pendingEmailData.conversationScene,
-        window.pendingEmailData.emailDate
-    );
-    
-    // 更新预览区域的HTML
-    const preview = document.getElementById('conversationPreview');
-    if (preview) {
-        const iframe = document.createElement('iframe');
-        iframe.style.width = '100%';
-        iframe.style.height = '600px';
-        iframe.style.border = '1px solid #ddd';
-        iframe.style.borderRadius = '8px';
-        iframe.style.backgroundColor = '#fff';
-        iframe.srcdoc = html;
-        preview.innerHTML = '';
-        preview.appendChild(iframe);
-    }
+    // 生成完整的Titan.email界面HTML
+    const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments);
     
     // 显示下载按钮
-    displayEmailHTMLDownload(html, window.pendingEmailData.customerName);
-    
-    // 隐藏编辑区域
-    const emailEditArea = document.getElementById('emailEditArea');
-    if (emailEditArea) {
-        emailEditArea.style.display = 'none';
-    }
-    
-    // 清理临时数据
-    window.pendingEmailData = null;
-}
-
-// 取消邮件编辑
-function cancelEmailEdit() {
-    const emailEditArea = document.getElementById('emailEditArea');
-    if (emailEditArea) {
-        emailEditArea.style.display = 'none';
-    }
-    window.pendingEmailData = null;
+    displayEmailHTMLDownload(html, customerName);
 }
 
 // 生成Titan.email界面HTML
-function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate) {
+function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments = []) {
     // 根据场景生成主题
     const subject = conversationScene === 'kyc' 
         ? 'Enhanced KYC Documentation Request'
@@ -2660,6 +1962,99 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
         .message-body strong {
             font-weight: 600;
         }
+        .attachments-section {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .attachments-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .attachment-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .attachment-count {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+        .attachment-download-all {
+            color: #0066cc;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .attachment-download-all:hover {
+            text-decoration: underline;
+        }
+        .attachments-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            min-width: 200px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        .attachment-item:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .attachment-icon-large {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .attachment-icon-large.pdf {
+            background: #dc3545;
+        }
+        .attachment-icon-large.image {
+            background: #007bff;
+        }
+        .attachment-icon-large.other {
+            background: #6c757d;
+        }
+        .attachment-icon-large svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .attachment-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .attachment-name {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .attachment-size {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -2675,11 +2070,9 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
     emails.forEach((email, index) => {
         const isCustomer = email.sender === 'customer';
         const fromName = isCustomer ? customerName : 'WSP Team';
-        // 客户发送邮件时，寄件人邮箱应该是senderEmail（客户填写的寄件人邮箱）
-        // 公司发送邮件时，寄件人邮箱应该是senderEmail（公司邮箱）
-        const fromEmail = senderEmail; // 寄件人邮箱统一使用senderEmail
+        const fromEmail = isCustomer ? recipientEmail : senderEmail;
         const toName = isCustomer ? 'WSP Team' : customerName;
-        const toEmail = isCustomer ? recipientEmail : recipientEmail;
+        const toEmail = isCustomer ? senderEmail : recipientEmail;
         
         // 使用用户输入的日期
         const dateStr = emailDate || formatEmailDateForDisplay(email.date);
@@ -2731,7 +2124,8 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
                         </div>
                     </header>
                     <div class="message-body-container">
-                        <div class="message-body">${formatEmailBodyWithLinks(email.body)}</div>
+                        <div class="message-body">${escapeHtml(email.body)}</div>
+                        ${attachments.length > 0 && index === 0 ? generateAttachmentsHTML(attachments) : ''}
                     </div>
                 </div>
             </div>`;
@@ -2743,6 +2137,66 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
     </div>
 </body>
 </html>`;
+    
+    return html;
+}
+
+// 生成附件HTML
+function generateAttachmentsHTML(attachments) {
+    if (!attachments || attachments.length === 0) {
+        return '';
+    }
+    
+    let html = `
+        <div class="attachments-section">
+            <div class="attachments-header">
+                <svg class="attachment-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+                <span class="attachment-count">${attachments.length}</span>
+                <a href="#" class="attachment-download-all">Attachments Download All</a>
+            </div>
+            <div class="attachments-list">`;
+    
+    attachments.forEach(attachment => {
+        const fileType = attachment.type || 'other';
+        const fileName = attachment.name || 'Untitled';
+        const fileSize = attachment.size || '0 KB';
+        
+        // 根据文件类型选择图标
+        let iconSVG = '';
+        if (fileType === 'pdf') {
+            iconSVG = `
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>`;
+        } else if (fileType === 'image') {
+            iconSVG = `
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"/>
+                </svg>`;
+        } else {
+            iconSVG = `
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>`;
+        }
+        
+        html += `
+            <div class="attachment-item">
+                <div class="attachment-icon-large ${fileType}">
+                    ${iconSVG}
+                </div>
+                <div class="attachment-info">
+                    <div class="attachment-name">${escapeHtml(fileName)}</div>
+                    <div class="attachment-size">${escapeHtml(fileSize)}</div>
+                </div>
+            </div>`;
+    });
+    
+    html += `
+            </div>
+        </div>`;
     
     return html;
 }
@@ -3019,14 +2473,8 @@ function downloadEmailsIndividually(emailFiles) {
 }
 
 // 生成WhatsApp消息HTML
-function generateWhatsAppMessageHTML(msg, customerName, index, conversation) {
+function generateWhatsAppMessageHTML(msg, customerName, index) {
     const isCustomer = msg.sender === 'customer';
-    
-    // 检查前一条消息的发送者，如果不同则添加间距
-    const prevMsg = index > 0 ? conversation[index - 1] : null;
-    const isDifferentSender = !prevMsg || prevMsg.sender !== msg.sender;
-    const spacingClass = isDifferentSender ? 'x1n2onr6' : ''; // WhatsApp会在不同发送者之间自动添加间距
-    
     const messageId = isCustomer ? `false_${Date.now()}@c.us_${generateRandomId()}` : `true_${Date.now()}@c.us_${generateRandomId()}`;
     const className = isCustomer ? '_amjv xa0aww2' : '_amjv xscbp6u';
     const messageClass = isCustomer ? 'message-in' : 'message-out';
@@ -3044,37 +2492,10 @@ function generateWhatsAppMessageHTML(msg, customerName, index, conversation) {
     const timeDisplay = timeParts.display; // 如 "上午10:30"
     const timeFull = timeParts.full; // 如 "[上午10:30, 10/15/2025]"
     
-    // 处理链接：将URL转换为蓝色可点击链接
-    const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-    const urlPlaceholders = [];
-    let textWithPlaceholders = msg.text;
-    let match;
-    let placeholderIndex = 0;
-    
-    // 用占位符替换所有URL
-    while ((match = urlRegex.exec(msg.text)) !== null) {
-        const url = match[1];
-        const placeholder = `__URL_PLACEHOLDER_${placeholderIndex}__`;
-        urlPlaceholders.push(url);
-        textWithPlaceholders = textWithPlaceholders.replace(url, placeholder);
-        placeholderIndex++;
-    }
-    
     // 转义HTML
-    let escapedText = escapeHtml(textWithPlaceholders);
+    const escapedText = escapeHtml(msg.text);
     
-    // 将占位符替换为蓝色链接
-    urlPlaceholders.forEach((url, index) => {
-        const placeholder = `__URL_PLACEHOLDER_${index}__`;
-        escapedText = escapedText.replace(placeholder, `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${escapeHtml(url)}</a>`);
-    });
-    
-    // WhatsApp在不同发送者之间需要添加间距
-    // 如果前一条消息的发送者不同，在外层div之前添加一个空div来创建间距
-    const spacingDiv = isDifferentSender ? '<div style="height: 8px;"></div>' : '';
-    
-    // 普通消息（包含文本和链接）
-    let html = `${spacingDiv}<div class="x1n2onr6"><div tabindex="-1" class="" role="row"><div tabindex="-1" class="${className}" data-id="${messageId}"><div class="x78zum5 xdt5ytf" data-virtualized="false"><div class=""><div class="${messageClass} focusable-list-item _amjy _amjz _amjw x1klvx2g xahtqtb"><span class=""></span><div class="_amk4 false _amkd _amk5 false"><span aria-hidden="true" data-icon="${tailIcon}" class="_amk7"><svg viewBox="0 0 8 13" height="13" width="8" preserveAspectRatio="xMidYMid meet" class="" version="1.1" x="0px" y="0px" enable-background="new 0 0 8 13"><title>${tailIcon}</title>${tailPath}</svg></span><div class="_amk6 _amlo false false"><span aria-label="${ariaLabel}"></span><div><div class="x9f619 x1hx0egp x1yrsyyn xizg8k xu9hqtb xwib8y2"><div class="copyable-text" data-pre-plain-text="${timeFull} ${senderName}: "><div class="_akbu x6ikm8r x10wlt62"><span dir="ltr" class="x1f6kntn xjb2p0i x8r4c90 xo1l8bm x1ic7a3i x12xpedu _ao3e selectable-text copyable-text" style="min-height: 0px;"><span class="">${escapedText}</span></span><span class=""><span class="x3nfvp2 xxymvpz xlshs6z xqtp20y xexx8yu x1uc92m x18d9i69 x181vq82 x12lo8hy x152skdk" aria-hidden="true">${isCustomer ? '<span class="x1c4vz4f x2lah0s"></span>' : '<span class="x1c4vz4f x2lah0s xn6xy2s"></span>'}<span class="x1c4vz4f x2lah0s">${timeDisplay}</span></span></span></div></div><div class="x1n2onr6 x1n327nk x18mqm2i xhsvlbd x14z9mp xz62fqu x1wbi8v6"><div class="x1bvqhpb xx3o462 xuxw1ft x78zum5 x6s0dn4 x12lo8hy x152skdk"><span class="x1rg5ohu x16dsc37" dir="auto"><span class="x193iq5w xeuugli x13faqbe x1vvkbs xt0psk2 x1fj9vlw xhslqc4 x1hx0egp x1pg5gke xjb2p0i xo1l8bm xl2ypbo x1ic7a3i" style="--x-fontSize: 12px; --x-lineHeight: 8.5137px;">${timeDisplay}</span></span>${isCustomer ? '' : '<div class="xhslqc4 x1rg5ohu x7phf20"><span aria-hidden="false" aria-label=" Read " data-icon="msg-dblcheck" class="x1rv0e52"><svg viewBox="0 0 16 11" height="11" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>msg-dblcheck</title><path d="M11.0714 0.652832C10.991 0.585124 10.8894 0.55127 10.7667 0.55127C10.6186 0.55127 10.4916 0.610514 10.3858 0.729004L4.19688 8.36523L1.79112 6.09277C1.7488 6.04622 1.69802 6.01025 1.63877 5.98486C1.57953 5.95947 1.51817 5.94678 1.45469 5.94678C1.32351 5.94678 1.20925 5.99544 1.11192 6.09277L0.800883 6.40381C0.707784 6.49268 0.661235 6.60482 0.661235 6.74023C0.661235 6.87565 0.707784 6.98991 0.800883 7.08301L3.79698 10.0791C3.94509 10.2145 4.11224 10.2822 4.29844 10.2822C4.40424 10.2822 4.5058 10.259 4.60313 10.2124C4.70046 10.1659 4.78086 10.1003 4.84434 10.0156L11.4903 1.59863C11.5623 1.5013 11.5982 1.40186 11.5982 1.30029C11.5982 1.14372 11.5348 1.01888 11.4078 0.925781L11.0714 0.652832ZM8.6212 8.32715C8.43077 8.20866 8.2488 8.09017 8.0753 7.97168C7.99489 7.89128 7.8891 7.85107 7.75791 7.85107C7.6098 7.85107 7.4892 7.90397 7.3961 8.00977L7.10411 8.33984C7.01947 8.43717 6.97715 8.54508 6.97715 8.66357C6.97715 8.79476 7.0237 8.90902 7.1168 9.00635L8.1959 10.0791C8.33132 10.2145 8.49636 10.2822 8.69102 10.2822C8.79681 10.2822 8.89838 10.259 8.99571 10.2124C9.09304 10.1659 9.17556 10.1003 9.24327 10.0156L15.8639 1.62402C15.9358 1.53939 15.9718 1.43994 15.9718 1.32568C15.9718 1.1818 15.9125 1.05697 15.794 0.951172L15.4386 0.678223C15.3582 0.610514 15.2587 0.57666 15.1402 0.57666C14.9964 0.57666 14.8715 0.635905 14.7657 0.754395L8.6212 8.32715Z" fill="currentColor"></path></svg></span></div>'}
+    let html = `<div class="x1n2onr6"><div tabindex="-1" class="" role="row"><div tabindex="-1" class="${className}" data-id="${messageId}"><div class="x78zum5 xdt5ytf" data-virtualized="false"><div class=""><div class="${messageClass} focusable-list-item _amjy _amjz _amjw x1klvx2g xahtqtb"><span class=""></span><div class="_amk4 false _amkd _amk5 false"><span aria-hidden="true" data-icon="${tailIcon}" class="_amk7"><svg viewBox="0 0 8 13" height="13" width="8" preserveAspectRatio="xMidYMid meet" class="" version="1.1" x="0px" y="0px" enable-background="new 0 0 8 13"><title>${tailIcon}</title>${tailPath}</svg></span><div class="_amk6 _amlo false false"><span aria-label="${ariaLabel}"></span><div><div class="x9f619 x1hx0egp x1yrsyyn xizg8k xu9hqtb xwib8y2"><div class="copyable-text" data-pre-plain-text="${timeFull} ${senderName}: "><div class="_akbu x6ikm8r x10wlt62"><span dir="ltr" class="x1f6kntn xjb2p0i x8r4c90 xo1l8bm x1ic7a3i x12xpedu _ao3e selectable-text copyable-text" style="min-height: 0px;"><span class="">${escapedText}</span></span><span class=""><span class="x3nfvp2 xxymvpz xlshs6z xqtp20y xexx8yu x1uc92m x18d9i69 x181vq82 x12lo8hy x152skdk" aria-hidden="true">${isCustomer ? '<span class="x1c4vz4f x2lah0s"></span>' : '<span class="x1c4vz4f x2lah0s xn6xy2s"></span>'}<span class="x1c4vz4f x2lah0s">${timeDisplay}</span></span></span></div></div><div class="x1n2onr6 x1n327nk x18mqm2i xhsvlbd x14z9mp xz62fqu x1wbi8v6"><div class="x1bvqhpb xx3o462 xuxw1ft x78zum5 x6s0dn4 x12lo8hy x152skdk"><span class="x1rg5ohu x16dsc37" dir="auto"><span class="x193iq5w xeuugli x13faqbe x1vvkbs xt0psk2 x1fj9vlw xhslqc4 x1hx0egp x1pg5gke xjb2p0i xo1l8bm xl2ypbo x1ic7a3i" style="--x-fontSize: 12px; --x-lineHeight: 8.5137px;">${timeDisplay}</span></span>${isCustomer ? '' : '<div class="xhslqc4 x1rg5ohu x7phf20"><span aria-hidden="false" aria-label=" Read " data-icon="msg-dblcheck" class="x1rv0e52"><svg viewBox="0 0 16 11" height="11" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>msg-dblcheck</title><path d="M11.0714 0.652832C10.991 0.585124 10.8894 0.55127 10.7667 0.55127C10.6186 0.55127 10.4916 0.610514 10.3858 0.729004L4.19688 8.36523L1.79112 6.09277C1.7488 6.04622 1.69802 6.01025 1.63877 5.98486C1.57953 5.95947 1.51817 5.94678 1.45469 5.94678C1.32351 5.94678 1.20925 5.99544 1.11192 6.09277L0.800883 6.40381C0.707784 6.49268 0.661235 6.60482 0.661235 6.74023C0.661235 6.87565 0.707784 6.98991 0.800883 7.08301L3.79698 10.0791C3.94509 10.2145 4.11224 10.2822 4.29844 10.2822C4.40424 10.2822 4.5058 10.259 4.60313 10.2124C4.70046 10.1659 4.78086 10.1003 4.84434 10.0156L11.4903 1.59863C11.5623 1.5013 11.5982 1.40186 11.5982 1.30029C11.5982 1.14372 11.5348 1.01888 11.4078 0.925781L11.0714 0.652832ZM8.6212 8.32715C8.43077 8.20866 8.2488 8.09017 8.0753 7.97168C7.99489 7.89128 7.8891 7.85107 7.75791 7.85107C7.6098 7.85107 7.4892 7.90397 7.3961 8.00977L7.10411 8.33984C7.01947 8.43717 6.97715 8.54508 6.97715 8.66357C6.97715 8.79476 7.0237 8.90902 7.1168 9.00635L8.1959 10.0791C8.33132 10.2145 8.49636 10.2822 8.69102 10.2822C8.79681 10.2822 8.89838 10.259 8.99571 10.2124C9.09304 10.1659 9.17556 10.1003 9.24327 10.0156L15.8639 1.62402C15.9358 1.53939 15.9718 1.43994 15.9718 1.32568C15.9718 1.1818 15.9125 1.05697 15.794 0.951172L15.4386 0.678223C15.3582 0.610514 15.2587 0.57666 15.1402 0.57666C14.9964 0.57666 14.8715 0.635905 14.7657 0.754395L8.6212 8.32715Z" fill="currentColor"></path></svg></span></div>'}
 </div></div></div></div><span class=""></span><div class="_amlr"></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j ${bottomDivClass} x1q0g3np x6s0dn4 _amj_"><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 xexx8yu x1im30kd x18d9i69 x1djpfga"><div></div></div></div><span aria-label="This is an auto-delete message"></span></div><div class="x78zum5 xbfrwjf x8k05lb xeq5yr9 x1n2onr6 ${bottomClass}"></div></div></div></div></div></div></div>`;
     
     return html;
@@ -3107,13 +2528,8 @@ function generateTelegramMessageHTML(msg, customerName, index, conversation) {
     const timeParts = parseTime(msg.time);
     const timeDisplay = timeParts.timeOnly; // 如 "17:22"
     
-    // 处理链接：将URL转换为蓝色可点击链接
-    const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-    let escapedText = escapeHtml(msg.text);
-    // 将URL替换为蓝色链接
-    escapedText = escapedText.replace(urlRegex, (url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #0084ff; text-decoration: underline;">${url}</a>`;
-    });
+    // 转义HTML
+    const escapedText = escapeHtml(msg.text);
     
     // 生成唯一的filter ID，避免重复
     const filterId = `messageAppendix${messageId}`;
@@ -3147,36 +2563,6 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
-
-// 格式化邮件正文，将URL转换为链接
-function formatEmailBodyWithLinks(text) {
-    // 先识别URL并用占位符替换，然后转义HTML，最后替换回链接
-    const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-    const urlPlaceholders = [];
-    let textWithPlaceholders = text;
-    let match;
-    let placeholderIndex = 0;
-    
-    // 用占位符替换所有URL
-    while ((match = urlRegex.exec(text)) !== null) {
-        const url = match[1];
-        const placeholder = `__URL_PLACEHOLDER_${placeholderIndex}__`;
-        urlPlaceholders.push(url);
-        textWithPlaceholders = textWithPlaceholders.replace(url, placeholder);
-        placeholderIndex++;
-    }
-    
-    // 转义HTML
-    let escapedText = escapeHtml(textWithPlaceholders);
-    
-    // 将占位符替换回链接
-    urlPlaceholders.forEach((url, index) => {
-        const placeholder = `__URL_PLACEHOLDER_${index}__`;
-        escapedText = escapedText.replace(placeholder, `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline;">${escapeHtml(url)}</a>`);
-    });
-    
-    return escapedText;
 }
 
 // 解析时间格式：从 "10/15 10:30" 转换为 WhatsApp 格式（英文）
@@ -3315,7 +2701,7 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
 
         messages.push({
             sender: 'company',
-            text: `You can send them via email to compliance@wsdglobalpay.com. Please make sure they're clear and include all pages. Thank you for your cooperation!`,
+            text: `You can send them via email to compliance@geoswift.com. Please make sure they're clear and include all pages. Thank you for your cooperation!`,
             time: formatTime(day1, 10, 43)
         });
 
@@ -3403,7 +2789,7 @@ function generateConciseKYCConversation(customerName, customerAge, platform, add
 
         messages.push({
             sender: 'company',
-            text: `Email to compliance@wsdglobalpay.com. Thanks.`,
+            text: `Email to compliance@geoswift.com. Thanks.`,
             time: formatTime(day1, 11, 5)
         });
     } else {
@@ -3464,7 +2850,7 @@ function generateCautiousKYCConversation(customerName, customerAge, platform, ad
 
         messages.push({
             sender: 'company',
-            text: `Please email them to compliance@wsdglobalpay.com. Thank you for your cooperation.`,
+            text: `Please email them to compliance@geoswift.com. Thank you for your cooperation.`,
             time: formatTime(day1, 9, 42)
         });
     } else {
@@ -3531,7 +2917,7 @@ function generateUrgentKYCConversation(customerName, customerAge, platform, addi
 
         messages.push({
             sender: 'company',
-            text: `Great, send to compliance@wsdglobalpay.com.`,
+            text: `Great, send to compliance@geoswift.com.`,
             time: formatTime(day1, 8, 20)
         });
     } else {
@@ -3592,7 +2978,7 @@ function generateFriendlyKYCConversation(customerName, customerAge, platform, ad
 
         messages.push({
             sender: 'company',
-            text: `You can email them to compliance@wsdglobalpay.com. Thanks so much!`,
+            text: `You can email them to compliance@geoswift.com. Thanks so much!`,
             time: formatTime(day1, 10, 21)
         });
 
@@ -3665,7 +3051,7 @@ function generateProfessionalKYCConversation(customerName, customerAge, platform
 
         messages.push({
             sender: 'company',
-            text: `Please submit via email to compliance@wsdglobalpay.com. Ensure all pages are included and clearly legible.`,
+            text: `Please submit via email to compliance@geoswift.com. Ensure all pages are included and clearly legible.`,
             time: formatTime(day1, 9, 6)
         });
 
@@ -3714,250 +3100,4 @@ function generateProfessionalKYCConversation(customerName, customerAge, platform
     }
 
     return messages;
-}
-
-// 显示可编辑的对话界面
-function showEditableConversation(conversation) {
-    const editArea = document.getElementById('conversationEditArea');
-    if (!editArea) {
-        console.error('conversationEditArea not found');
-        return;
-    }
-    
-    // 清空编辑区域，但保留添加消息按钮
-    const addBtn = editArea.querySelector('#addMessageBtn');
-    editArea.innerHTML = '';
-    if (addBtn) {
-        editArea.appendChild(addBtn);
-    }
-    
-    // 创建消息容器
-    const messagesContainer = document.createElement('div');
-    messagesContainer.id = 'editableMessages';
-    
-    conversation.forEach((msg, index) => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'editable-message';
-        msgDiv.style.marginBottom = '15px';
-        msgDiv.style.padding = '10px';
-        msgDiv.style.border = '1px solid #ddd';
-        msgDiv.style.borderRadius = '5px';
-        msgDiv.style.backgroundColor = '#f9f9f9';
-        
-        const headerDiv = document.createElement('div');
-        headerDiv.style.marginBottom = '8px';
-        headerDiv.style.display = 'flex';
-        headerDiv.style.alignItems = 'center';
-        headerDiv.style.gap = '10px';
-        headerDiv.style.flexWrap = 'wrap';
-        
-        const senderLabel = document.createElement('label');
-        senderLabel.textContent = `发送者 (${index + 1}): `;
-        senderLabel.style.fontWeight = 'bold';
-        senderLabel.style.marginRight = '5px';
-        senderLabel.style.flex = '0 0 auto';
-        
-        const senderSelect = document.createElement('select');
-        senderSelect.className = 'editable-msg-sender';
-        senderSelect.setAttribute('data-index', index);
-        senderSelect.style.padding = '5px';
-        senderSelect.style.borderRadius = '3px';
-        senderSelect.style.border = '1px solid #ccc';
-        senderSelect.style.flex = '0 0 auto';
-        senderSelect.style.minWidth = '80px';
-        
-        const option1 = document.createElement('option');
-        option1.value = 'customer';
-        option1.textContent = '客户';
-        if (msg.sender === 'customer') option1.selected = true;
-        
-        const option2 = document.createElement('option');
-        option2.value = 'company';
-        option2.textContent = '公司';
-        if (msg.sender === 'company') option2.selected = true;
-        
-        senderSelect.appendChild(option1);
-        senderSelect.appendChild(option2);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '🗑️ 删除';
-        deleteBtn.type = 'button';
-        deleteBtn.className = 'delete-message-btn';
-        deleteBtn.setAttribute('data-index', index);
-        deleteBtn.style.padding = '6px 12px';
-        deleteBtn.style.backgroundColor = '#ff4444';
-        deleteBtn.style.color = 'white';
-        deleteBtn.style.border = 'none';
-        deleteBtn.style.borderRadius = '3px';
-        deleteBtn.style.cursor = 'pointer';
-        deleteBtn.style.flex = '0 0 auto';
-        deleteBtn.style.fontSize = '13px';
-        deleteBtn.style.fontWeight = 'bold';
-        deleteBtn.style.marginLeft = 'auto';
-        deleteBtn.style.display = 'inline-block';
-        deleteBtn.style.visibility = 'visible';
-        deleteBtn.style.opacity = '1';
-        deleteBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (confirm('确定要删除这条消息吗？')) {
-                conversation.splice(index, 1);
-                showEditableConversation(conversation);
-            }
-            return false;
-        };
-        
-        headerDiv.appendChild(senderLabel);
-        headerDiv.appendChild(senderSelect);
-        headerDiv.appendChild(deleteBtn);
-        
-        const textarea = document.createElement('textarea');
-        textarea.className = 'editable-msg-text';
-        textarea.setAttribute('data-index', index);
-        textarea.value = msg.text;
-        textarea.style.width = '100%';
-        textarea.style.minHeight = '60px';
-        textarea.style.padding = '8px';
-        textarea.style.border = '1px solid #ccc';
-        textarea.style.borderRadius = '3px';
-        textarea.style.fontSize = '14px';
-        textarea.style.fontFamily = 'inherit';
-        textarea.style.resize = 'vertical';
-        textarea.style.marginBottom = '5px';
-        
-        const timeDiv = document.createElement('div');
-        timeDiv.style.display = 'flex';
-        timeDiv.style.alignItems = 'center';
-        timeDiv.style.gap = '5px';
-        
-        const timeLabel = document.createElement('label');
-        timeLabel.textContent = '时间: ';
-        timeLabel.style.fontSize = '12px';
-        timeLabel.style.color = '#666';
-        
-        const timeInput = document.createElement('input');
-        timeInput.type = 'text';
-        timeInput.className = 'editable-msg-time';
-        timeInput.setAttribute('data-index', index);
-        timeInput.value = msg.time;
-        timeInput.style.padding = '3px 5px';
-        timeInput.style.border = '1px solid #ccc';
-        timeInput.style.borderRadius = '3px';
-        timeInput.style.fontSize = '12px';
-        timeInput.style.width = '150px';
-        
-        timeDiv.appendChild(timeLabel);
-        timeDiv.appendChild(timeInput);
-        
-        msgDiv.appendChild(headerDiv);
-        msgDiv.appendChild(textarea);
-        msgDiv.appendChild(timeDiv);
-        
-        messagesContainer.appendChild(msgDiv);
-    });
-    
-    editArea.insertBefore(messagesContainer, addBtn);
-    
-    // 更新全局变量
-    currentConversation = conversation;
-}
-
-// 添加新消息
-function addNewMessage() {
-    if (!currentConversation) {
-        alert('请先生成对话');
-        return;
-    }
-    
-    const newMsg = {
-        sender: 'customer',
-        text: '',
-        time: formatTime(new Date(), new Date().getHours(), new Date().getMinutes())
-    };
-    
-    currentConversation.push(newMsg);
-    showEditableConversation(currentConversation);
-    
-    // 滚动到底部并聚焦到新消息的文本框
-    setTimeout(() => {
-        const editArea = document.getElementById('conversationEditArea');
-        if (editArea) {
-            editArea.scrollTop = editArea.scrollHeight;
-        }
-        const lastTextarea = editArea.querySelector('.editable-msg-text:last-child');
-        if (lastTextarea) {
-            lastTextarea.focus();
-        }
-    }, 100);
-}
-
-// 保存编辑后的对话并更新HTML
-function saveEditedConversation() {
-    if (!currentConversation) {
-        alert('没有可保存的对话');
-        return;
-    }
-    
-    const textareas = document.querySelectorAll('.editable-msg-text');
-    const senderSelects = document.querySelectorAll('.editable-msg-sender');
-    const timeInputs = document.querySelectorAll('.editable-msg-time');
-    
-    // 更新对话内容
-    textareas.forEach(textarea => {
-        const index = parseInt(textarea.getAttribute('data-index'));
-        if (currentConversation[index]) {
-            currentConversation[index].text = textarea.value;
-        }
-    });
-    
-    senderSelects.forEach(select => {
-        const index = parseInt(select.getAttribute('data-index'));
-        if (currentConversation[index]) {
-            currentConversation[index].sender = select.value;
-        }
-    });
-    
-    timeInputs.forEach(input => {
-        const index = parseInt(input.getAttribute('data-index'));
-        if (currentConversation[index]) {
-            currentConversation[index].time = input.value;
-        }
-    });
-    
-    // 重新生成HTML
-    if (currentPlatform === 'email') {
-        // 邮件需要特殊处理
-        const senderEmail = document.getElementById('senderEmail').value;
-        const recipientEmail = document.getElementById('recipientEmail').value;
-        const customerGreeting = document.getElementById('customerGreeting').value;
-        const emailDate = document.getElementById('emailDate').value;
-        const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
-        
-        // 将对话转换为邮件格式
-        const emails = currentConversation.map((msg, index) => {
-            const subjects = msg.sender === 'customer' 
-                ? ['Re: Account Opening Inquiry - USD to USDT', 'Re: USD to USDT Account Opening', 'Re: Account Opening Request']
-                : ['Account Opening Inquiry - USD to USDT', 'USD to USDT Account Opening', 'Account Opening Request'];
-            return {
-                sender: msg.sender,
-                subject: subjects[index % subjects.length],
-                body: msg.text,
-                date: new Date()
-            };
-        });
-        
-        const html = generateTitanEmailHTML(emails, currentCustomerName, senderEmail, recipientEmail, conversationScene, emailDate);
-        displayEmailHTMLDownload(html, currentCustomerName);
-    } else {
-        generateBrowserScript(currentConversation, currentPlatform);
-    }
-    
-    // 更新预览
-    displayConversation(currentConversation);
-    
-    // 隐藏编辑区域
-    document.getElementById('conversationEditArea').style.display = 'none';
-    document.getElementById('editConversationBtn').style.display = 'inline-block';
-    document.getElementById('saveConversationBtn').style.display = 'none';
-    document.getElementById('cancelEditBtn').style.display = 'none';
 }

@@ -3,80 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聊天记录生成器</title>
-    <style>
-        /* 密码保护界面样式 */
-        #passwordProtection {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-
-        .password-container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .password-container h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .password-container input {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-
-        .password-container input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .password-container button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .password-container button:hover {
-            opacity: 0.9;
-        }
-
-        .error-message {
-            color: #e74c3c;
-            margin-top: 10px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-    </style>
+    <title>合规对话生成工具</title>
     <style>
         * {
             margin: 0;
@@ -104,11 +31,6 @@
             color: #333;
             margin-bottom: 10px;
             font-size: 28px;
-        }
-        
-        .tool-title {
-            text-align: center;
-            margin-bottom: 30px;
         }
 
         .subtitle {
@@ -302,13 +224,8 @@
 </head>
 <body>
     <div class="container">
-        <div style="text-align: center; margin-bottom: 15px; padding: 10px; background: #f0f0f0; border-radius: 8px; font-size: 12px; color: #666;">
-            <strong>最后更新时间：</strong><span id="lastUpdateTime"></span>
-        </div>
-        <div class="tool-title">
-            <h1>聊天记录生成器</h1>
-            <p class="subtitle">根据客户信息生成合规的WhatsApp/Telegram/邮件对话记录</p>
-        </div>
+        <h1>合规对话生成工具</h1>
+        <p class="subtitle">根据客户信息生成符合合规要求的WhatsApp/Telegram/邮件对话</p>
 
         <form id="conversationForm">
             <div class="form-group">
@@ -395,19 +312,7 @@
                         <input type="radio" id="scene_kyc" name="conversationScene" value="kyc">
                         <label for="scene_kyc" style="margin: 0; font-weight: normal;">补充材料（KYC加强）</label>
                     </div>
-                    <div class="checkbox-item">
-                        <input type="radio" id="scene_custom" name="conversationScene" value="custom">
-                        <label for="scene_custom" style="margin: 0; font-weight: normal;">自定义场景</label>
-                    </div>
                 </div>
-            </div>
-
-            <div class="form-group" id="customSceneGroup" style="display: none;">
-                <label for="sceneDescription">场景描述 *</label>
-                <textarea id="sceneDescription" name="sceneDescription" rows="3" placeholder="请用中文描述场景背景，例如：客户询问账户被冻结的原因，需要解释并请求提供相关材料"></textarea>
-                
-                <label for="customerResponseCore" style="margin-top: 15px; display: block;">客户答复核心内容 *</label>
-                <textarea id="customerResponseCore" name="customerResponseCore" rows="3" placeholder="请用中文描述客户需要表达的核心内容，例如：客户表示理解，愿意配合提供材料，但需要时间准备"></textarea>
             </div>
 
             <div class="form-group" id="ageGroup" style="display: none;">
@@ -440,25 +345,6 @@
 
         <div class="preview-section" id="previewSection" style="display: none;">
             <h2 class="preview-title">对话预览</h2>
-            <div style="margin-bottom: 15px;">
-                <button id="editConversationBtn" class="btn" style="background: #28a745; margin-right: 10px;">✏️ 编辑对话</button>
-                <button id="saveConversationBtn" class="btn" style="background: #007bff; display: none;">💾 保存并更新HTML</button>
-                <button id="cancelEditBtn" class="btn btn-secondary" style="display: none;">❌ 取消编辑</button>
-            </div>
-            <div id="conversationEditArea" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; max-height: 600px; overflow-y: auto;">
-                <h3 style="margin-top: 0; margin-bottom: 15px;">编辑对话内容</h3>
-                <div id="editableMessages"></div>
-                <button id="addMessageBtn" class="btn" style="background: #17a2b8; margin-top: 10px; font-size: 14px; padding: 8px 15px;">+ 添加消息</button>
-            </div>
-            <div id="emailEditArea" style="display: none; background: #f0f8ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #007bff;">
-                <h3 style="margin-top: 0; margin-bottom: 15px; color: #007bff;">📧 编辑邮件内容</h3>
-                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">请在下方编辑邮件正文，确认无误后点击"确认并生成HTML"按钮。</p>
-                <textarea id="emailBodyTextarea" style="width: 100%; min-height: 300px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical;"></textarea>
-                <div style="margin-top: 15px; text-align: right;">
-                    <button id="confirmEmailBtn" class="btn" style="background: #28a745; padding: 10px 20px; font-size: 16px;">✅ 确认并生成HTML</button>
-                    <button id="cancelEmailEditBtn" class="btn btn-secondary" style="margin-left: 10px; padding: 10px 20px;">❌ 取消</button>
-                </div>
-            </div>
             <div class="conversation-preview" id="conversationPreview"></div>
             
             <div class="instructions" id="instructionsContent">
@@ -505,148 +391,7 @@
         </div>
     </div>
 
-    <!-- 密码保护界面 -->
-    <div id="passwordProtection">
-        <div class="password-container">
-            <h2>🔒 访问密码</h2>
-            <p style="color: #666; margin-bottom: 20px;">请输入访问密码以使用此工具</p>
-            <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="off">
-            <button onclick="checkPassword()">进入</button>
-            <div class="error-message" id="errorMessage">密码错误，请重试</div>
-        </div>
-    </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="conversation-generator.js"></script>
-    <script>
-        // 密码保护功能
-        // 默认密码：请修改此密码
-        const ACCESS_PASSWORD = 'hifi123@';
-        
-        // 检查是否已经通过验证
-        function checkAuth() {
-            const authStatus = sessionStorage.getItem('chatGeneratorAuth');
-            if (authStatus === 'authenticated') {
-                document.getElementById('passwordProtection').style.display = 'none';
-                return true;
-            }
-            return false;
-        }
-
-        // 验证密码
-        function checkPassword() {
-            const input = document.getElementById('passwordInput').value;
-            const errorMsg = document.getElementById('errorMessage');
-            
-            if (input === ACCESS_PASSWORD) {
-                sessionStorage.setItem('chatGeneratorAuth', 'authenticated');
-                document.getElementById('passwordProtection').style.display = 'none';
-                errorMsg.classList.remove('show');
-            } else {
-                errorMsg.classList.add('show');
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('passwordInput').focus();
-            }
-        }
-
-        // 页面加载时检查
-        window.addEventListener('DOMContentLoaded', function() {
-            // 显示最后更新时间（固定时间，记录页面最后更新的时间）
-            const lastUpdateTime = document.getElementById('lastUpdateTime');
-            if (lastUpdateTime) {
-                // 设置固定的最后更新时间：2025-12-11 14:15（根据实际更新时间修改）
-                const updateDate = '2025-12-11 14:15'; // 修改这里的时间来更新显示
-                lastUpdateTime.textContent = updateDate;
-            }
-            
-            // 绑定编辑功能按钮
-            const editBtn = document.getElementById('editConversationBtn');
-            const saveBtn = document.getElementById('saveConversationBtn');
-            const cancelBtn = document.getElementById('cancelEditBtn');
-            const addMsgBtn = document.getElementById('addMessageBtn');
-            
-            if (editBtn) {
-                editBtn.addEventListener('click', function() {
-                    // 检查全局变量 currentConversation（在 conversation-generator.js 中定义）
-                    if (typeof currentConversation !== 'undefined' && currentConversation && currentConversation.length > 0) {
-                        document.getElementById('conversationEditArea').style.display = 'block';
-                        editBtn.style.display = 'none';
-                        if (saveBtn) saveBtn.style.display = 'inline-block';
-                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
-                        if (typeof showEditableConversation === 'function') {
-                            showEditableConversation(currentConversation);
-                        } else {
-                            alert('编辑功能未加载，请刷新页面重试');
-                        }
-                    } else {
-                        alert('请先生成对话');
-                    }
-                });
-            }
-            
-            if (saveBtn) {
-                saveBtn.addEventListener('click', function() {
-                    if (typeof saveEditedConversation === 'function') {
-                        saveEditedConversation();
-                    } else {
-                        alert('保存功能未加载，请刷新页面重试');
-                    }
-                });
-            }
-            
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', function() {
-                    document.getElementById('conversationEditArea').style.display = 'none';
-                    editBtn.style.display = 'inline-block';
-                    saveBtn.style.display = 'none';
-                    cancelBtn.style.display = 'none';
-                });
-            }
-            
-            if (addMsgBtn) {
-                addMsgBtn.addEventListener('click', function() {
-                    if (typeof addNewMessage === 'function') {
-                        addNewMessage();
-                    } else {
-                        alert('添加消息功能未加载，请刷新页面重试');
-                    }
-                });
-            }
-            
-            // 绑定邮件编辑功能按钮
-            const confirmEmailBtn = document.getElementById('confirmEmailBtn');
-            const cancelEmailEditBtn = document.getElementById('cancelEmailEditBtn');
-            
-            if (confirmEmailBtn) {
-                confirmEmailBtn.addEventListener('click', function() {
-                    if (typeof confirmEmailAndGenerateHTML === 'function') {
-                        confirmEmailAndGenerateHTML();
-                    } else {
-                        alert('确认功能未加载，请刷新页面重试');
-                    }
-                });
-            }
-            
-            if (cancelEmailEditBtn) {
-                cancelEmailEditBtn.addEventListener('click', function() {
-                    if (typeof cancelEmailEdit === 'function') {
-                        cancelEmailEdit();
-                    } else {
-                        alert('取消功能未加载，请刷新页面重试');
-                    }
-                });
-            }
-            
-            if (!checkAuth()) {
-                document.getElementById('passwordInput').focus();
-                // 支持回车键提交
-                document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        checkPassword();
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
