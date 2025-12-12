@@ -2267,7 +2267,7 @@ function generateAttachmentsHTML(attachments) {
         html += `
             <div class="attachment-item">
                 <div class="attachment-icon-large ${fileType}">
-                    ${iconSVG}
+                    ${fileType === 'pdf' ? iconSVG : iconSVG}
                 </div>
                 <div class="attachment-info">
                     <div class="attachment-name">${escapeHtml(fileName)}</div>
