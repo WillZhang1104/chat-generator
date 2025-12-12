@@ -2093,7 +2093,7 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
             flex-shrink: 0;
         }
         .attachment-icon-large.pdf {
-            background: #dc3545;
+            background: transparent;
         }
         .attachment-icon-large.image {
             background: #007bff;
