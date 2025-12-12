@@ -457,12 +457,12 @@ function generateConversationByStyle(customerName, purposeDetails, formMethod, p
         urgent: generateUrgentConversation,
         friendly: generateFriendlyConversation,
         professional: generateProfessionalConversation,
-        detailed: generateDetailedConversation,
-        casual: generateCasualConversation,
-        formal: generateFormalConversation,
-        inquisitive: generateInquisitiveConversation,
-        straightforward: generateStraightforwardConversation,
-        elaborate: generateElaborateConversation
+        detailed: generateVerboseConversation, // 详细型使用话多型
+        casual: generateFriendlyConversation, // 随意型使用友好型
+        formal: generateProfessionalConversation, // 正式型使用专业型
+        inquisitive: generateVerboseConversation, // 好奇型使用话多型
+        straightforward: generateConciseConversation, // 直接型使用简洁型
+        elaborate: generateVerboseConversation // 详细阐述型使用话多型
     };
     
     const generator = conversationTemplates[style] || generateFriendlyConversation;
