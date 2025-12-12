@@ -574,7 +574,7 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'company',
         text: `Great! The process is straightforward. First, we'll need to understand your use case - what will be the primary purpose of your account? This helps us ensure compliance and provide the best service.`,
-        time: formatTime(day1, 9, 25)
+        time: formatTimeWithRange(day1, 9, 25)
     });
 
     // 构建目的说明，融入细节
@@ -589,13 +589,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Sure! ${purposeText} I have a few questions though - ${question1.toLowerCase()} And ${question2.toLowerCase()}`,
-        time: formatTime(day1, 9, 28)
+        time: formatTimeWithRange(day1, 9, 28)
     });
 
     messages.push({
         sender: 'company',
         text: `Perfect, thanks for that info. ${response1} ${response2}`,
-        time: formatTime(day1, 9, 31)
+        time: formatTimeWithRange(day1, 9, 31)
     });
 
     const question3 = seededChoice(conversationVariations.customerQuestions, seed, variant * 3);
@@ -604,13 +604,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `${seededChoice(conversationVariations.acknowledgments, seed, variant)} ${question3.toLowerCase()} And is there a minimum deposit amount?`,
-        time: formatTime(day1, 9, 35)
+        time: formatTimeWithRange(day1, 9, 35)
     });
 
     messages.push({
         sender: 'company',
         text: `${response3} No minimum deposit required to get started!`,
-        time: formatTime(day1, 9, 38)
+        time: formatTimeWithRange(day1, 9, 38)
     });
 
     const day2 = new Date(now);
@@ -619,26 +619,26 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Got it. So what's the next step?`,
-        time: formatTime(day2, 10, 15)
+        time: formatTimeWithRange(day2, 10, 15)
     });
 
     messages.push({
         sender: 'company',
         text: `To get started, we'll need you to complete our onboarding form. This collects all the necessary information for account setup and compliance.`,
-        time: formatTime(day2, 10, 18)
+        time: formatTimeWithRange(day2, 10, 18)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `Here's the link to our online onboarding form: https://onboarding.geoswift.com It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
-            time: formatTime(day2, 10, 20)
+            time: formatTimeWithRange(day2, 10, 20)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF onboarding form to your email. Please complete all sections and send it back as an attachment when you're done.`,
-            time: formatTime(day2, 10, 20)
+            time: formatTimeWithRange(day2, 10, 20)
         });
     }
 
@@ -650,13 +650,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `${seededChoice(conversationVariations.acknowledgments, seed, variant * 2)} Let me review everything first. One more thing - ${question4.toLowerCase()} And ${question5.toLowerCase()}`,
-        time: formatTime(day2, 10, 25)
+        time: formatTimeWithRange(day2, 10, 25)
     });
 
     messages.push({
         sender: 'company',
         text: `${response4} We accept bank transfers, wire transfers, and ACH transfers.`,
-        time: formatTime(day2, 10, 28)
+        time: formatTimeWithRange(day2, 10, 28)
     });
 
     const question6 = seededChoice(conversationVariations.customerQuestions, seed, variant * 5);
@@ -664,13 +664,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Great! And ${question6.toLowerCase()}`,
-        time: formatTime(day2, 10, 32)
+        time: formatTimeWithRange(day2, 10, 32)
     });
 
     messages.push({
         sender: 'company',
         text: `${response5} For larger amounts, it might take a bit longer for security checks, but we'll keep you updated throughout the process.`,
-        time: formatTime(day2, 10, 35)
+        time: formatTimeWithRange(day2, 10, 35)
     });
 
     const closingPhrase = seededChoice(conversationVariations.closingPhrases, seed, variant);
@@ -678,13 +678,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Sounds good! Let me think about it and review everything. I'll probably submit the form in the next day or two. ${closingPhrase}`,
-        time: formatTime(day2, 10, 38)
+        time: formatTimeWithRange(day2, 10, 38)
     });
 
     messages.push({
         sender: 'company',
         text: `You're welcome! Take your time. Once you submit the form, you'll receive a confirmation email and we'll start the review process. Feel free to reach out if you have any other questions.`,
-        time: formatTime(day2, 10, 41)
+        time: formatTimeWithRange(day2, 10, 41)
     });
 
     return messages;
@@ -740,39 +740,39 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Yes please.`,
-        time: formatTime(day2, 14, 20)
+        time: formatTimeWithRange(day2, 14, 20)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `Here's the link: https://onboarding.geoswift.com Let me know once you've submitted it.`,
-            time: formatTime(day2, 14, 22)
+            time: formatTimeWithRange(day2, 14, 22)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF form to your email. Please return it when completed.`,
-            time: formatTime(day2, 14, 22)
+            time: formatTimeWithRange(day2, 14, 22)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Will do. How long for approval?`,
-        time: formatTime(day2, 14, 25)
+        time: formatTimeWithRange(day2, 14, 25)
     });
 
     messages.push({
         sender: 'company',
         text: `Usually 1-2 business days after we receive your completed form.`,
-        time: formatTime(day2, 14, 27)
+        time: formatTimeWithRange(day2, 14, 27)
     });
 
     messages.push({
         sender: 'customer',
         text: `Thanks.`,
-        time: formatTime(day2, 14, 30)
+        time: formatTimeWithRange(day2, 14, 30)
     });
 
     return messages;
@@ -852,39 +852,39 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     messages.push({
         sender: 'customer',
         text: `Good. So what's the next step?`,
-        time: formatTime(day2, 13, 30)
+        time: formatTimeWithRange(day2, 13, 30)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `To proceed, please complete our onboarding form: https://onboarding.geoswift.com All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
-            time: formatTime(day2, 13, 33)
+            time: formatTimeWithRange(day2, 13, 33)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've emailed you the PDF onboarding form with all security and compliance information, plus our privacy policy. Please review everything carefully and return it when ready.`,
-            time: formatTime(day2, 13, 33)
+            time: formatTimeWithRange(day2, 13, 33)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Thank you. I'll review everything carefully before submitting. How long does the review process take?`,
-        time: formatTime(day2, 13, 37)
+        time: formatTimeWithRange(day2, 13, 37)
     });
 
     messages.push({
         sender: 'company',
         text: `Typically 1-2 business days. Our compliance team reviews each application thoroughly to ensure everything is in order.`,
-        time: formatTime(day2, 13, 40)
+        time: formatTimeWithRange(day2, 13, 40)
     });
 
     messages.push({
         sender: 'customer',
         text: `Understood. Let me review everything first and I'll probably submit it by end of week. Thanks for answering all my questions.`,
-        time: formatTime(day2, 13, 43)
+        time: formatTimeWithRange(day2, 13, 43)
     });
 
     return messages;
@@ -941,56 +941,56 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
         messages.push({
             sender: 'company',
             text: `Here's the link: https://onboarding.geoswift.com Submit as soon as possible and we'll review it right away.`,
-            time: formatTime(day2, 9, 15)
+            time: formatTimeWithRange(day2, 9, 15)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF form to your email. Please complete and return it immediately - we're monitoring for your submission.`,
-            time: formatTime(day2, 9, 15)
+            time: formatTimeWithRange(day2, 9, 15)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Working on it now. What documents do I need ready?`,
-        time: formatTime(day2, 9, 20)
+        time: formatTimeWithRange(day2, 9, 20)
     });
 
     messages.push({
         sender: 'company',
         text: `Government ID, proof of address (utility bill or bank statement), and if it's a large transaction, source of funds documentation. Have those ready and you'll be good to go.`,
-        time: formatTime(day2, 9, 23)
+        time: formatTimeWithRange(day2, 9, 23)
     });
 
     messages.push({
         sender: 'customer',
         text: `Got it. Almost done with the form.`,
-        time: formatTime(day2, 9, 35)
+        time: formatTimeWithRange(day2, 9, 35)
     });
 
     messages.push({
         sender: 'company',
         text: `Perfect! Once you submit, we'll start the review process immediately.`,
-        time: formatTime(day2, 9, 37)
+        time: formatTimeWithRange(day2, 9, 37)
     });
 
     messages.push({
         sender: 'customer',
         text: `Done! Submitted. How long until approval?`,
-        time: formatTime(day2, 9, 45)
+        time: formatTimeWithRange(day2, 9, 45)
     });
 
     messages.push({
         sender: 'company',
         text: `We'll review it within 24 hours. You'll receive an email notification once approved. If we need any additional information, we'll reach out right away.`,
-        time: formatTime(day2, 9, 48)
+        time: formatTimeWithRange(day2, 9, 48)
     });
 
     messages.push({
         sender: 'customer',
         text: `Thanks! Please keep me updated.`,
-        time: formatTime(day2, 9, 50)
+        time: formatTimeWithRange(day2, 9, 50)
     });
 
     return messages;
@@ -1058,51 +1058,51 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     messages.push({
         sender: 'customer',
         text: `Sounds manageable! What documents will I need?`,
-        time: formatTime(day2, 14, 15)
+        time: formatTimeWithRange(day2, 14, 15)
     });
 
     messages.push({
         sender: 'company',
         text: `Just standard stuff - government ID and proof of address. Nothing complicated!`,
-        time: formatTime(day2, 14, 18)
+        time: formatTimeWithRange(day2, 14, 18)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `You can access the form here: https://onboarding.geoswift.com Let me know if you have any questions while filling it out - I'm here to help!`,
-            time: formatTime(day2, 14, 20)
+            time: formatTimeWithRange(day2, 14, 20)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF form to your email. Feel free to reach out if you need any assistance - don't hesitate to ask!`,
-            time: formatTime(day2, 14, 20)
+            time: formatTimeWithRange(day2, 14, 20)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Got it. Let me review everything first. How long does approval usually take?`,
-        time: formatTime(day2, 14, 25)
+        time: formatTimeWithRange(day2, 14, 25)
     });
 
     messages.push({
         sender: 'company',
         text: `Usually 1-2 business days. We'll send you an email as soon as you're approved!`,
-        time: formatTime(day2, 14, 28)
+        time: formatTimeWithRange(day2, 14, 28)
     });
 
     messages.push({
         sender: 'customer',
         text: `Great! Thanks for being so helpful. I'll probably submit it in the next day or two after I look everything over.`,
-        time: formatTime(day2, 14, 31)
+        time: formatTimeWithRange(day2, 14, 31)
     });
 
     messages.push({
         sender: 'company',
         text: `You're welcome! We're excited to have you on board. Feel free to reach out anytime if you have questions. Have a great day!`,
-        time: formatTime(day2, 14, 34)
+        time: formatTimeWithRange(day2, 14, 34)
     });
 
     return messages;
@@ -1170,45 +1170,45 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     messages.push({
         sender: 'customer',
         text: `Very well. What's the next step in the onboarding process?`,
-        time: formatTime(day2, 14, 0)
+        time: formatTimeWithRange(day2, 14, 0)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `Please complete the onboarding form at: https://onboarding.geoswift.com Upon submission, our compliance team will review your application and initiate the verification process.`,
-            time: formatTime(day2, 14, 3)
+            time: formatTimeWithRange(day2, 14, 3)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the onboarding form to your registered email address. Please complete all required sections and return it at your earliest convenience. Our compliance team will review upon receipt.`,
-            time: formatTime(day2, 14, 3)
+            time: formatTimeWithRange(day2, 14, 3)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Understood. What's the expected timeline for account approval?`,
-        time: formatTime(day2, 14, 6)
+        time: formatTimeWithRange(day2, 14, 6)
     });
 
     messages.push({
         sender: 'company',
         text: `Typically 1-2 business days after we receive complete documentation. We'll notify you via email upon approval.`,
-        time: formatTime(day2, 14, 9)
+        time: formatTimeWithRange(day2, 14, 9)
     });
 
     messages.push({
         sender: 'customer',
         text: `Excellent. I'll review the documentation and likely submit it by end of week.`,
-        time: formatTime(day2, 14, 12)
+        time: formatTimeWithRange(day2, 14, 12)
     });
 
     messages.push({
         sender: 'company',
         text: `Perfect. We look forward to working with you. Should you have any questions during the process, please don't hesitate to reach out.`,
-        time: formatTime(day2, 14, 15)
+        time: formatTimeWithRange(day2, 14, 15)
     });
 
     return messages;
@@ -1261,6 +1261,103 @@ function generateRefusalReason(customerName) {
     return reasons[Math.abs(hash) % reasons.length];
 }
 
+// 获取对话时间段设置
+function getConversationTimeRange() {
+    const timeRange = document.querySelector('input[name="conversationTime"]:checked')?.value || 'morning';
+    
+    if (timeRange === 'custom') {
+        const customTime = document.getElementById('customStartTime').value;
+        if (customTime && customTime.match(/^\d{1,2}:\d{2}$/)) {
+            const [hour, minute] = customTime.split(':').map(Number);
+            return {
+                startHour: hour,
+                startMinute: minute,
+                range: 'custom'
+            };
+        }
+    }
+    
+    // 默认时间段
+    const ranges = {
+        morning: { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 },
+        afternoon: { startHour: 12, startMinute: 0, endHour: 18, endMinute: 0 },
+        evening: { startHour: 18, startMinute: 0, endHour: 22, endMinute: 0 }
+    };
+    
+    return ranges[timeRange] || ranges.morning;
+}
+
+// 生成时间段内的时间
+function generateTimeInRange(baseDate, timeRange, offsetMinutes = 0) {
+    let hour, minute;
+    
+    if (timeRange.range === 'custom') {
+        hour = timeRange.startHour;
+        minute = timeRange.startMinute + offsetMinutes;
+    } else {
+        const totalMinutes = (timeRange.startHour * 60 + timeRange.startMinute) + offsetMinutes;
+        const endTotalMinutes = timeRange.endHour * 60 + timeRange.endMinute;
+        const clampedMinutes = Math.min(totalMinutes, endTotalMinutes - 5); // 确保不超过结束时间
+        hour = Math.floor(clampedMinutes / 60);
+        minute = clampedMinutes % 60;
+    }
+    
+    return formatTime(baseDate, hour, minute);
+}
+
+// 获取对话时间段设置
+function getConversationTimeRange() {
+    const timeRange = document.querySelector('input[name="conversationTime"]:checked')?.value || 'morning';
+    
+    if (timeRange === 'custom') {
+        const customTime = document.getElementById('customStartTime')?.value;
+        if (customTime && customTime.match(/^\d{1,2}:\d{2}$/)) {
+            const [hour, minute] = customTime.split(':').map(Number);
+            return {
+                startHour: hour,
+                startMinute: minute,
+                range: 'custom'
+            };
+        }
+    }
+    
+    // 默认时间段
+    const ranges = {
+        morning: { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 },
+        afternoon: { startHour: 12, startMinute: 0, endHour: 18, endMinute: 0 },
+        evening: { startHour: 18, startMinute: 0, endHour: 22, endMinute: 0 }
+    };
+    
+    return ranges[timeRange] || ranges.morning;
+}
+
+// 根据时间段调整时间
+function adjustTimeForRange(baseHour, baseMinute, timeRange) {
+    if (timeRange.range === 'custom') {
+        return { hour: timeRange.startHour, minute: timeRange.startMinute };
+    }
+    
+    // 将基础时间映射到选定时间段
+    const baseTotalMinutes = baseHour * 60 + baseMinute;
+    const rangeStartMinutes = timeRange.startHour * 60 + timeRange.startMinute;
+    const rangeEndMinutes = timeRange.endHour * 60 + timeRange.endMinute;
+    const rangeDuration = rangeEndMinutes - rangeStartMinutes;
+    
+    // 假设基础时间在8:00-22:00范围内，映射到选定时间段
+    const baseRangeStart = 8 * 60; // 8:00
+    const baseRangeEnd = 22 * 60; // 22:00
+    const baseRangeDuration = baseRangeEnd - baseRangeStart;
+    
+    // 计算比例并映射
+    const ratio = (baseTotalMinutes - baseRangeStart) / baseRangeDuration;
+    const adjustedMinutes = rangeStartMinutes + (ratio * rangeDuration);
+    
+    const adjustedHour = Math.floor(adjustedMinutes / 60);
+    const adjustedMinute = adjustedMinutes % 60;
+    
+    return { hour: adjustedHour, minute: adjustedMinute };
+}
+
 function formatTime(date, hour, minute) {
     const d = new Date(date);
     d.setHours(hour, minute, 0);
@@ -1269,6 +1366,13 @@ function formatTime(date, hour, minute) {
     const hours = String(d.getHours()).padStart(2, '0');
     const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${month}/${day} ${hours}:${minutes}`;
+}
+
+// 格式化时间（带时间段调整）
+function formatTimeWithRange(date, baseHour, baseMinute) {
+    const timeRange = getConversationTimeRange();
+    const adjusted = adjustTimeForRange(baseHour, baseMinute, timeRange);
+    return formatTime(date, adjusted.hour, adjusted.minute);
 }
 
 // 存储当前对话，用于编辑功能
@@ -3095,13 +3199,13 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
         messages.push({
             sender: 'customer',
             text: `Let me think about this. I'll need to discuss it with my family first.`,
-            time: formatTime(day2, 14, 20)
+            time: formatTimeWithRange(day2, 14, 20)
         });
 
         messages.push({
             sender: 'company',
             text: `Of course, take your time. We're here to answer any questions you might have. Please let us know when you've made a decision.`,
-            time: formatTime(day2, 14, 23)
+            time: formatTimeWithRange(day2, 14, 23)
         });
     }
 
