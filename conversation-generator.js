@@ -2066,17 +2066,19 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
         .attachments-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
         }
         .attachment-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
+            padding: 10px 14px;
             background: white;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            min-width: 200px;
+            border-radius: 6px;
+            min-width: 180px;
+            max-width: 300px;
+            width: auto;
             cursor: pointer;
             transition: box-shadow 0.2s;
         }
@@ -2084,8 +2086,8 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .attachment-icon-large {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2124,6 +2126,9 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
         .attachment-info {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
         .attachment-name {
             font-size: 14px;
@@ -2132,11 +2137,12 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            line-height: 1.3;
         }
         .attachment-size {
             font-size: 12px;
             color: #666;
-            margin-top: 4px;
+            line-height: 1.2;
         }
     </style>
 </head>
@@ -2236,8 +2242,8 @@ function generateAttachmentsHTML(attachments) {
                 <svg class="attachment-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
-                <span class="attachment-count">${attachments.length} Attachments</span>
-                <a href="#" class="attachment-download-all">Download All</a>
+                <span class="attachment-count">${attachments.length} Attachment${attachments.length !== 1 ? 's' : ''}</span>
+                <a href="#" class="attachment-download-all">Download</a>
             </div>
             <div class="attachments-list">`;
     
