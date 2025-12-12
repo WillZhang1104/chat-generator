@@ -2077,8 +2077,8 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             min-width: 180px;
+            width: 500px;
             max-width: 500px;
-            width: auto;
             cursor: pointer;
             transition: box-shadow 0.2s;
         }
@@ -2252,10 +2252,14 @@ function generateAttachmentsHTML(attachments) {
         const fileName = attachment.name || 'Untitled';
         const fileSize = attachment.size || '0 KB';
         
-        // 提取文件扩展名
-        const fileExtension = fileName.includes('.') 
-            ? fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase()
-            : '';
+        // 提取文件名和扩展名
+        let baseFileName = fileName;
+        let fileExtension = '';
+        if (fileName.includes('.')) {
+            const lastDotIndex = fileName.lastIndexOf('.');
+            baseFileName = fileName.substring(0, lastDotIndex);
+            fileExtension = fileName.substring(lastDotIndex + 1).toUpperCase();
+        }
         
         // 根据文件类型选择图标
         let iconSVG = '';
@@ -2281,7 +2285,7 @@ function generateAttachmentsHTML(attachments) {
                     ${fileType === 'pdf' ? iconSVG : iconSVG}
                 </div>
                 <div class="attachment-info">
-                    <div class="attachment-name">${escapeHtml(fileName)}${fileExtension ? ' <span style="color: #999; font-weight: normal;">.' + escapeHtml(fileExtension) + '</span>' : ''}</div>
+                    <div class="attachment-name">${escapeHtml(baseFileName)}${fileExtension ? '<span style="color: #999; font-weight: normal;">.' + escapeHtml(fileExtension) + '</span>' : ''}</div>
                     <div class="attachment-size">${escapeHtml(fileSize)}</div>
                 </div>
             </div>`;
