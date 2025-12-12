@@ -1273,7 +1273,13 @@ function generateRefusalReason(customerName) {
 
 // 获取对话时间段设置
 function getConversationTimeRange() {
-    const timeRange = document.querySelector('input[name="conversationTime"]:checked')?.value || 'morning';
+    const timeRangeInput = document.querySelector('input[name="conversationTime"]:checked');
+    // 如果时间段选择不存在，返回默认值（早上）
+    if (!timeRangeInput) {
+        return { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 };
+    }
+    
+    const timeRange = timeRangeInput.value || 'morning';
     
     if (timeRange === 'custom') {
         const customTime = document.getElementById('customStartTime')?.value;
