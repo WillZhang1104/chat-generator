@@ -423,6 +423,34 @@
                     addAttachmentItem();
                 });
             }
+
+            // 时间段选择切换时显示/隐藏自定义时间输入
+            const timeRadios = document.querySelectorAll('input[name="conversationTime"]');
+            const customTimeGroup = document.getElementById('customTimeGroup');
+            if (timeRadios.length > 0 && customTimeGroup) {
+                timeRadios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        if (this.value === 'custom') {
+                            customTimeGroup.style.display = 'block';
+                        } else {
+                            customTimeGroup.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // 平台切换时显示/隐藏邮件配置
+            const platformSelect = document.getElementById('platform');
+            if (platformSelect) {
+                platformSelect.addEventListener('change', function() {
+                    const emailConfigGroup = document.getElementById('emailConfigGroup');
+                    if (this.value === 'email') {
+                        emailConfigGroup.style.display = 'block';
+                    } else {
+                        emailConfigGroup.style.display = 'none';
+                    }
+                });
+            }
         });
 
         function addAttachmentItem() {
