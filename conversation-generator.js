@@ -186,6 +186,9 @@ function generateConversation() {
             }
         }
         
+        // 生成合规问题答案
+        generateComplianceAnswers(customerName, null, 'kyc');
+        
         // 显示预览区域
         document.getElementById('previewSection').style.display = 'block';
         document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
@@ -247,6 +250,9 @@ function generateConversation() {
                 document.getElementById('emailInstructions').style.display = 'none';
             }
         }
+        
+        // 生成合规问题答案
+        generateComplianceAnswers(customerName, purposeDetails, 'initial');
         
         // 显示预览区域
         document.getElementById('previewSection').style.display = 'block';

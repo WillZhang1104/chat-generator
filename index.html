@@ -358,6 +358,26 @@
                 <button id="addMessageBtn" class="btn" style="background: #17a2b8; display: none; margin-left: 10px;">+ 新增消息</button>
             </div>
             <div class="conversation-preview" id="conversationPreview"></div>
+
+            <!-- 合规问题答案区域 -->
+            <div id="complianceAnswersSection" style="display: none; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h2 style="color: #333; margin-bottom: 20px; font-size: 20px;">合规问题答案</h2>
+                
+                <div class="form-group">
+                    <label for="sourceOfFunds" style="font-weight: 600; color: #333;">1. Source of Funds Details（资金来源详细说明）*</label>
+                    <textarea id="sourceOfFunds" rows="4" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="将自动生成资金来源说明..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="fundFlow" style="font-weight: 600; color: #333;">2. Fund Flow Description（资金流向说明）*</label>
+                    <textarea id="fundFlow" rows="4" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="将自动生成资金流向说明..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="transactionPurpose" style="font-weight: 600; color: #333;">3. Transaction Purpose Details（交易目的详细说明）*</label>
+                    <textarea id="transactionPurpose" rows="4" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="将自动生成交易目的说明..."></textarea>
+                </div>
+            </div>
             <div id="conversationEditArea" style="display: none; margin-top: 20px; padding: 20px; border: 1px solid #007bff; border-radius: 8px; background-color: #e7f3ff;">
                 <h3 style="margin-top: 0; margin-bottom: 15px; color: #007bff;">编辑对话</h3>
                 <div id="editableMessages"></div>
