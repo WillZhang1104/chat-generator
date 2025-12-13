@@ -4109,9 +4109,9 @@ function generateTransactionPurpose(customerName, purposes, style, variant, seed
 // 话多型资金来源说明
 function generateVerboseSourceOfFunds(customerName, purposes, variant, seed) {
     const variants = [
-        `The funds originate from my personal savings accumulated through my employment as a software engineer. I have been working in the technology sector for several years and receive regular salary payments along with quarterly bonuses. I have also made some successful investments in the stock market which have contributed to my savings. All funds are held in my personal bank accounts and I can provide bank statements for verification if required.`,
-        `My source of funds comes from multiple legitimate sources: (1) Salary income from my position as a marketing director where I have been employed for several years; (2) Investment returns from a diversified portfolio including stocks, bonds, and mutual funds; (3) Rental income from a property I own; and (4) Occasional freelance consulting work in my field of expertise. All these income streams are documented and can be verified through tax returns, pay stubs, and bank statements.`,
-        `The funds I intend to use for this transaction are derived from my long-term savings and investment portfolio. I have been systematically saving a portion of my income while working as a financial analyst. My primary sources include regular salary payments, annual bonuses from my employer, dividends from stock investments, and interest earned on my savings accounts. I maintain detailed records of all transactions and can provide comprehensive documentation including tax forms and bank statements.`
+        `The funds originate from my personal savings accumulated through employment. I receive regular salary payments and quarterly bonuses. I have also made some investments in the stock market which have contributed to my savings. All funds are held in my personal bank accounts and I can provide bank statements for verification.`,
+        `My source of funds comes from multiple sources: (1) Salary income from my employment; (2) Investment returns from a diversified portfolio; (3) Rental income from a property I own; and (4) Occasional freelance consulting work. All income streams are documented and can be verified through tax returns, pay stubs, and bank statements.`,
+        `The funds are derived from my savings and investment portfolio. I have been saving a portion of my income from employment. My primary sources include regular salary payments, annual bonuses, dividends from investments, and interest earned on savings accounts. I can provide documentation including tax forms and bank statements.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4119,9 +4119,9 @@ function generateVerboseSourceOfFunds(customerName, purposes, variant, seed) {
 // 简洁型资金来源说明
 function generateConciseSourceOfFunds(customerName, purposes, variant, seed) {
     const variants = [
-        `Salary income from employment. Bank statements available for verification.`,
-        `Personal savings from employment income. Funds held in personal bank account.`,
-        `Employment income and investment returns. Can provide bank statements and tax documents.`
+        `Salary income from employment. Bank statements available.`,
+        `Personal savings from employment income.`,
+        `Employment income and investment returns.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4129,8 +4129,8 @@ function generateConciseSourceOfFunds(customerName, purposes, variant, seed) {
 // 谨慎型资金来源说明
 function generateCautiousSourceOfFunds(customerName, purposes, variant, seed) {
     const variants = [
-        `The funds originate from my verified employment income. I have been employed full-time for several years and can provide employment verification letters, pay stubs, and bank statements showing regular salary deposits. All funds are held in accounts under my name at established financial institutions, and I maintain complete records of all transactions. I am prepared to provide any additional documentation required for compliance purposes.`,
-        `My source of funds consists of legitimate income from my professional employment. I can provide documentation including employment contract, recent pay stubs, tax returns, and bank statements showing the accumulation of these funds over time. All accounts are in my name and have been active for several years. I understand the importance of transparency in financial transactions and am committed to providing all necessary verification documents.`
+        `The funds originate from my verified employment income. I can provide employment verification letters, pay stubs, and bank statements showing regular salary deposits. All funds are held in accounts under my name and I maintain complete records of all transactions.`,
+        `My source of funds consists of legitimate income from my professional employment. I can provide documentation including employment contract, pay stubs, tax returns, and bank statements. All accounts are in my name and I am committed to providing all necessary verification documents.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4138,9 +4138,9 @@ function generateCautiousSourceOfFunds(customerName, purposes, variant, seed) {
 // 急切型资金来源说明
 function generateUrgentSourceOfFunds(customerName, purposes, variant, seed) {
     const variants = [
-        `Employment income. Bank statements available. Need to proceed quickly.`,
-        `Salary from my job. Can provide pay stubs and bank statements immediately.`,
-        `Personal savings from work income. All documents ready for verification.`
+        `Employment income. Bank statements available.`,
+        `Salary from employment. Can provide pay stubs and bank statements.`,
+        `Personal savings from employment income.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4148,8 +4148,8 @@ function generateUrgentSourceOfFunds(customerName, purposes, variant, seed) {
 // 友好型资金来源说明
 function generateFriendlySourceOfFunds(customerName, purposes, variant, seed) {
     const variants = [
-        `Hi! The funds come from my regular salary - I've been working as a project manager for several years now. I've been saving up for a while, and all the money is in my personal bank account. I'm happy to provide bank statements or pay stubs if you need them!`,
-        `Sure! The money comes from my job income. I work as a teacher and have been putting aside some savings each month. Everything is documented in my bank account, and I can share statements whenever you need them. Thanks!`
+        `Hi! The funds come from my regular salary. I've been saving up for a while, and all the money is in my personal bank account. I'm happy to provide bank statements or pay stubs if you need them!`,
+        `Sure! The money comes from my job income. I've been putting aside some savings each month. Everything is documented and I can share statements whenever you need them. Thanks!`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4157,8 +4157,8 @@ function generateFriendlySourceOfFunds(customerName, purposes, variant, seed) {
 // 专业型资金来源说明
 function generateProfessionalSourceOfFunds(customerName, purposes, variant, seed) {
     const variants = [
-        `The funds originate from verified employment income. I am employed as a Senior Accountant and receive regular salary payments. Funds are held in my primary bank account. I can provide employment verification, recent pay stubs, and bank statements upon request.`,
-        `Source of funds: Employment income from my position as Operations Manager. Funds are maintained in personal bank accounts and can be verified through provided documentation including employment letters, tax returns, and bank statements.`
+        `The funds originate from verified employment income. I receive regular salary payments. Funds are held in my personal bank account. I can provide employment verification, pay stubs, and bank statements upon request.`,
+        `Source of funds: Employment income. Funds are maintained in personal bank accounts and can be verified through employment letters, tax returns, and bank statements.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4168,9 +4168,9 @@ function generateProfessionalSourceOfFunds(customerName, purposes, variant, seed
 // 话多型资金流向说明
 function generateVerboseFundFlow(customerName, purposes, variant, seed) {
     const variants = [
-        `The funds will flow from my personal bank account to your platform. Specifically, I will initiate a wire transfer from my checking account, which contains funds from my salary deposits. Once the funds are received by your platform, I intend to convert them to USDT for my investment purposes. The entire transaction will be documented, and I can provide bank transfer confirmations and receipts for your records.`,
-        `Here's how the funds will move: First, I'll transfer the amount from my primary savings account to my checking account. Then, I'll initiate a bank transfer to your platform's designated account. After the funds are successfully deposited into my account on your platform, I plan to use them to purchase USDT tokens, which I will then use for my intended investment activities. I can provide transaction confirmations at each step of this process.`,
-        `The fund flow process will be as follows: (1) Funds originate from my employment income accumulated in my savings account; (2) I will transfer the required amount to my checking account; (3) From my checking account, I will execute a wire transfer to your platform's bank account; (4) Once received, the funds will be credited to my account balance on your platform; (5) I will then convert these funds to USDT according to my investment strategy. Each step will generate documentation that I can provide for compliance purposes.`
+        `The funds will flow from my personal bank account to your platform via wire transfer. Once received, I intend to convert them to USDT for my investment purposes. I can provide bank transfer confirmations for your records.`,
+        `Here's how the funds will move: I'll transfer the amount from my savings account to my checking account, then initiate a bank transfer to your platform. After the funds are deposited into my platform account, I plan to use them to purchase USDT tokens. I can provide transaction confirmations at each step.`,
+        `The fund flow process: (1) Funds from my savings account; (2) Transfer to checking account; (3) Wire transfer to your platform's bank account; (4) Funds credited to my platform account; (5) Conversion to USDT. I can provide documentation for each step.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4188,8 +4188,8 @@ function generateConciseFundFlow(customerName, purposes, variant, seed) {
 // 谨慎型资金流向说明
 function generateCautiousFundFlow(customerName, purposes, variant, seed) {
     const variants = [
-        `The funds will flow through the following verified channels: From my personal bank account via wire transfer to your platform's designated bank account. Upon receipt and verification, the funds will be credited to my account on your platform. I will maintain records of all transactions and can provide transfer confirmations, bank statements, and any other documentation required to verify the legitimate movement of funds through each stage of this process.`,
-        `Fund flow path: Personal bank account → Wire transfer to platform's bank account → Credit to my platform account → Conversion to USDT as needed. All transactions will be documented and traceable. I understand the importance of maintaining transparency in fund movements and am prepared to provide complete documentation for compliance review.`
+        `The funds will flow from my personal bank account via wire transfer to your platform's bank account. Upon receipt, the funds will be credited to my account on your platform. I will maintain records of all transactions and can provide transfer confirmations and bank statements.`,
+        `Fund flow path: Personal bank account → Wire transfer to platform's bank account → Credit to my platform account → Conversion to USDT. All transactions will be documented and traceable. I am prepared to provide complete documentation for compliance review.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4207,8 +4207,8 @@ function generateUrgentFundFlow(customerName, purposes, variant, seed) {
 // 友好型资金流向说明
 function generateFriendlyFundFlow(customerName, purposes, variant, seed) {
     const variants = [
-        `The money will come from my bank account - I'll do a wire transfer to your platform, and then once it's there, I'll convert it to USDT for my investments. Pretty straightforward! I can show you the transfer confirmation once it's done.`,
-        `Here's the flow: My savings account → Wire transfer to your platform → Then I'll buy USDT with those funds. Simple as that! Happy to provide any documentation you need along the way.`
+        `The money will come from my bank account - I'll do a wire transfer to your platform, then convert it to USDT for my investments. I can show you the transfer confirmation once it's done.`,
+        `Here's the flow: My savings account → Wire transfer to your platform → Then I'll buy USDT with those funds. Happy to provide any documentation you need!`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4216,15 +4216,13 @@ function generateFriendlyFundFlow(customerName, purposes, variant, seed) {
 // 专业型资金流向说明
 function generateProfessionalFundFlow(customerName, purposes, variant, seed) {
     const variants = [
-        `Fund Flow: (1) Source: Personal bank account; (2) Transfer method: Wire transfer; (3) Destination: Platform's designated bank account; (4) Platform credit: Funds credited to account balance; (5) Conversion: Funds converted to USDT per transaction requirements. All steps documented and verifiable.`,
+        `Fund Flow: (1) Personal bank account; (2) Wire transfer; (3) Platform's bank account; (4) Platform credit; (5) Conversion to USDT. All steps documented.`,
         `Flow Path:
-- Source Account: Personal bank account
-- Transfer Method: Wire Transfer
-- Receiving Account: Platform's bank account
-- Platform Credit: Funds deposited to account
-- Final Step: Conversion to USDT
-
-All transactions will be traceable and documented.`
+- Source: Personal bank account
+- Transfer: Wire Transfer
+- Destination: Platform's bank account
+- Credit: Platform account
+- Final: Conversion to USDT`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4235,9 +4233,9 @@ All transactions will be traceable and documented.`
 function generateVerboseTransactionPurpose(customerName, purposes, variant, seed) {
     const purposeText = purposes.length > 0 ? purposes.join(', ') : 'investment';
     const variants = [
-        `My primary purpose for these transactions is ${purposeText}. Specifically, I am looking to diversify my investment portfolio by including cryptocurrency assets. I have been researching the crypto market and believe that USDT provides a stable entry point into this asset class. I plan to use these funds to make strategic investments over time, potentially expanding into other cryptocurrencies as I become more familiar with the market dynamics.`,
-        `The purpose of these transactions is ${purposeText}. I have been actively investing in various financial instruments, including stocks, mutual funds, and ETFs. Now, I want to add cryptocurrency to my investment mix, starting with USDT due to its stability relative to other cryptocurrencies. My goal is to gradually build a crypto portfolio that complements my existing investments.`,
-        `I intend to use these funds for ${purposeText} purposes. More specifically, I am interested in entering the cryptocurrency market as part of my investment diversification strategy. USDT appeals to me because it maintains a stable value pegged to the US dollar, which makes it a good starting point for crypto investing.`
+        `My primary purpose for these transactions is ${purposeText}. I am looking to diversify my investment portfolio by including cryptocurrency assets. I have been researching the crypto market and believe that USDT provides a stable entry point. I plan to use these funds to make strategic investments over time.`,
+        `The purpose of these transactions is ${purposeText}. I have been investing in various financial instruments including stocks and mutual funds. Now, I want to add cryptocurrency to my investment mix, starting with USDT due to its stability.`,
+        `I intend to use these funds for ${purposeText} purposes. I am interested in entering the cryptocurrency market as part of my investment diversification strategy. USDT appeals to me because it maintains a stable value, making it a good starting point for crypto investing.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4246,9 +4244,9 @@ function generateVerboseTransactionPurpose(customerName, purposes, variant, seed
 function generateConciseTransactionPurpose(customerName, purposes, variant, seed) {
     const purposeText = purposes.length > 0 ? purposes.join(', ') : 'investment';
     const variants = [
-        `Purpose: ${purposeText}. Diversifying investment portfolio with cryptocurrency.`,
-        `Transaction purpose: ${purposeText}. Building crypto investment portfolio.`,
-        `Purpose: ${purposeText}. Adding cryptocurrency to existing investment strategy.`
+        `Purpose: ${purposeText}. Diversifying portfolio with cryptocurrency.`,
+        `Transaction purpose: ${purposeText}. Building crypto portfolio.`,
+        `Purpose: ${purposeText}. Adding cryptocurrency to investment strategy.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4257,8 +4255,8 @@ function generateConciseTransactionPurpose(customerName, purposes, variant, seed
 function generateCautiousTransactionPurpose(customerName, purposes, variant, seed) {
     const purposeText = purposes.length > 0 ? purposes.join(', ') : 'investment';
     const variants = [
-        `The purpose of these transactions is ${purposeText}. I am engaging in these transactions as part of a carefully considered investment strategy. I have conducted extensive research on cryptocurrency markets, understand the associated risks, and have determined that this aligns with my investment objectives and risk tolerance. All transactions will be conducted in compliance with applicable regulations.`,
-        `Transaction Purpose: ${purposeText}. I am pursuing these transactions for legitimate investment purposes as part of my diversified portfolio strategy. I have evaluated the risks and benefits and determined that cryptocurrency investments fit within my overall financial planning goals. I commit to maintaining transparency and providing all necessary documentation.`
+        `The purpose of these transactions is ${purposeText}. I am engaging in these transactions as part of a carefully considered investment strategy. I have conducted research on cryptocurrency markets, understand the risks, and have determined that this aligns with my investment objectives.`,
+        `Transaction Purpose: ${purposeText}. I am pursuing these transactions for legitimate investment purposes as part of my diversified portfolio strategy. I have evaluated the risks and benefits and determined that cryptocurrency investments fit within my financial planning goals.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4267,9 +4265,9 @@ function generateCautiousTransactionPurpose(customerName, purposes, variant, see
 function generateUrgentTransactionPurpose(customerName, purposes, variant, seed) {
     const purposeText = purposes.length > 0 ? purposes.join(', ') : 'investment';
     const variants = [
-        `Purpose: ${purposeText}. Need to proceed quickly.`,
-        `Transaction purpose: ${purposeText}. Ready to execute.`,
-        `Purpose: ${purposeText}. Time-sensitive investment opportunity.`
+        `Purpose: ${purposeText}.`,
+        `Transaction purpose: ${purposeText}.`,
+        `Purpose: ${purposeText}.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4278,8 +4276,8 @@ function generateUrgentTransactionPurpose(customerName, purposes, variant, seed)
 function generateFriendlyTransactionPurpose(customerName, purposes, variant, seed) {
     const purposeText = purposes.length > 0 ? purposes.join(', ') : 'investment';
     const variants = [
-        `Hi! I'm looking to use these funds for ${purposeText}. I've been wanting to get into cryptocurrency for a while now, and USDT seems like a good place to start since it's stable. I'm planning to use it as part of my investment strategy. Happy to answer any questions!`,
-        `Sure! The purpose is ${purposeText}. I'm interested in diversifying my investments and thought crypto would be a good addition. USDT looks like a stable option to begin with. This is all part of my long-term financial planning.`
+        `Hi! I'm looking to use these funds for ${purposeText}. I've been wanting to get into cryptocurrency, and USDT seems like a good place to start since it's stable. Happy to answer any questions!`,
+        `Sure! The purpose is ${purposeText}. I'm interested in diversifying my investments and thought crypto would be a good addition. USDT looks like a stable option to begin with.`
     ];
     return seededChoice(variants, seed, variant);
 }
@@ -4288,15 +4286,13 @@ function generateFriendlyTransactionPurpose(customerName, purposes, variant, see
 function generateProfessionalTransactionPurpose(customerName, purposes, variant, seed) {
     const purposeText = purposes.length > 0 ? purposes.join(', ') : 'investment';
     const variants = [
-        `Transaction Purpose: ${purposeText}. Objective: Portfolio diversification through cryptocurrency assets. Strategy: Initial allocation to USDT (stablecoin) as foundation, with potential expansion to other cryptocurrencies based on market analysis. This transaction aligns with my investment policy statement and risk management framework.`,
+        `Transaction Purpose: ${purposeText}. Objective: Portfolio diversification through cryptocurrency assets. Strategy: Initial allocation to USDT as foundation, with potential expansion to other cryptocurrencies.`,
         `Purpose: ${purposeText}
-Objective: Diversify investment portfolio
+Objective: Diversify portfolio
 Strategy: 
 1. Initial investment in USDT
 2. Potential expansion to other cryptocurrencies
-3. Long-term wealth building through digital assets
-
-This aligns with my overall investment strategy and risk tolerance.`
+3. Long-term wealth building`
     ];
     return seededChoice(variants, seed, variant);
 }
