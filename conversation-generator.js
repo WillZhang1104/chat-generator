@@ -1410,11 +1410,21 @@ function generateBrowserScript(conversation, platform) {
     // 生成可以直接复制粘贴的HTML代码
     const customerName = document.getElementById('customerName').value;
     const htmlMessages = conversation.map((msg, index) => {
-        if (platform === 'telegram') {
-            return generateTelegramMessageHTML(msg, customerName, index, conversation);
-        } else {
-            return generateWhatsAppMessageHTML(msg, customerName, index);
+        let html = '';
+        // 如果是WhatsApp平台，检查是否需要添加间隔
+        if (platform === 'whatsapp' && index > 0) {
+            const prevMsg = conversation[index - 1];
+            // 如果当前消息和上一条消息的发送者不同，添加间隔
+            if (prevMsg.sender !== msg.sender) {
+                html += '<div style="height: 8px;"></div>\n';
+            }
         }
+        if (platform === 'telegram') {
+            html += generateTelegramMessageHTML(msg, customerName, index, conversation);
+        } else {
+            html += generateWhatsAppMessageHTML(msg, customerName, index);
+        }
+        return html;
     }).join('\n');
 
     // 直接生成HTML代码，不包含注释
