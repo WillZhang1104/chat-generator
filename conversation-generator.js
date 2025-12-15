@@ -4971,7 +4971,8 @@ ${conversationText}
 
 // Google Gemini API（免费，推荐）
 async function callGeminiAPI(prompt, apiKey) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+    // 使用 v1 API 和 gemini-1.5-flash 模型（免费且快速）
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
