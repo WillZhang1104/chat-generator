@@ -158,9 +158,10 @@ function generateConversation() {
         
         // 如果启用AI优化，则优化对话
         if (shouldUseAIOptimization()) {
-            const apiKey = getOpenAIApiKey();
+            const provider = getAIProvider();
+            const apiKey = getAIApiKey();
             if (!apiKey) {
-                alert('请先输入 OpenAI API Key 才能使用 AI 优化功能');
+                alert('请先输入 API Key 才能使用 AI 优化功能');
                 return;
             }
             
@@ -172,7 +173,7 @@ function generateConversation() {
             
             // 异步优化对话
             try {
-                conversation = await optimizeConversationWithAI(conversation, customerName, platform, apiKey);
+                conversation = await optimizeConversationWithAI(conversation, customerName, platform, provider, apiKey);
             } catch (error) {
                 console.error('AI优化失败:', error);
                 alert('AI优化失败，将使用原始对话。错误：' + error.message);
@@ -245,9 +246,10 @@ function generateConversation() {
         
         // 如果启用AI优化，则优化对话
         if (shouldUseAIOptimization()) {
-            const apiKey = getOpenAIApiKey();
+            const provider = getAIProvider();
+            const apiKey = getAIApiKey();
             if (!apiKey) {
-                alert('请先输入 OpenAI API Key 才能使用 AI 优化功能');
+                alert('请先输入 API Key 才能使用 AI 优化功能');
                 return;
             }
             
@@ -259,7 +261,7 @@ function generateConversation() {
             
             // 异步优化对话
             try {
-                conversation = await optimizeConversationWithAI(conversation, customerName, platform, apiKey);
+                conversation = await optimizeConversationWithAI(conversation, customerName, platform, provider, apiKey);
             } catch (error) {
                 console.error('AI优化失败:', error);
                 alert('AI优化失败，将使用原始对话。错误：' + error.message);

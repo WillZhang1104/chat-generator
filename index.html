@@ -348,9 +348,22 @@
                     <span style="font-weight: 600;">使用 AI 优化对话（使对话更自然、更像真人）</span>
                 </label>
                 <div id="aiConfigGroup" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
-                    <label for="openaiApiKey" style="font-size: 13px; color: #666;">OpenAI API Key（可选，留空则使用默认配置）</label>
-                    <input type="password" id="openaiApiKey" name="openaiApiKey" placeholder="sk-..." style="margin-top: 5px; font-size: 13px;">
-                    <p style="font-size: 12px; color: #999; margin-top: 5px;">注意：API Key 仅存储在浏览器本地，不会上传到服务器。使用 OpenAI API 会产生费用。</p>
+                    <label for="aiProvider" style="font-size: 13px; color: #666; display: block; margin-bottom: 8px;">选择 AI 服务提供商：</label>
+                    <select id="aiProvider" name="aiProvider" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; margin-bottom: 10px;">
+                        <option value="gemini">Google Gemini（免费，推荐）</option>
+                        <option value="groq">Groq（免费，快速）</option>
+                        <option value="huggingface">Hugging Face（免费）</option>
+                        <option value="openai">OpenAI（付费）</option>
+                    </select>
+                    <label for="aiApiKey" style="font-size: 13px; color: #666;">API Key：</label>
+                    <input type="password" id="aiApiKey" name="aiApiKey" placeholder="输入API Key（Gemini/Groq免费）" style="margin-top: 5px; font-size: 13px; width: 100%;">
+                    <p style="font-size: 12px; color: #999; margin-top: 5px;">
+                        <strong>免费选项：</strong><br>
+                        • <strong>Google Gemini</strong>：访问 <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a> 获取免费API Key<br>
+                        • <strong>Groq</strong>：访问 <a href="https://console.groq.com/keys" target="_blank">Groq Console</a> 获取免费API Key<br>
+                        • <strong>Hugging Face</strong>：访问 <a href="https://huggingface.co/settings/tokens" target="_blank">Hugging Face</a> 获取免费Token<br>
+                        注意：API Key 仅存储在浏览器本地，不会上传到服务器。
+                    </p>
                 </div>
             </div>
 
