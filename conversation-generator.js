@@ -4971,30 +4971,53 @@ ${conversationText}
 
 // Google Gemini API（免费，推荐）
 async function callGeminiAPI(prompt, apiKey) {
-    // 使用 v1 API 和 gemini-1.5-flash 模型（免费且快速）
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            contents: [{
-                parts: [{
-                    text: prompt
-                }]
-            }]
-        })
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Gemini API请求失败: ${response.status} - ${errorData.error?.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    const optimizedText = data.candidates[0].content.parts[0].text.trim();
+    // 使用 v1beta API 和 gemini-1.5-flash 模型（免费且快速）
+    // 如果 gemini-1.5-flash 不可用，尝试 gemini-1.5-pro 或 gemini-pro
+    const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
+    let lastError = null;
     
-    return parseAIResponse(optimizedText);
+    for (const model of models) {
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                lastError = new Error(`Gemini API请求失败 (${model}): ${response.status} - ${errorData.error?.message || response.statusText}`);
+                // 如果这个模型不可用，尝试下一个
+                if (response.status === 404 && models.indexOf(model) < models.length - 1) {
+                    continue;
+                }
+                throw lastError;
+            }
+
+            const data = await response.json();
+            const optimizedText = data.candidates[0].content.parts[0].text.trim();
+            
+            return parseAIResponse(optimizedText);
+        } catch (error) {
+            // 如果是最后一个模型，抛出错误
+            if (models.indexOf(model) === models.length - 1) {
+                throw error;
+            }
+            // 否则继续尝试下一个模型
+            lastError = error;
+        }
+    }
+    
+    // 如果所有模型都失败，抛出最后一个错误
+    throw lastError || new Error('所有 Gemini 模型都不可用');
 }
 
 // Groq API（免费，快速）
