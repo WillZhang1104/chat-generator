@@ -154,7 +154,30 @@ function generateConversation() {
         const additionalInfo = document.getElementById('additionalInfo').value;
         
         // 生成补充材料对话
-        const conversation = createKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide);
+        let conversation = createKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide);
+        
+        // 如果启用AI优化，则优化对话
+        if (shouldUseAIOptimization()) {
+            const apiKey = getOpenAIApiKey();
+            if (!apiKey) {
+                alert('请先输入 OpenAI API Key 才能使用 AI 优化功能');
+                return;
+            }
+            
+            // 显示加载提示
+            const preview = document.getElementById('conversationPreview');
+            if (preview) {
+                preview.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">正在使用 AI 优化对话，请稍候...</div>';
+            }
+            
+            // 异步优化对话
+            try {
+                conversation = await optimizeConversationWithAI(conversation, customerName, platform, apiKey);
+            } catch (error) {
+                console.error('AI优化失败:', error);
+                alert('AI优化失败，将使用原始对话。错误：' + error.message);
+            }
+        }
         
         // 显示预览
         displayConversation(conversation);
@@ -218,7 +241,30 @@ function generateConversation() {
         const purposeDetails = getPurposeDetails(checkedPurposes, customPurpose);
 
         // 生成对话
-        const conversation = createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo);
+        let conversation = createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo);
+        
+        // 如果启用AI优化，则优化对话
+        if (shouldUseAIOptimization()) {
+            const apiKey = getOpenAIApiKey();
+            if (!apiKey) {
+                alert('请先输入 OpenAI API Key 才能使用 AI 优化功能');
+                return;
+            }
+            
+            // 显示加载提示
+            const preview = document.getElementById('conversationPreview');
+            if (preview) {
+                preview.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">正在使用 AI 优化对话，请稍候...</div>';
+            }
+            
+            // 异步优化对话
+            try {
+                conversation = await optimizeConversationWithAI(conversation, customerName, platform, apiKey);
+            } catch (error) {
+                console.error('AI优化失败:', error);
+                alert('AI优化失败，将使用原始对话。错误：' + error.message);
+            }
+        }
         
         // 显示预览
         displayConversation(conversation);
