@@ -2633,13 +2633,31 @@ function saveEditedConversation() {
         
         const attachments = window.getAttachments ? window.getAttachments() : [];
         const html = generateTitanEmailHTML(emails, currentCustomerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments);
+        
+        // 在预览区域显示邮件HTML
+        const preview = document.getElementById('conversationPreview');
+        if (preview) {
+            preview.innerHTML = '';
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            iframe.style.border = 'none';
+            iframe.style.borderRadius = '8px';
+            iframe.style.background = 'white';
+            preview.appendChild(iframe);
+            
+            // 将HTML写入iframe
+            iframe.contentDocument.open();
+            iframe.contentDocument.write(html);
+            iframe.contentDocument.close();
+        }
+        
         displayEmailHTMLDownload(html, currentCustomerName);
     } else {
         generateBrowserScript(currentConversation, currentPlatform);
+        // 更新预览
+        displayConversation(currentConversation);
     }
-    
-    // 更新预览
-    displayConversation(currentConversation);
     
     // 隐藏编辑区域
     document.getElementById('conversationEditArea').style.display = 'none';
