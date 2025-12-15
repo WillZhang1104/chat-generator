@@ -28,7 +28,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (editBtn) {
         editBtn.addEventListener('click', function() {
-            if (currentConversation) {
+            if (currentPlatform === 'email' && currentEmails) {
+                // 邮件编辑
+                showEditableEmail(currentEmails);
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+                cancelBtn.style.display = 'inline-block';
+                addMsgBtn.style.display = 'inline-block';
+                document.getElementById('conversationEditArea').style.display = 'block';
+            } else if (currentConversation) {
+                // 对话编辑
                 showEditableConversation(currentConversation);
                 editBtn.style.display = 'none';
                 saveBtn.style.display = 'inline-block';
@@ -1365,6 +1374,11 @@ function formatTimeWithRange(date, baseHour, baseMinute) {
 let currentConversation = null;
 let currentPlatform = null;
 let currentCustomerName = null;
+let currentEmails = null; // 存储当前邮件数据
+let currentSenderEmail = null;
+let currentRecipientEmail = null;
+let currentEmailDate = null;
+let currentAttachments = [];
 
 function displayConversation(messages) {
     const preview = document.getElementById('conversationPreview');
@@ -1952,6 +1966,14 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     // 生成邮件格式的对话
     const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting);
     
+    // 保存邮件数据用于编辑
+    currentEmails = emails;
+    currentCustomerName = customerName;
+    currentSenderEmail = senderEmail;
+    currentRecipientEmail = recipientEmail;
+    currentEmailDate = emailDate;
+    currentPlatform = 'email';
+    
     // 获取附件列表（安全获取，避免错误）
     let attachments = [];
     try {
@@ -1962,6 +1984,7 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
         console.warn('获取附件列表时出错:', e);
         attachments = [];
     }
+    currentAttachments = attachments;
     
     // 生成完整的Titan.email界面HTML
     const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments);
@@ -1983,6 +2006,13 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
         iframe.contentDocument.open();
         iframe.contentDocument.write(html);
         iframe.contentDocument.close();
+    }
+    
+    // 显示编辑按钮
+    const editBtn = document.getElementById('editConversationBtn');
+    if (editBtn) {
+        editBtn.style.display = 'inline-block';
+        editBtn.textContent = '编辑邮件';
     }
     
     // 显示下载按钮
@@ -2547,92 +2577,232 @@ function showEditableConversation(conversation) {
     currentConversation = conversation;
 }
 
-// 添加新消息
-function addNewMessage() {
-    if (!currentConversation) {
-        alert('请先生成对话');
+// 显示可编辑的邮件界面
+function showEditableEmail(emails) {
+    const editArea = document.getElementById('conversationEditArea');
+    const editableMessages = document.getElementById('editableMessages');
+    if (!editArea || !editableMessages) {
+        console.error('编辑区域未找到');
         return;
     }
     
-    const newMsg = {
-        sender: 'customer',
-        text: '',
-        time: formatTime(new Date(), new Date().getHours(), new Date().getMinutes())
-    };
+    editableMessages.innerHTML = '';
     
-    currentConversation.push(newMsg);
-    showEditableConversation(currentConversation);
+    emails.forEach((email, index) => {
+        const emailDiv = document.createElement('div');
+        emailDiv.className = 'editable-email';
+        emailDiv.style.marginBottom = '20px';
+        emailDiv.style.padding = '15px';
+        emailDiv.style.border = '1px solid #ddd';
+        emailDiv.style.borderRadius = '5px';
+        emailDiv.style.backgroundColor = '#f9f9f9';
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.style.marginBottom = '10px';
+        headerDiv.style.display = 'flex';
+        headerDiv.style.alignItems = 'center';
+        headerDiv.style.gap = '10px';
+        headerDiv.style.flexWrap = 'wrap';
+        
+        const senderLabel = document.createElement('label');
+        senderLabel.textContent = `发送者 (${index + 1}): `;
+        senderLabel.style.fontWeight = 'bold';
+        senderLabel.style.marginRight = '5px';
+        
+        const senderSelect = document.createElement('select');
+        senderSelect.className = 'editable-email-sender';
+        senderSelect.setAttribute('data-index', index);
+        senderSelect.style.padding = '5px';
+        senderSelect.style.borderRadius = '3px';
+        senderSelect.style.border = '1px solid #ccc';
+        senderSelect.style.minWidth = '100px';
+        
+        const option1 = document.createElement('option');
+        option1.value = 'customer';
+        option1.textContent = '客户';
+        if (email.sender === 'customer') option1.selected = true;
+        
+        const option2 = document.createElement('option');
+        option2.value = 'company';
+        option2.textContent = '公司';
+        if (email.sender === 'company') option2.selected = true;
+        
+        senderSelect.appendChild(option1);
+        senderSelect.appendChild(option2);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️ 删除';
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'delete-email-btn';
+        deleteBtn.setAttribute('data-index', index);
+        deleteBtn.style.padding = '6px 12px';
+        deleteBtn.style.backgroundColor = '#ff4444';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '3px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.fontSize = '13px';
+        deleteBtn.style.fontWeight = 'bold';
+        deleteBtn.style.marginLeft = 'auto';
+        deleteBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm('确定要删除这封邮件吗？')) {
+                emails.splice(index, 1);
+                showEditableEmail(emails);
+            }
+            return false;
+        };
+        
+        headerDiv.appendChild(senderLabel);
+        headerDiv.appendChild(senderSelect);
+        headerDiv.appendChild(deleteBtn);
+        
+        // 主题输入
+        const subjectDiv = document.createElement('div');
+        subjectDiv.style.marginBottom = '10px';
+        
+        const subjectLabel = document.createElement('label');
+        subjectLabel.textContent = '邮件主题: ';
+        subjectLabel.style.fontWeight = 'bold';
+        subjectLabel.style.display = 'block';
+        subjectLabel.style.marginBottom = '5px';
+        
+        const subjectInput = document.createElement('input');
+        subjectInput.type = 'text';
+        subjectInput.className = 'editable-email-subject';
+        subjectInput.setAttribute('data-index', index);
+        subjectInput.value = email.subject || '';
+        subjectInput.style.width = '100%';
+        subjectInput.style.padding = '8px';
+        subjectInput.style.border = '1px solid #ccc';
+        subjectInput.style.borderRadius = '3px';
+        subjectInput.style.fontSize = '14px';
+        
+        subjectDiv.appendChild(subjectLabel);
+        subjectDiv.appendChild(subjectInput);
+        
+        // 正文输入
+        const bodyDiv = document.createElement('div');
+        
+        const bodyLabel = document.createElement('label');
+        bodyLabel.textContent = '邮件正文: ';
+        bodyLabel.style.fontWeight = 'bold';
+        bodyLabel.style.display = 'block';
+        bodyLabel.style.marginBottom = '5px';
+        
+        const bodyTextarea = document.createElement('textarea');
+        bodyTextarea.className = 'editable-email-body';
+        bodyTextarea.setAttribute('data-index', index);
+        bodyTextarea.value = email.body || '';
+        bodyTextarea.style.width = '100%';
+        bodyTextarea.style.minHeight = '150px';
+        bodyTextarea.style.padding = '8px';
+        bodyTextarea.style.border = '1px solid #ccc';
+        bodyTextarea.style.borderRadius = '3px';
+        bodyTextarea.style.fontSize = '14px';
+        bodyTextarea.style.fontFamily = 'inherit';
+        bodyTextarea.style.resize = 'vertical';
+        
+        bodyDiv.appendChild(bodyLabel);
+        bodyDiv.appendChild(bodyTextarea);
+        
+        emailDiv.appendChild(headerDiv);
+        emailDiv.appendChild(subjectDiv);
+        emailDiv.appendChild(bodyDiv);
+        
+        editableMessages.appendChild(emailDiv);
+    });
     
-    // 滚动到底部并聚焦到新消息的文本框
-    setTimeout(() => {
-        const editArea = document.getElementById('conversationEditArea');
-        if (editArea) {
-            editArea.scrollTop = editArea.scrollHeight;
-        }
-        const lastTextarea = document.querySelector('.editable-msg-text:last-child');
-        if (lastTextarea) {
-            lastTextarea.focus();
-        }
-    }, 100);
+    // 更新全局变量
+    currentEmails = emails;
+}
+
+// 添加新消息
+function addNewMessage() {
+    if (currentPlatform === 'email' && currentEmails) {
+        // 添加新邮件
+        const newEmail = {
+            sender: 'customer',
+            subject: '',
+            body: '',
+            date: new Date()
+        };
+        
+        currentEmails.push(newEmail);
+        showEditableEmail(currentEmails);
+        
+        // 滚动到底部并聚焦到新邮件的正文文本框
+        setTimeout(() => {
+            const editArea = document.getElementById('conversationEditArea');
+            if (editArea) {
+                editArea.scrollTop = editArea.scrollHeight;
+            }
+            const lastTextarea = document.querySelector('.editable-email-body:last-child');
+            if (lastTextarea) {
+                lastTextarea.focus();
+            }
+        }, 100);
+    } else if (currentConversation) {
+        // 添加新消息
+        const newMsg = {
+            sender: 'customer',
+            text: '',
+            time: formatTime(new Date(), new Date().getHours(), new Date().getMinutes())
+        };
+        
+        currentConversation.push(newMsg);
+        showEditableConversation(currentConversation);
+        
+        // 滚动到底部并聚焦到新消息的文本框
+        setTimeout(() => {
+            const editArea = document.getElementById('conversationEditArea');
+            if (editArea) {
+                editArea.scrollTop = editArea.scrollHeight;
+            }
+            const lastTextarea = document.querySelector('.editable-msg-text:last-child');
+            if (lastTextarea) {
+                lastTextarea.focus();
+            }
+        }, 100);
+    } else {
+        alert('请先生成对话或邮件');
+    }
 }
 
 // 保存编辑后的对话并更新HTML
 function saveEditedConversation() {
-    if (!currentConversation) {
-        alert('没有可保存的对话');
-        return;
-    }
-    
-    const textareas = document.querySelectorAll('.editable-msg-text');
-    const senderSelects = document.querySelectorAll('.editable-msg-sender');
-    const timeInputs = document.querySelectorAll('.editable-msg-time');
-    
-    // 更新对话内容
-    textareas.forEach(textarea => {
-        const index = parseInt(textarea.getAttribute('data-index'));
-        if (currentConversation[index]) {
-            currentConversation[index].text = textarea.value;
-        }
-    });
-    
-    senderSelects.forEach(select => {
-        const index = parseInt(select.getAttribute('data-index'));
-        if (currentConversation[index]) {
-            currentConversation[index].sender = select.value;
-        }
-    });
-    
-    timeInputs.forEach(input => {
-        const index = parseInt(input.getAttribute('data-index'));
-        if (currentConversation[index]) {
-            currentConversation[index].time = input.value;
-        }
-    });
-    
-    // 重新生成HTML
-    if (currentPlatform === 'email') {
-        // 邮件需要特殊处理
-        const senderEmail = document.getElementById('senderEmail').value;
-        const recipientEmail = document.getElementById('recipientEmail').value;
-        const customerGreeting = document.getElementById('customerGreeting').value;
-        const emailDate = document.getElementById('emailDate').value;
-        const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
+    if (currentPlatform === 'email' && currentEmails) {
+        // 邮件编辑保存
+        const subjectInputs = document.querySelectorAll('.editable-email-subject');
+        const bodyTextareas = document.querySelectorAll('.editable-email-body');
+        const senderSelects = document.querySelectorAll('.editable-email-sender');
         
-        // 将对话转换为邮件格式
-        const emails = currentConversation.map((msg, index) => {
-            const subjects = msg.sender === 'customer' 
-                ? ['Re: Account Opening Inquiry - USD to USDT', 'Re: USD to USDT Account Opening', 'Re: Account Opening Request']
-                : ['Account Opening Inquiry - USD to USDT', 'USD to USDT Account Opening', 'Account Opening Request'];
-            return {
-                sender: msg.sender,
-                subject: subjects[index % subjects.length],
-                body: msg.text,
-                date: new Date()
-            };
+        // 更新邮件内容
+        subjectInputs.forEach(input => {
+            const index = parseInt(input.getAttribute('data-index'));
+            if (currentEmails[index]) {
+                currentEmails[index].subject = input.value;
+            }
         });
         
-        const attachments = window.getAttachments ? window.getAttachments() : [];
-        const html = generateTitanEmailHTML(emails, currentCustomerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments);
+        bodyTextareas.forEach(textarea => {
+            const index = parseInt(textarea.getAttribute('data-index'));
+            if (currentEmails[index]) {
+                currentEmails[index].body = textarea.value;
+            }
+        });
+        
+        senderSelects.forEach(select => {
+            const index = parseInt(select.getAttribute('data-index'));
+            if (currentEmails[index]) {
+                currentEmails[index].sender = select.value;
+            }
+        });
+        
+        // 重新生成邮件HTML
+        const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
+        const html = generateTitanEmailHTML(currentEmails, currentCustomerName, currentSenderEmail, currentRecipientEmail, conversationScene, currentEmailDate, currentAttachments);
         
         // 在预览区域显示邮件HTML
         const preview = document.getElementById('conversationPreview');
@@ -2653,23 +2823,81 @@ function saveEditedConversation() {
         }
         
         displayEmailHTMLDownload(html, currentCustomerName);
-    } else {
+        
+        // 隐藏编辑区域
+        document.getElementById('conversationEditArea').style.display = 'none';
+        document.getElementById('editConversationBtn').style.display = 'inline-block';
+        document.getElementById('saveConversationBtn').style.display = 'none';
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        document.getElementById('addMessageBtn').style.display = 'none';
+    } else if (currentConversation) {
+        // 对话编辑保存
+        const textareas = document.querySelectorAll('.editable-msg-text');
+        const senderSelects = document.querySelectorAll('.editable-msg-sender');
+        const timeInputs = document.querySelectorAll('.editable-msg-time');
+        
+        // 更新对话内容
+        textareas.forEach(textarea => {
+            const index = parseInt(textarea.getAttribute('data-index'));
+            if (currentConversation[index]) {
+                currentConversation[index].text = textarea.value;
+            }
+        });
+        
+        senderSelects.forEach(select => {
+            const index = parseInt(select.getAttribute('data-index'));
+            if (currentConversation[index]) {
+                currentConversation[index].sender = select.value;
+            }
+        });
+        
+        timeInputs.forEach(input => {
+            const index = parseInt(input.getAttribute('data-index'));
+            if (currentConversation[index]) {
+                currentConversation[index].time = input.value;
+            }
+        });
+        
         generateBrowserScript(currentConversation, currentPlatform);
         // 更新预览
         displayConversation(currentConversation);
+        
+        // 隐藏编辑区域
+        document.getElementById('conversationEditArea').style.display = 'none';
+        document.getElementById('editConversationBtn').style.display = 'inline-block';
+        document.getElementById('saveConversationBtn').style.display = 'none';
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        document.getElementById('addMessageBtn').style.display = 'none';
+    } else {
+        alert('没有可保存的内容');
     }
-    
-    // 隐藏编辑区域
-    document.getElementById('conversationEditArea').style.display = 'none';
-    document.getElementById('editConversationBtn').style.display = 'inline-block';
-    document.getElementById('saveConversationBtn').style.display = 'none';
-    document.getElementById('cancelEditBtn').style.display = 'none';
-    document.getElementById('addMessageBtn').style.display = 'none';
 }
 
 // 取消编辑
 function cancelEdit() {
-    displayConversation(currentConversation);
+    if (currentPlatform === 'email' && currentEmails) {
+        // 重新生成邮件预览
+        const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
+        const html = generateTitanEmailHTML(currentEmails, currentCustomerName, currentSenderEmail, currentRecipientEmail, conversationScene, currentEmailDate, currentAttachments);
+        
+        const preview = document.getElementById('conversationPreview');
+        if (preview) {
+            preview.innerHTML = '';
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            iframe.style.border = 'none';
+            iframe.style.borderRadius = '8px';
+            iframe.style.background = 'white';
+            preview.appendChild(iframe);
+            
+            iframe.contentDocument.open();
+            iframe.contentDocument.write(html);
+            iframe.contentDocument.close();
+        }
+    } else if (currentConversation) {
+        displayConversation(currentConversation);
+    }
     
     // 隐藏编辑区域
     document.getElementById('conversationEditArea').style.display = 'none';
