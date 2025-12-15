@@ -69,11 +69,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // 监听表单提交
     const conversationForm = document.getElementById('conversationForm');
     if (conversationForm) {
-        conversationForm.addEventListener('submit', function(e) {
+        conversationForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             e.stopPropagation();
             try {
-                generateConversation();
+                await generateConversation();
             } catch (error) {
                 console.error('生成对话时出错:', error);
                 alert('生成对话时出错: ' + error.message);
