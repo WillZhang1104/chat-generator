@@ -4971,25 +4971,26 @@ ${conversationText}
 
 // Google Gemini API（免费，推荐）
 async function callGeminiAPI(prompt, apiKey) {
-    // 尝试不同的 API 版本和模型组合
-    // 根据 Google Gemini API 文档，v1beta 版本支持以下模型：
-    // - gemini-pro (旧版本，可能已弃用)
-    // - gemini-1.5-pro
-    // - gemini-1.5-flash
-    // 如果 v1beta 不可用，尝试使用 REST API 端点
+    // 根据实际的模型列表，使用支持的模型
+    // 从 https://generativelanguage.googleapis.com/v1beta/models 可以看到支持的模型
+    // 推荐使用 gemini-2.5-flash（免费且快速）或 gemini-2.5-pro（更强能力）
     
     const apiConfigs = [
         {
-            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-            model: 'gemini-1.5-flash'
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+            model: 'gemini-2.5-flash'
         },
         {
-            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
-            model: 'gemini-1.5-pro'
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
+            model: 'gemini-2.5-pro'
         },
         {
-            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-            model: 'gemini-pro'
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            model: 'gemini-2.0-flash'
+        },
+        {
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${apiKey}`,
+            model: 'gemini-2.0-flash-001'
         }
     ];
     
