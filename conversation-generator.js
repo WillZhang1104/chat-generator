@@ -2585,10 +2585,9 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
         // 注意：senderEmail是"寄件人邮箱"（公司邮箱），recipientEmail是"收件人邮箱"（客户邮箱）
         // 客户发送邮件时，客户是寄件人，应该显示客户邮箱（recipientEmail）
         // 公司发送邮件时，公司是寄件人，应该显示公司邮箱（senderEmail）
-        // 修复：交换客户和公司的邮箱显示
-        const fromEmail = isCustomer ? senderEmail : recipientEmail;
+        const fromEmail = isCustomer ? recipientEmail : senderEmail;
         const toName = isCustomer ? 'WSP Team' : customerName;
-        const toEmail = isCustomer ? recipientEmail : senderEmail;
+        const toEmail = isCustomer ? senderEmail : recipientEmail;
         
         // 使用用户输入的日期
         const dateStr = emailDate || formatEmailDateForDisplay(email.date);
