@@ -162,9 +162,8 @@ function generateConversation() {
         // 根据平台生成不同的输出
         if (platform === 'email') {
             const senderEmail = document.getElementById('senderEmail').value;
-            const recipientEmail = document.getElementById('recipientEmail').value;
-            if (!senderEmail || !recipientEmail) {
-                alert('邮件场景需要填写寄件人和收件人邮箱');
+            if (!senderEmail) {
+                alert('邮件场景需要填写寄件人邮箱（客户邮箱）');
                 return;
             }
             const customerGreeting = document.getElementById('customerGreeting').value;
@@ -177,7 +176,7 @@ function generateConversation() {
                 alert('邮件场景需要填写邮件日期');
                 return;
             }
-            generateEmailHTML(conversation, customerName, senderEmail, recipientEmail, null, customerGreeting, emailDate);
+            generateEmailHTML(conversation, customerName, senderEmail, null, customerGreeting, emailDate);
             // 显示邮件使用说明
             document.getElementById('whatsappInstructions').style.display = 'none';
             document.getElementById('emailInstructions').style.display = 'block';
@@ -227,9 +226,8 @@ function generateConversation() {
         // 根据平台生成不同的输出
         if (platform === 'email') {
             const senderEmail = document.getElementById('senderEmail').value;
-            const recipientEmail = document.getElementById('recipientEmail').value;
-            if (!senderEmail || !recipientEmail) {
-                alert('邮件场景需要填写寄件人和收件人邮箱');
+            if (!senderEmail) {
+                alert('邮件场景需要填写寄件人邮箱（客户邮箱）');
                 return;
             }
             const customerGreeting = document.getElementById('customerGreeting').value;
@@ -242,7 +240,7 @@ function generateConversation() {
                 alert('邮件场景需要填写邮件日期');
                 return;
             }
-            generateEmailHTML(conversation, customerName, senderEmail, recipientEmail, purposeDetails, customerGreeting, emailDate);
+            generateEmailHTML(conversation, customerName, senderEmail, purposeDetails, customerGreeting, emailDate);
             // 显示邮件使用说明
             document.getElementById('whatsappInstructions').style.display = 'none';
             document.getElementById('emailInstructions').style.display = 'block';
@@ -2240,7 +2238,7 @@ function generateProfessionalKYCProvisionEmail(customerName, customerGreeting, v
 }
 
 // 生成Titan.email界面HTML
-function generateEmailHTML(conversation, customerName, senderEmail, recipientEmail, purposeDetails, customerGreeting, emailDate) {
+function generateEmailHTML(conversation, customerName, senderEmail, purposeDetails, customerGreeting, emailDate) {
     const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
     const willProvide = conversationScene === 'kyc' 
         ? document.querySelector('input[name="willProvide"]:checked')?.value === 'yes'
@@ -2256,7 +2254,7 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     currentEmails = emails;
     currentCustomerName = customerName;
     currentSenderEmail = senderEmail;
-    currentRecipientEmail = recipientEmail;
+    currentRecipientEmail = null; // 不再需要收件人邮箱
     currentEmailDate = emailDate;
     currentPlatform = 'email';
     
@@ -2273,7 +2271,7 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     currentAttachments = attachments;
     
     // 生成完整的Titan.email界面HTML
-    const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments);
+    const html = generateTitanEmailHTML(emails, customerName, senderEmail, conversationScene, emailDate, attachments);
     
     // 在预览区域显示邮件HTML
     const preview = document.getElementById('conversationPreview');
@@ -2306,7 +2304,7 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
 }
 
 // 生成Titan.email界面HTML
-function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments = []) {
+function generateTitanEmailHTML(emails, customerName, senderEmail, conversationScene, emailDate, attachments = []) {
     // 根据场景生成主题
     const subject = conversationScene === 'kyc' 
         ? 'Enhanced KYC Documentation Request'
@@ -2582,12 +2580,11 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
     emails.forEach((email, index) => {
         const isCustomer = email.sender === 'customer';
         const fromName = isCustomer ? customerName : 'WSP Team';
-        // 注意：senderEmail是"寄件人邮箱"（公司邮箱），recipientEmail是"收件人邮箱"（客户邮箱）
-        // 客户发送邮件时，客户是寄件人，应该显示客户邮箱（recipientEmail）
-        // 公司发送邮件时，公司是寄件人，应该显示公司邮箱（senderEmail）
-        const fromEmail = isCustomer ? recipientEmail : senderEmail;
-        const toName = isCustomer ? 'WSP Team' : customerName;
-        const toEmail = isCustomer ? senderEmail : recipientEmail;
+        // 邮件是客户发给WSP Team的
+        // 客户发送邮件时，客户是寄件人，应该显示客户邮箱（senderEmail）
+        // 收件人只显示"me"，不显示邮箱地址
+        const fromEmail = senderEmail; // 客户邮箱（寄件人邮箱）
+        const toName = 'WSP Team'; // 收件人只显示"me"，不显示邮箱
         
         // 使用用户输入的日期
         const dateStr = emailDate || formatEmailDateForDisplay(email.date);
@@ -3076,7 +3073,7 @@ function saveEditedConversation() {
         
         // 重新生成邮件HTML
         const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
-        const html = generateTitanEmailHTML(currentEmails, currentCustomerName, currentSenderEmail, currentRecipientEmail, conversationScene, currentEmailDate, currentAttachments);
+        const html = generateTitanEmailHTML(currentEmails, currentCustomerName, currentSenderEmail, conversationScene, currentEmailDate, currentAttachments);
         
         // 在预览区域显示邮件HTML
         const preview = document.getElementById('conversationPreview');
@@ -3152,7 +3149,7 @@ function cancelEdit() {
     if (currentPlatform === 'email' && currentEmails) {
         // 重新生成邮件预览
         const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
-        const html = generateTitanEmailHTML(currentEmails, currentCustomerName, currentSenderEmail, currentRecipientEmail, conversationScene, currentEmailDate, currentAttachments);
+        const html = generateTitanEmailHTML(currentEmails, currentCustomerName, currentSenderEmail, conversationScene, currentEmailDate, currentAttachments);
         
         const preview = document.getElementById('conversationPreview');
         if (preview) {
