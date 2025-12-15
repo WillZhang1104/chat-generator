@@ -131,7 +131,7 @@ function clearForm() {
     document.getElementById('formMethodGroup').style.display = 'block';
 }
 
-function generateConversation() {
+async function generateConversation() {
     const customerName = document.getElementById('customerName').value;
     const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
     
