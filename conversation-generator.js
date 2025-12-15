@@ -4891,3 +4891,241 @@ Strategy:
     ];
     return seededChoice(variants, seed, variant);
 }
+
+
+// ========== AI 优化对话功能（支持多个免费AI API） ==========
+
+// 使用 AI API 优化对话，使其更自然、更像真人
+async function optimizeConversationWithAI(conversation, customerName, platform, provider, apiKey) {
+    if (!conversation || conversation.length === 0) {
+        return conversation;
+    }
+
+    try {
+        // 构建提示词
+        const platformContext = platform === 'whatsapp' ? 'WhatsApp消息' : 
+                               platform === 'telegram' ? 'Telegram消息' : 
+                               '邮件';
+        
+        const conversationText = conversation.map(msg => {
+            const sender = msg.sender === 'customer' ? '客户' : '公司';
+            return `${sender}: ${msg.text}`;
+        }).join('\n');
+
+        const prompt = `你是一个对话优化专家。请优化以下${platformContext}对话，使其更加自然、更像真人之间的真实对话。
+
+要求：
+1. 保持对话的核心信息和目的不变
+2. 使语言更加自然、口语化
+3. 添加适当的语气词、停顿、自然的表达方式
+4. 保持原有的对话风格（如友好、专业等）
+5. 不要改变对话的基本结构和顺序
+6. 保持客户名称：${customerName}
+
+原始对话：
+${conversationText}
+
+请返回优化后的对话，格式为JSON数组，每个元素包含：
+- sender: "customer" 或 "company"
+- text: 优化后的消息内容
+- time: 保持原有的时间（格式：HH:mm）
+
+只返回JSON数组，不要其他内容。`;
+
+        let optimizedConversation;
+        
+        // 根据提供商调用不同的API
+        switch (provider) {
+            case 'gemini':
+                optimizedConversation = await callGeminiAPI(prompt, apiKey);
+                break;
+            case 'groq':
+                optimizedConversation = await callGroqAPI(prompt, apiKey);
+                break;
+            case 'huggingface':
+                optimizedConversation = await callHuggingFaceAPI(prompt, apiKey);
+                break;
+            case 'openai':
+                optimizedConversation = await callOpenAIAPI(prompt, apiKey);
+                break;
+            default:
+                throw new Error('不支持的AI提供商');
+        }
+
+        // 验证并合并时间信息
+        if (Array.isArray(optimizedConversation) && optimizedConversation.length === conversation.length) {
+            return optimizedConversation.map((msg, index) => ({
+                sender: msg.sender || conversation[index].sender,
+                text: msg.text || conversation[index].text,
+                time: conversation[index].time // 保持原有时间
+            }));
+        } else {
+            console.warn('AI返回的对话长度不匹配，使用原始对话');
+            return conversation;
+        }
+    } catch (error) {
+        console.error('AI优化对话时出错:', error);
+        throw error;
+    }
+}
+
+// Google Gemini API（免费，推荐）
+async function callGeminiAPI(prompt, apiKey) {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            contents: [{
+                parts: [{
+                    text: prompt
+                }]
+            }]
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Gemini API请求失败: ${response.status} - ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    const optimizedText = data.candidates[0].content.parts[0].text.trim();
+    
+    return parseAIResponse(optimizedText);
+}
+
+// Groq API（免费，快速）
+async function callGroqAPI(prompt, apiKey) {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'llama-3.1-70b-versatile',
+            messages: [
+                {
+                    role: 'system',
+                    content: '你是一个专业的对话优化助手，擅长将对话优化得更自然、更像真人。'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Groq API请求失败: ${response.status} - ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    const optimizedText = data.choices[0].message.content.trim();
+    
+    return parseAIResponse(optimizedText);
+}
+
+// Hugging Face API（免费）
+async function callHuggingFaceAPI(prompt, apiKey) {
+    const response = await fetch('https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            inputs: prompt,
+            parameters: {
+                max_new_tokens: 2000,
+                temperature: 0.7
+            }
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Hugging Face API请求失败: ${response.status} - ${errorData.error || response.statusText}`);
+    }
+
+    const data = await response.json();
+    const optimizedText = Array.isArray(data) ? data[0].generated_text : data.generated_text;
+    
+    return parseAIResponse(optimizedText);
+}
+
+// OpenAI API（付费）
+async function callOpenAIAPI(prompt, apiKey) {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'system',
+                    content: '你是一个专业的对话优化助手，擅长将对话优化得更自然、更像真人。'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`OpenAI API请求失败: ${response.status} - ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    const optimizedText = data.choices[0].message.content.trim();
+    
+    return parseAIResponse(optimizedText);
+}
+
+// 解析AI返回的内容
+function parseAIResponse(text) {
+    try {
+        // 尝试直接解析
+        return JSON.parse(text);
+    } catch (e) {
+        // 如果直接解析失败，尝试提取JSON部分
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        } else {
+            throw new Error('无法解析AI返回的内容');
+        }
+    }
+}
+
+// 检查是否启用AI优化
+function shouldUseAIOptimization() {
+    const checkbox = document.getElementById('useAIOptimization');
+    return checkbox && checkbox.checked;
+}
+
+// 获取AI提供商
+function getAIProvider() {
+    const select = document.getElementById('aiProvider');
+    return select ? select.value : 'gemini';
+}
+
+// 获取AI API Key
+function getAIApiKey() {
+    const input = document.getElementById('aiApiKey');
+    return input ? input.value.trim() : '';
+}
