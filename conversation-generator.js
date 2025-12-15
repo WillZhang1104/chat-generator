@@ -1966,6 +1966,25 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
     // 生成完整的Titan.email界面HTML
     const html = generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmail, conversationScene, emailDate, attachments);
     
+    // 在预览区域显示邮件HTML
+    const preview = document.getElementById('conversationPreview');
+    if (preview) {
+        // 创建iframe来显示邮件HTML
+        preview.innerHTML = '';
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.height = '600px';
+        iframe.style.border = 'none';
+        iframe.style.borderRadius = '8px';
+        iframe.style.background = 'white';
+        preview.appendChild(iframe);
+        
+        // 将HTML写入iframe
+        iframe.contentDocument.open();
+        iframe.contentDocument.write(html);
+        iframe.contentDocument.close();
+    }
+    
     // 显示下载按钮
     displayEmailHTMLDownload(html, customerName);
 }
