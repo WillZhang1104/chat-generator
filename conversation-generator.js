@@ -2681,7 +2681,8 @@ function generateAttachmentsHTML(attachments) {
         if (fileName.includes('.')) {
             const lastDotIndex = fileName.lastIndexOf('.');
             baseFileName = fileName.substring(0, lastDotIndex);
-            fileExtension = fileName.substring(lastDotIndex + 1).toUpperCase();
+            // 保持原始大小写，不强制转换为大写
+            fileExtension = fileName.substring(lastDotIndex + 1);
         }
         
         // 根据文件类型选择图标
