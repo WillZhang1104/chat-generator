@@ -5045,38 +5045,74 @@ async function callGeminiAPI(prompt, apiKey) {
 
 // Groq API（免费，快速）
 async function callGroqAPI(prompt, apiKey) {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-            model: 'llama-3.1-70b-versatile',
-            messages: [
-                {
-                    role: 'system',
-                    content: '你是一个专业的对话优化助手，擅长将对话优化得更自然、更像真人。'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000
-        })
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Groq API请求失败: ${response.status} - ${errorData.error?.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    const optimizedText = data.choices[0].message.content.trim();
+    // Groq 当前支持的模型列表（llama-3.1-70b-versatile 已停用）
+    // 优先使用 llama-3.3-70b-versatile（最新版本），如果不可用则尝试其他模型
+    const models = [
+        'llama-3.3-70b-versatile',  // 最新版本，推荐
+        'llama-3.1-8b-instant',     // 快速版本
+        'llama-3.1-70b-versatile',  // 旧版本（可能已停用，但保留作为备选）
+        'mixtral-8x7b-32768',       // Mixtral 模型
+        'gemma2-9b-it'              // Gemma 模型
+    ];
     
-    return parseAIResponse(optimizedText);
+    let lastError = null;
+    
+    for (const model of models) {
+        try {
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: '你是一个专业的对话优化助手，擅长将对话优化得更自然、更像真人。'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 2000
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error?.message || response.statusText;
+                
+                // 如果模型已停用或不可用，尝试下一个模型
+                if (response.status === 400 && (errorMessage.includes('decommissioned') || errorMessage.includes('not found'))) {
+                    lastError = new Error(`Groq API请求失败 (${model}): ${response.status} - ${errorMessage}`);
+                    if (models.indexOf(model) < models.length - 1) {
+                        continue; // 尝试下一个模型
+                    }
+                }
+                
+                throw new Error(`Groq API请求失败 (${model}): ${response.status} - ${errorMessage}`);
+            }
+
+            const data = await response.json();
+            const optimizedText = data.choices[0].message.content.trim();
+            
+            return parseAIResponse(optimizedText);
+        } catch (error) {
+            // 如果是最后一个模型，抛出错误
+            if (models.indexOf(model) === models.length - 1) {
+                throw error;
+            }
+            // 否则继续尝试下一个模型
+            lastError = error;
+        }
+    }
+    
+    // 如果所有模型都失败，抛出最后一个错误
+    throw lastError || new Error('所有 Groq 模型都不可用，请检查您的 API Key 是否正确');
 }
 
 // Hugging Face API（免费）
