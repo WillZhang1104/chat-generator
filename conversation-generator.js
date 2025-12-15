@@ -1446,7 +1446,7 @@ function generateBrowserScript(conversation, platform) {
 }
 
 // 生成邮件格式的对话（正式邮件格式，但更自然多样化）
-function generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting) {
+function generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting, additionalInfo) {
     const emails = [];
     const now = new Date();
     const style = getConversationStyle(customerName); // 根据客户名称确定风格
@@ -1459,7 +1459,7 @@ function generateEmailConversation(customerName, purposeDetails, conversationSce
         if (!purposeDetails || purposeDetails.length === 0) {
             purposeDetails = [{ main: 'various purposes', details: [] }];
         }
-        const emailBody = generateInitialEmailByStyle(customerName, purposeDetails, customerGreeting, style, variant, seed);
+        const emailBody = generateInitialEmailByStyle(customerName, purposeDetails, customerGreeting, style, variant, seed, additionalInfo);
         
         emails.push({
             sender: 'customer',
@@ -1471,12 +1471,8 @@ function generateEmailConversation(customerName, purposeDetails, conversationSce
     } else {
         // 补充材料场景
         if (willProvide) {
-            // 愿意提供
-            let emailBody = `${customerGreeting}\n\n`;
-            emailBody += `Thank you for your email regarding the enhanced KYC documentation request.\n\n`;
-            emailBody += `I understand the requirement for bank statements for the last 2-3 months. I will prepare and send these documents to you within the next few business days.\n\n`;
-            emailBody += `Please let me know if there are any specific formatting requirements or if you need any additional information.\n\n`;
-            emailBody += `Best regards,\n${customerName}`;
+            // 愿意提供 - 根据风格生成不同格式的同意邮件
+            const emailBody = generateKYCProvisionEmailByStyle(customerName, customerGreeting, style, variant, seed, additionalInfo);
             
             emails.push({
                 sender: 'customer',
@@ -1486,7 +1482,7 @@ function generateEmailConversation(customerName, purposeDetails, conversationSce
             });
         } else {
             // 不愿意提供 - 根据风格生成不同格式的拒绝邮件
-            const emailBody = generateKYCRefusalEmailByStyle(customerName, customerGreeting, style, variant, seed);
+            const emailBody = generateKYCRefusalEmailByStyle(customerName, customerGreeting, style, variant, seed, additionalInfo);
             
             emails.push({
                 sender: 'customer',
@@ -1518,11 +1514,11 @@ function generateInitialEmailByStyle(customerName, purposeDetails, customerGreet
     };
     
     const generator = emailTemplates[style] || generateFriendlyInitialEmail;
-    return generator(customerName, purposeDetails, customerGreeting, variant, seed);
+    return generator(customerName, purposeDetails, customerGreeting, variant, seed, additionalInfo);
 }
 
 // 话多型初次邮件
-function generateVerboseInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0) {
+function generateVerboseInitialEmail(customerName, purposeDetails, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
     const purposeText = buildPurposeText(purposeDetails);
     
     let body = `${customerGreeting}\n\n`;
@@ -1541,6 +1537,11 @@ function generateVerboseInitialEmail(customerName, purposeDetails, customerGreet
     body += `**Source of Funds:** The funds come from my personal savings and business operations. I've been in business for several years and maintain accounts with major banks. Everything is properly documented and above board.\n\n`;
     
     body += `**Transaction Details:** I'm planning to make transactions monthly, typically around $15k-$40k per transaction. Annual volume would probably be in the $200k-$300k range.\n\n`;
+    
+    // 融入额外信息
+    if (additionalInfo && additionalInfo.trim()) {
+        body += `${additionalInfo}\n\n`;
+    }
     
     // 使用变体系统选择不同的问题
     const questions = [
@@ -1858,11 +1859,26 @@ function generateKYCRefusalEmailByStyle(customerName, customerGreeting, style, v
     };
     
     const generator = emailTemplates[style] || generateFriendlyKYCRefusalEmail;
-    return generator(customerName, customerGreeting, variant, seed);
+    return generator(customerName, customerGreeting, variant, seed, additionalInfo);
+}
+
+// 根据风格生成KYC同意提供邮件（多样化）
+function generateKYCProvisionEmailByStyle(customerName, customerGreeting, style, variant = 0, seed = 0, additionalInfo = '') {
+    const emailTemplates = {
+        verbose: generateVerboseKYCProvisionEmail,
+        concise: generateConciseKYCProvisionEmail,
+        cautious: generateCautiousKYCProvisionEmail,
+        urgent: generateUrgentKYCProvisionEmail,
+        friendly: generateFriendlyKYCProvisionEmail,
+        professional: generateProfessionalKYCProvisionEmail
+    };
+    
+    const generator = emailTemplates[style] || generateFriendlyKYCProvisionEmail;
+    return generator(customerName, customerGreeting, variant, seed, additionalInfo);
 }
 
 // 话多型KYC拒绝邮件
-function generateVerboseKYCRefusalEmail(customerName, customerGreeting, variant = 0, seed = 0) {
+function generateVerboseKYCRefusalEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
     const refusalReason = generateRefusalReason(customerName);
     
     let body = `${customerGreeting}\n\n`;
@@ -1880,6 +1896,9 @@ function generateVerboseKYCRefusalEmail(customerName, customerGreeting, variant 
     }
     
     body += `I'd be happy to discuss alternative verification methods. Maybe a bank letter confirming account status, or tax returns? There should be ways to verify without requiring full bank statements.\n\n`;
+    if (additionalInfo && additionalInfo.trim()) {
+        body += `${additionalInfo}\n\n`;
+    }
     body += `I hope we can find a solution that works for both of us.\n\n`;
     body += `Best regards,\n${customerName}`;
     
@@ -1944,16 +1963,280 @@ function generateFriendlyKYCRefusalEmail(customerName, customerGreeting, variant
 }
 
 // 专业型KYC拒绝邮件
-function generateProfessionalKYCRefusalEmail(customerName, customerGreeting, variant = 0, seed = 0) {
+function generateProfessionalKYCRefusalEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
     let body = `${customerGreeting}\n\n`;
     body += `Thank you for your email regarding the enhanced KYC documentation request.\n\n`;
     body += `I have reviewed your request for bank statements covering the last 2-3 months. While I understand the compliance requirements, I have concerns regarding this particular request.\n\n`;
     body += `I have already provided comprehensive identification and address verification documentation. The additional requirement for bank statements appears excessive, particularly as it seems to be based on age rather than transaction risk factors.\n\n`;
     body += `I would be open to discussing alternative verification methods that can satisfy your compliance requirements while respecting privacy concerns. Options might include bank confirmation letters, tax documentation, or other official financial records.\n\n`;
+    if (additionalInfo) {
+        body += `${additionalInfo}\n\n`;
+    }
     body += `I look forward to your response and hope we can find a mutually acceptable solution.\n\n`;
     body += `Best regards,\n${customerName}`;
     
     return body;
+}
+
+// ========== KYC同意提供邮件生成函数 ==========
+
+// 话多型KYC同意邮件
+function generateVerboseKYCProvisionEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
+    const variants = [
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thank you for your email regarding the enhanced KYC documentation request. I appreciate you taking the time to explain the requirements clearly.\n\n`;
+            body += `I understand that you need bank statements for the last 2-3 months as part of the enhanced KYC process. I'm happy to provide these documents to help move things forward.\n\n`;
+            body += `I'll gather all the necessary statements from my accounts and prepare them for submission. Should I send them via email, or is there a secure portal where I can upload them? Also, do you need statements from all my accounts, or just the primary one I'll be using for transactions?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `I want to make sure I provide everything correctly the first time, so please let me know if there are any specific formatting requirements or additional information you might need.\n\n`;
+            body += `I'll aim to send these documents within the next few business days. If you need them sooner, please let me know and I'll do my best to accommodate.\n\n`;
+            body += `Thank you for your patience, and I look forward to completing this process.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `I received your email about the enhanced KYC documentation, and I wanted to respond promptly.\n\n`;
+            body += `I understand the need for bank statements covering the last 2-3 months. This makes sense from a compliance perspective, and I'm prepared to provide these documents.\n\n`;
+            body += `I have accounts at a couple of different banks - should I include statements from all of them, or just the main account I'll be using? Also, are PDF statements directly from the bank acceptable, or do you need them in a specific format?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `I'm planning to gather everything together and send it over within the next week. Is there a preferred method for submission - email attachment, secure upload, or something else?\n\n`;
+            body += `Please let me know if there's anything else you need from my end to complete this verification process.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thank you for reaching out regarding the enhanced KYC documentation requirements.\n\n`;
+            body += `I've reviewed your request for bank statements for the last 2-3 months, and I'm happy to provide these documents. I understand this is part of your compliance procedures, and I want to make sure we can move forward smoothly.\n\n`;
+            body += `A few quick questions before I send everything over:\n\n`;
+            body += `- Do you need statements from all accounts, or just the primary one?\n`;
+            body += `- Are digital statements from my bank's online portal acceptable?\n`;
+            body += `- Is there a file size limit or preferred format for the attachments?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `I'll start gathering the documents right away and should be able to send them within the next few business days. If you have any specific requirements or deadlines, please let me know.\n\n`;
+            body += `I appreciate your help in getting this sorted out.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `I got your email about the enhanced KYC documentation request, and I wanted to let you know that I'm on it.\n\n`;
+            body += `I understand you need bank statements for the last 2-3 months. No problem - I'll pull those together and get them over to you.\n\n`;
+            body += `Just to make sure I send everything correctly, could you clarify a couple of things? Do you need statements from all my accounts, or just the main one? And are PDFs from my bank's website okay, or do you need something more official?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `I'm planning to send everything within the next week. Is email the best way to send these, or do you have a secure upload system?\n\n`;
+            body += `Let me know if there's anything else you need, and I'll get it sorted.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thank you for your email regarding the enhanced KYC documentation requirements.\n\n`;
+            body += `I understand that you need bank statements covering the last 2-3 months as part of the enhanced verification process. I'm prepared to provide these documents and want to ensure I submit everything correctly.\n\n`;
+            body += `Before I gather and send the statements, I'd like to confirm a few details:\n\n`;
+            body += `1. Should I include statements from all my bank accounts, or only the primary account I'll be using for transactions?\n`;
+            body += `2. Are electronic statements downloaded from my bank's online portal acceptable, or do you require original paper statements?\n`;
+            body += `3. What is the preferred method for submission - email attachment, secure portal upload, or another method?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `I'll begin collecting the necessary documents immediately and aim to submit them within the next 3-5 business days. If you have any specific formatting requirements or deadlines, please let me know.\n\n`;
+            body += `I appreciate your assistance in completing this process, and I'm happy to provide any additional information you might need.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        }
+    ];
+    
+    return variants[variant % variants.length]();
+}
+
+// 话少型KYC同意邮件
+function generateConciseKYCProvisionEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
+    const variants = [
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thanks for your email. I can provide the bank statements - I'll send them within the next few days.\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Do you need statements from all accounts or just the main one?\n\n`;
+            body += `Thanks,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Got it. I'll prepare the bank statements and send them over this week.\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Should I email them or upload somewhere?\n\n`;
+            body += `Best,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `I can provide the statements. Will send them within a few business days.\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Any specific format requirements?\n\n`;
+            body += `Regards,\n${customerName}`;
+            return body;
+        }
+    ];
+    
+    return variants[variant % variants.length]();
+}
+
+// 谨慎型KYC同意邮件
+function generateCautiousKYCProvisionEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
+    const variants = [
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thank you for your email regarding the enhanced KYC documentation request.\n\n`;
+            body += `I understand the requirement for bank statements covering the last 2-3 months. While I want to comply with your requirements, I'd like to confirm a few details before submitting these sensitive documents.\n\n`;
+            body += `Could you please clarify:\n`;
+            body += `- How will these documents be stored and protected?\n`;
+            body += `- Who will have access to them?\n`;
+            body += `- Are digital statements acceptable, or do you require originals?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Once I have these details, I'll proceed with gathering and submitting the statements within the next week.\n\n`;
+            body += `I appreciate your understanding.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `I received your request for bank statements as part of the enhanced KYC process.\n\n`;
+            body += `I'm willing to provide these documents, but I'd like to ensure they're handled securely. Could you confirm your data protection measures and how long these documents will be retained?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Once I have this information, I'll prepare and send the statements.\n\n`;
+            body += `Thank you,\n${customerName}`;
+            return body;
+        }
+    ];
+    
+    return variants[variant % variants.length]();
+}
+
+// 紧急型KYC同意邮件
+function generateUrgentKYCProvisionEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
+    const variants = [
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `I'll get those bank statements to you ASAP - probably by tomorrow or the day after.\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Email attachment works best for me. Should I send them all together or separately?\n\n`;
+            body += `Thanks,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `I'm on it - will send the statements today or tomorrow.\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Is email okay?\n\n`;
+            body += `Best,\n${customerName}`;
+            return body;
+        }
+    ];
+    
+    return variants[variant % variants.length]();
+}
+
+// 友好型KYC同意邮件
+function generateFriendlyKYCProvisionEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
+    const variants = [
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thanks for your email! I'm happy to provide the bank statements you need.\n\n`;
+            body += `I'll gather everything together and send them over within the next few days. Just let me know if you need statements from all my accounts or just the main one.\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Email works great for me - is that okay with you?\n\n`;
+            body += `Looking forward to getting this sorted!\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Hi! Got your message about the bank statements - no problem at all.\n\n`;
+            body += `I'll pull those together and send them your way this week. Should I include all accounts or just the primary one?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `Let me know if you need anything else!\n\n`;
+            body += `Thanks,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thanks for reaching out! I'm happy to help with the KYC documentation.\n\n`;
+            body += `I'll get those bank statements ready and send them over within the next few business days. Do you prefer email or is there a portal I should use?\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `If you need anything else, just let me know!\n\n`;
+            body += `Best,\n${customerName}`;
+            return body;
+        }
+    ];
+    
+    return variants[variant % variants.length]();
+}
+
+// 专业型KYC同意邮件
+function generateProfessionalKYCProvisionEmail(customerName, customerGreeting, variant = 0, seed = 0, additionalInfo = '') {
+    const variants = [
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `Thank you for your email regarding the enhanced KYC documentation requirements.\n\n`;
+            body += `I acknowledge your request for bank statements covering the last 2-3 months. I am prepared to provide these documents to facilitate the verification process.\n\n`;
+            body += `To ensure I submit the correct documentation, could you please confirm:\n`;
+            body += `- Whether statements from all accounts are required, or only the primary transaction account\n`;
+            body += `- The preferred submission method (email attachment, secure portal, etc.)\n`;
+            body += `- Any specific formatting or file requirements\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `I will gather the necessary statements and submit them within 3-5 business days. Please let me know if you require expedited processing or have any specific deadlines.\n\n`;
+            body += `I appreciate your assistance in completing this verification.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        },
+        () => {
+            let body = `${customerGreeting}\n\n`;
+            body += `I have received your request for enhanced KYC documentation, specifically bank statements for the last 2-3 months.\n\n`;
+            body += `I will prepare and submit these documents in accordance with your requirements. Please advise on your preferred submission method and any specific formatting guidelines.\n\n`;
+            if (additionalInfo) {
+                body += `${additionalInfo}\n\n`;
+            }
+            body += `I anticipate submitting the documentation within the next business week. Should you require any additional information or have specific deadlines, please let me know.\n\n`;
+            body += `Thank you for your cooperation.\n\n`;
+            body += `Best regards,\n${customerName}`;
+            return body;
+        }
+    ];
+    
+    return variants[variant % variants.length]();
 }
 
 // 生成Titan.email界面HTML
@@ -1963,8 +2246,11 @@ function generateEmailHTML(conversation, customerName, senderEmail, recipientEma
         ? document.querySelector('input[name="willProvide"]:checked')?.value === 'yes'
         : null;
     
+    // 获取额外信息
+    const additionalInfo = document.getElementById('additionalInfo')?.value || '';
+    
     // 生成邮件格式的对话
-    const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting);
+    const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting, additionalInfo);
     
     // 保存邮件数据用于编辑
     currentEmails = emails;
@@ -2247,19 +2533,7 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
             background: transparent;
         }
         .attachment-icon-large.image {
-            background: #007bff;
-            position: relative;
-        }
-        .attachment-icon-large.image::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 12px;
-            height: 12px;
-            background: #ffc107;
-            border-radius: 50%;
+            background: transparent;
         }
         .attachment-icon-large.other {
             background: #6c757d;
@@ -2308,6 +2582,8 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, recipientEmai
     emails.forEach((email, index) => {
         const isCustomer = email.sender === 'customer';
         const fromName = isCustomer ? customerName : 'WSP Team';
+        // 客户发送邮件时，客户是寄件人，应该显示客户邮箱（recipientEmail）
+        // 公司发送邮件时，公司是寄件人，应该显示公司邮箱（senderEmail）
         const fromEmail = isCustomer ? recipientEmail : senderEmail;
         const toName = isCustomer ? 'WSP Team' : customerName;
         const toEmail = isCustomer ? senderEmail : recipientEmail;
@@ -2416,11 +2692,8 @@ function generateAttachmentsHTML(attachments) {
             // 使用pdf.svg文件
             iconSVG = `<img src="./pdf.svg" alt="PDF" style="width: 100%; height: 100%; object-fit: contain;">`;
         } else if (fileType === 'image') {
-            // 图片图标 - 蓝色背景，白色矩形，中间有黄色圆点（通过CSS实现）
-            iconSVG = `
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="4" y="4" width="16" height="16" rx="2"/>
-                </svg>`;
+            // 使用jpg.svg文件
+            iconSVG = `<img src="./jpg.svg" alt="Image" style="width: 100%; height: 100%; object-fit: contain;">`;
         } else {
             iconSVG = `
                 <svg viewBox="0 0 24 24" fill="currentColor">
