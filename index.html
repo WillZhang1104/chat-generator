@@ -664,10 +664,22 @@
         const aiConfigGroup = document.getElementById('aiConfigGroup');
         const aiProviderSelect = document.getElementById('aiProvider');
         const aiApiKeyInput = document.getElementById('aiApiKey');
+        const showCustomPromptCheckbox = document.getElementById('showCustomPrompt');
+        const customAIPromptTextarea = document.getElementById('customAIPrompt');
+        const promptHint = document.getElementById('promptHint');
         
         if (useAIOptimizationCheckbox) {
             useAIOptimizationCheckbox.addEventListener('change', function() {
                 aiConfigGroup.style.display = this.checked ? 'block' : 'none';
+            });
+        }
+
+        // 显示/隐藏自定义 Prompt
+        if (showCustomPromptCheckbox && customAIPromptTextarea && promptHint) {
+            showCustomPromptCheckbox.addEventListener('change', function() {
+                const isVisible = this.checked;
+                customAIPromptTextarea.style.display = isVisible ? 'block' : 'none';
+                promptHint.style.display = isVisible ? 'block' : 'none';
             });
         }
 
