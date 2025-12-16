@@ -627,33 +627,32 @@ function generateConversationStart(customerName, purposeDetails, conversationSta
 // 话多型对话 - 会问很多问题，比较详细
 function generateVerboseConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 4);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     // 使用多样化的开头
     messages.push({
         sender: 'customer',
         text: generateConversationStart(customerName, purposeDetails, conversationStart),
-        time: formatTime(day1, 9, 15)
+        time: formatTimeWithRange(conversationDate, 9, 15)
     });
 
     messages.push({
         sender: 'company',
         text: `Hello ${customerName}! Thanks for reaching out. We offer USD to USDT onramp services - essentially you can deposit USD and we'll convert it to USDT for you. What brings you to us today?`,
-        time: formatTime(day1, 9, 18)
+        time: formatTimeWithRange(conversationDate, 9, 18)
     });
 
     messages.push({
         sender: 'customer',
         text: `I'm looking to get started with crypto and need a reliable way to convert my USD. I've heard good things about your service. What's the process like?`,
-        time: formatTime(day1, 9, 22)
+        time: formatTimeWithRange(conversationDate, 9, 22)
     });
 
     messages.push({
         sender: 'company',
         text: `Great! The process is straightforward. First, we'll need to understand your use case - what will be the primary purpose of your account? This helps us ensure compliance and provide the best service.`,
-        time: formatTimeWithRange(day1, 9, 25)
+        time: formatTimeWithRange(conversationDate, 9, 25)
     });
 
     // 构建目的说明，融入细节
@@ -769,54 +768,50 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
 // 话少型对话 - 简洁直接，但也要有基本的交流
 function generateConciseConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 3);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'customer',
         text: generateConversationStart(customerName, purposeDetails, conversationStart),
-        time: formatTime(day1, 11, 30)
+        time: formatTimeWithRange(conversationDate, 11, 30)
     });
 
     messages.push({
         sender: 'company',
         text: `Hello ${customerName}! We can help with that. What will be the primary purpose of your account?`,
-        time: formatTime(day1, 11, 32)
+        time: formatTimeWithRange(conversationDate, 11, 32)
     });
 
     const purposeText = buildPurposeText(purposeDetails);
     messages.push({
         sender: 'customer',
         text: purposeText,
-        time: formatTime(day1, 11, 35)
+        time: formatTimeWithRange(conversationDate, 11, 35)
     });
 
     messages.push({
         sender: 'company',
         text: `Understood. What's your typical transaction size?`,
-        time: formatTime(day1, 11, 37)
+        time: formatTimeWithRange(conversationDate, 11, 37)
     });
 
     messages.push({
         sender: 'customer',
         text: `Probably around $10k-$20k per transaction.`,
-        time: formatTime(day1, 11, 40)
+        time: formatTimeWithRange(conversationDate, 11, 40)
     });
 
     messages.push({
         sender: 'company',
         text: `Got it. For that amount, we'll need standard KYC verification. Should I send you the onboarding form?`,
-        time: formatTime(day1, 11, 42)
+        time: formatTimeWithRange(conversationDate, 11, 42)
     });
-
-    const day2 = new Date(now);
-    day2.setDate(day2.getDate() - 2);
     
     messages.push({
         sender: 'customer',
         text: `Yes please.`,
-        time: formatTimeWithRange(day2, 14, 20)
+        time: formatTimeWithRange(conversationDate, 14, 20)
     });
     
     if (formMethod === 'online') {
@@ -857,56 +852,55 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
 // 谨慎型对话 - 会问很多关于安全、合规的问题
 function generateCautiousConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 4);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'customer',
         text: generateConversationStart(customerName, purposeDetails, conversationStart),
-        time: formatTime(day1, 10, 45)
+        time: formatTimeWithRange(conversationDate, 10, 45)
     });
 
     messages.push({
         sender: 'company',
         text: `Hello ${customerName}! Absolutely, I'm happy to address your concerns. We take security and compliance very seriously - we're fully licensed and follow all regulatory requirements including KYC/AML. What would you like to know specifically?`,
-        time: formatTime(day1, 10, 48)
+        time: formatTimeWithRange(conversationDate, 10, 48)
     });
 
     messages.push({
         sender: 'customer',
         text: `Good to hear. What kind of KYC documentation do you require? And how is my personal information protected?`,
-        time: formatTime(day1, 10, 52)
+        time: formatTimeWithRange(conversationDate, 10, 52)
     });
 
     messages.push({
         sender: 'company',
         text: `We require standard KYC documents - government-issued ID, proof of address (utility bill or bank statement), and sometimes source of funds documentation for larger transactions. All data is encrypted using bank-level security and stored in compliance with GDPR and other data protection regulations.`,
-        time: formatTime(day1, 10, 55)
+        time: formatTimeWithRange(conversationDate, 10, 55)
     });
 
     messages.push({
         sender: 'customer',
         text: `Okay, that sounds standard. What about transaction security? How do you ensure funds are safe?`,
-        time: formatTime(day1, 10, 58)
+        time: formatTimeWithRange(conversationDate, 10, 58)
     });
 
     messages.push({
         sender: 'company',
         text: `We use multi-signature wallets and cold storage for the majority of funds. All transactions are monitored 24/7, and we have insurance coverage. We've never had a security breach.`,
-        time: formatTime(day1, 11, 2)
+        time: formatTimeWithRange(conversationDate, 11, 2)
     });
 
     messages.push({
         sender: 'customer',
         text: `That's reassuring. What's the primary purpose you need to know for?`,
-        time: formatTime(day1, 11, 5)
+        time: formatTimeWithRange(conversationDate, 11, 5)
     });
 
     messages.push({
         sender: 'company',
         text: `We need to understand the intended use case for compliance purposes - it helps us ensure we're meeting regulatory requirements and providing appropriate service levels. What will you be using the account for?`,
-        time: formatTime(day1, 11, 8)
+        time: formatTimeWithRange(conversationDate, 11, 8)
     });
 
     const purposeText = buildPurposeText(purposeDetails);
@@ -922,8 +916,6 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
         time: formatTime(day1, 11, 15)
     });
 
-    const day2 = new Date(now);
-    day2.setDate(day2.getDate() - 3);
     
     messages.push({
         sender: 'customer',
@@ -969,9 +961,8 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
 // 急切型对话 - 想要快速完成，催促
 function generateUrgentConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 3);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'customer',
@@ -1010,8 +1001,6 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
         time: formatTime(day1, 8, 44)
     });
 
-    const day2 = new Date(now);
-    day2.setDate(day2.getDate() - 2);
     
     if (formMethod === 'online') {
         messages.push({
@@ -1075,9 +1064,8 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
 // 友好型对话 - 比较礼貌，会闲聊几句
 function generateFriendlyConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 4);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'customer',
@@ -1128,8 +1116,6 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
         time: formatTime(day1, 10, 41)
     });
 
-    const day2 = new Date(now);
-    day2.setDate(day2.getDate() - 3);
     
     messages.push({
         sender: 'customer',
@@ -1187,9 +1173,8 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
 // 专业型对话 - 使用专业术语，比较正式
 function generateProfessionalConversation(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 4);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'customer',
@@ -1240,8 +1225,6 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
         time: formatTime(day1, 9, 21)
     });
 
-    const day2 = new Date(now);
-    day2.setDate(day2.getDate() - 3);
     
     messages.push({
         sender: 'customer',
@@ -3794,9 +3777,8 @@ function showCopySuccess() {
 // 话多型KYC对话
 function generateVerboseKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 2);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'company',
@@ -4176,8 +4158,6 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
             time: formatTimeWithRange(day1, 11, 0)
         });
 
-        const day2 = new Date(now);
-        day2.setDate(day2.getDate() - 1);
         
         messages.push({
             sender: 'customer',
@@ -4198,9 +4178,8 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
 // 话少型KYC对话
 function generateConciseKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 2);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'company',
@@ -4281,9 +4260,8 @@ function generateConciseKYCConversation(customerName, customerAge, platform, add
 // 谨慎型KYC对话
 function generateCautiousKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 2);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'company',
@@ -4395,9 +4373,8 @@ function generateCautiousKYCConversation(customerName, customerAge, platform, ad
 // 急切型KYC对话
 function generateUrgentKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 2);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'company',
@@ -4488,9 +4465,8 @@ function generateUrgentKYCConversation(customerName, customerAge, platform, addi
 // 友好型KYC对话
 function generateFriendlyKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 2);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'company',
@@ -4598,9 +4574,8 @@ function generateFriendlyKYCConversation(customerName, customerAge, platform, ad
 // 专业型KYC对话
 function generateProfessionalKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide, variant = 0, seed = 0) {
     const messages = [];
-    const now = new Date();
-    const day1 = new Date(now);
-    day1.setDate(day1.getDate() - 2);
+    // 获取用户指定的日期，如果没有则使用当前日期
+    const conversationDate = getConversationDate();
     
     messages.push({
         sender: 'company',
