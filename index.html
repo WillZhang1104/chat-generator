@@ -610,14 +610,24 @@
             // 显示隐藏后的 key
             inputElement.value = maskApiKey(fullKey, prefixLength, suffixLength);
             
-            // 监听焦点事件
-            inputElement.addEventListener('focus', function() {
+            // 移除旧的事件监听器（如果存在）
+            const oldFocusHandler = inputElement._focusHandler;
+            const oldBlurHandler = inputElement._blurHandler;
+            if (oldFocusHandler) {
+                inputElement.removeEventListener('focus', oldFocusHandler);
+            }
+            if (oldBlurHandler) {
+                inputElement.removeEventListener('blur', oldBlurHandler);
+            }
+            
+            // 创建新的事件处理器
+            const focusHandler = function() {
                 // 聚焦时显示完整 key
                 this.value = this.dataset.fullKey || fullKey;
                 this.type = 'text'; // 临时改为 text 以便查看
-            });
+            };
             
-            inputElement.addEventListener('blur', function() {
+            const blurHandler = function() {
                 // 失去焦点时隐藏中间部分
                 const currentValue = this.value;
                 if (currentValue === (this.dataset.fullKey || fullKey)) {
@@ -628,7 +638,15 @@
                     this.value = maskApiKey(currentValue, prefixLength, suffixLength);
                 }
                 this.type = 'password'; // 改回 password
-            });
+            };
+            
+            // 保存处理器引用以便后续移除
+            inputElement._focusHandler = focusHandler;
+            inputElement._blurHandler = blurHandler;
+            
+            // 添加新的事件监听器
+            inputElement.addEventListener('focus', focusHandler);
+            inputElement.addEventListener('blur', blurHandler);
         }
 
         // AI 优化开关
