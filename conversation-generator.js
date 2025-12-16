@@ -668,13 +668,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Sure! ${purposeText} I have a few questions though - ${question1.toLowerCase()} And ${question2.toLowerCase()}`,
-        time: formatTimeWithRange(day1, 9, 28)
+        time: formatTimeWithRange(conversationDate, 9, 28)
     });
 
     messages.push({
         sender: 'company',
         text: `Perfect, thanks for that info. ${response1} ${response2}`,
-        time: formatTimeWithRange(day1, 9, 31)
+        time: formatTimeWithRange(conversationDate, 9, 31)
     });
 
     const question3 = seededChoice(conversationVariations.customerQuestions, seed, variant * 3);
@@ -683,7 +683,7 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `${seededChoice(conversationVariations.acknowledgments, seed, variant)} ${question3.toLowerCase()} And is there a minimum deposit amount?`,
-        time: formatTimeWithRange(day1, 9, 35)
+        time: formatTimeWithRange(conversationDate, 9, 35)
     });
 
     messages.push({
