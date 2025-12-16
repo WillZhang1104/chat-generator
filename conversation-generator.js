@@ -689,35 +689,32 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'company',
         text: `${response3} No minimum deposit required to get started!`,
-        time: formatTimeWithRange(day1, 9, 38)
+        time: formatTimeWithRange(conversationDate, 9, 38)
     });
-
-    const day2 = new Date(now);
-    day2.setDate(day2.getDate() - 3);
     
     messages.push({
         sender: 'customer',
         text: `Got it. So what's the next step?`,
-        time: formatTimeWithRange(day2, 10, 15)
+        time: formatTimeWithRange(conversationDate, 10, 15)
     });
 
     messages.push({
         sender: 'company',
         text: `To get started, we'll need you to complete our onboarding form. This collects all the necessary information for account setup and compliance.`,
-        time: formatTimeWithRange(day2, 10, 18)
+        time: formatTimeWithRange(conversationDate, 10, 18)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `Here's the link to our online onboarding form: https://onboarding.geoswift.com It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
-            time: formatTimeWithRange(day2, 10, 20)
+            time: formatTimeWithRange(conversationDate, 10, 20)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF onboarding form to your email. Please complete all sections and send it back as an attachment when you're done.`,
-            time: formatTimeWithRange(day2, 10, 20)
+            time: formatTimeWithRange(conversationDate, 10, 20)
         });
     }
 
@@ -729,13 +726,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `${seededChoice(conversationVariations.acknowledgments, seed, variant * 2)} Let me review everything first. One more thing - ${question4.toLowerCase()} And ${question5.toLowerCase()}`,
-        time: formatTimeWithRange(day2, 10, 25)
+        time: formatTimeWithRange(conversationDate, 10, 25)
     });
 
     messages.push({
         sender: 'company',
         text: `${response4} We accept bank transfers, wire transfers, and ACH transfers.`,
-        time: formatTimeWithRange(day2, 10, 28)
+        time: formatTimeWithRange(conversationDate, 10, 28)
     });
 
     const question6 = seededChoice(conversationVariations.customerQuestions, seed, variant * 5);
@@ -743,13 +740,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Great! And ${question6.toLowerCase()}`,
-        time: formatTimeWithRange(day2, 10, 32)
+        time: formatTimeWithRange(conversationDate, 10, 32)
     });
 
     messages.push({
         sender: 'company',
         text: `${response5} For larger amounts, it might take a bit longer for security checks, but we'll keep you updated throughout the process.`,
-        time: formatTimeWithRange(day2, 10, 35)
+        time: formatTimeWithRange(conversationDate, 10, 35)
     });
 
     const closingPhrase = seededChoice(conversationVariations.closingPhrases, seed, variant);
@@ -757,13 +754,13 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     messages.push({
         sender: 'customer',
         text: `Sounds good! Let me think about it and review everything. I'll probably submit the form in the next day or two. ${closingPhrase}`,
-        time: formatTimeWithRange(day2, 10, 38)
+        time: formatTimeWithRange(conversationDate, 10, 38)
     });
 
     messages.push({
         sender: 'company',
         text: `You're welcome! Take your time. Once you submit the form, you'll receive a confirmation email and we'll start the review process. Feel free to reach out if you have any other questions.`,
-        time: formatTimeWithRange(day2, 10, 41)
+        time: formatTimeWithRange(conversationDate, 10, 41)
     });
 
     return messages;
@@ -1406,10 +1403,52 @@ function getConversationTimeRange() {
     return { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 };
 }
 
+// 根据时间段调整时间（支持时间递增）
+let timeCounter = 0; // 用于跟踪时间递增
+
+function resetTimeCounter() {
+    timeCounter = 0;
+}
+
 // 根据时间段调整时间
 function adjustTimeForRange(baseHour, baseMinute, timeRange) {
+    // 如果用户指定了自定义日期和时间段
+    if (timeRange.hasCustomDate) {
+        const rangeStartMinutes = timeRange.startHour * 60 + timeRange.startMinute;
+        const rangeEndMinutes = timeRange.endHour * 60 + timeRange.endMinute;
+        const rangeDuration = rangeEndMinutes - rangeStartMinutes;
+        
+        // 将基础时间映射到选定时间段
+        const baseTotalMinutes = baseHour * 60 + baseMinute;
+        const baseRangeStart = 8 * 60; // 8:00
+        const baseRangeEnd = 22 * 60; // 22:00
+        const baseRangeDuration = baseRangeEnd - baseRangeStart;
+        
+        // 计算比例并映射
+        const ratio = Math.max(0, Math.min(1, (baseTotalMinutes - baseRangeStart) / baseRangeDuration));
+        let adjustedMinutes = rangeStartMinutes + (ratio * rangeDuration);
+        
+        // 确保时间递增（每条消息至少间隔2分钟）
+        adjustedMinutes = Math.max(adjustedMinutes, rangeStartMinutes + (timeCounter * 2));
+        timeCounter++;
+        
+        // 确保不超过结束时间
+        adjustedMinutes = Math.min(adjustedMinutes, rangeEndMinutes);
+        
+        const adjustedHour = Math.floor(adjustedMinutes / 60);
+        const adjustedMinute = adjustedMinutes % 60;
+        
+        return { hour: adjustedHour, minute: adjustedMinute };
+    }
+    
+    // 旧的自定义时间段逻辑（向后兼容）
     if (timeRange.range === 'custom') {
-        return { hour: timeRange.startHour, minute: timeRange.startMinute };
+        const adjustedMinutes = timeRange.startHour * 60 + timeRange.startMinute + (timeCounter * 2);
+        timeCounter++;
+        return { 
+            hour: Math.floor(adjustedMinutes / 60), 
+            minute: adjustedMinutes % 60 
+        };
     }
     
     // 将基础时间映射到选定时间段
@@ -1424,8 +1463,15 @@ function adjustTimeForRange(baseHour, baseMinute, timeRange) {
     const baseRangeDuration = baseRangeEnd - baseRangeStart;
     
     // 计算比例并映射
-    const ratio = (baseTotalMinutes - baseRangeStart) / baseRangeDuration;
-    const adjustedMinutes = rangeStartMinutes + (ratio * rangeDuration);
+    const ratio = Math.max(0, Math.min(1, (baseTotalMinutes - baseRangeStart) / baseRangeDuration));
+    let adjustedMinutes = rangeStartMinutes + (ratio * rangeDuration);
+    
+    // 确保时间递增
+    adjustedMinutes = Math.max(adjustedMinutes, rangeStartMinutes + (timeCounter * 2));
+    timeCounter++;
+    
+    // 确保不超过结束时间
+    adjustedMinutes = Math.min(adjustedMinutes, rangeEndMinutes);
     
     const adjustedHour = Math.floor(adjustedMinutes / 60);
     const adjustedMinute = adjustedMinutes % 60;
@@ -1457,16 +1503,15 @@ function getConversationDate() {
 function formatTimeWithRange(date, baseHour, baseMinute) {
     const timeRange = getConversationTimeRange();
     
-    // 如果用户指定了自定义日期和时间段
+    // 如果用户指定了自定义日期和时间段，使用用户指定的日期
     if (timeRange.hasCustomDate && timeRange.date) {
         const adjusted = adjustTimeForRange(baseHour, baseMinute, timeRange);
         return formatTime(timeRange.date, adjusted.hour, adjusted.minute);
     }
     
-    // 使用传入的日期（可能是当前日期或用户指定的日期）
-    const conversationDate = getConversationDate();
+    // 否则使用传入的日期
     const adjusted = adjustTimeForRange(baseHour, baseMinute, timeRange);
-    return formatTime(conversationDate, adjusted.hour, adjusted.minute);
+    return formatTime(date, adjusted.hour, adjusted.minute);
 }
 
 // 存储当前对话，用于编辑功能
