@@ -417,6 +417,12 @@
             </div>
             <div class="conversation-preview" id="conversationPreview"></div>
 
+            <!-- 编辑对话区域 -->
+            <div id="conversationEditArea" style="display: none; margin-top: 20px; padding: 20px; border: 1px solid #007bff; border-radius: 8px; background-color: #e7f3ff;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; color: #007bff;">编辑对话</h3>
+                <div id="editableMessages"></div>
+            </div>
+
             <!-- 合规问题答案区域 -->
             <div id="complianceAnswersSection" style="display: none; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
                 <h2 style="color: #333; margin-bottom: 20px; font-size: 20px;">合规问题答案</h2>
@@ -435,10 +441,6 @@
                     <label for="transactionPurpose" style="font-weight: 600; color: #333;">3. Transaction Purpose Details（交易目的详细说明）*</label>
                     <textarea id="transactionPurpose" rows="4" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="将自动生成交易目的说明..."></textarea>
                 </div>
-            </div>
-            <div id="conversationEditArea" style="display: none; margin-top: 20px; padding: 20px; border: 1px solid #007bff; border-radius: 8px; background-color: #e7f3ff;">
-                <h3 style="margin-top: 0; margin-bottom: 15px; color: #007bff;">编辑对话</h3>
-                <div id="editableMessages"></div>
             </div>
             
             <div class="instructions" id="instructionsContent">
