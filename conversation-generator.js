@@ -5045,14 +5045,14 @@ async function callGeminiAPI(prompt, apiKey) {
 
 // Groq API（免费，快速）
 async function callGroqAPI(prompt, apiKey) {
-    // Groq 当前支持的模型列表（llama-3.1-70b-versatile 已停用）
+    // Groq 当前支持的模型列表（根据 https://console.groq.com/docs/deprecations）
+    // llama-3.1-70b-versatile 已停用，不再使用
     // 优先使用 llama-3.3-70b-versatile（最新版本），如果不可用则尝试其他模型
     const models = [
-        'llama-3.3-70b-versatile',  // 最新版本，推荐
-        'llama-3.1-8b-instant',     // 快速版本
-        'llama-3.1-70b-versatile',  // 旧版本（可能已停用，但保留作为备选）
-        'mixtral-8x7b-32768',       // Mixtral 模型
-        'gemma2-9b-it'              // Gemma 模型
+        'llama-3.3-70b-versatile',  // 最新版本，推荐（Llama 3.3 70B）
+        'llama-3.1-8b-instant',     // 快速版本（Llama 3.1 8B）
+        'mixtral-8x7b-32768',       // Mixtral 8x7B 模型（32K 上下文）
+        'gemma2-9b-it'              // Gemma 2 9B 模型
     ];
     
     let lastError = null;
