@@ -707,7 +707,7 @@ function generateVerboseConversation(customerName, purposeDetails, formMethod, p
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Here's the link to our online onboarding form: https://onboarding.geoswift.com It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
+            text: `Here's the link to our online onboarding form: https://wsdglobalpay.com/onboarding/ It should take about 10-15 minutes to complete. Let me know if you run into any issues!`,
             time: formatTimeWithRange(conversationDate, 10, 20)
         });
     } else {
@@ -822,7 +822,7 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Here's the link: https://onboarding.geoswift.com Let me know once you've submitted it.`,
+            text: `Here's the link: https://wsdglobalpay.com/onboarding/ Let me know once you've submitted it.`,
             time: formatTimeWithRange(day2, 14, 22)
         });
     } else {
@@ -934,7 +934,7 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `To proceed, please complete our onboarding form: https://onboarding.geoswift.com All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
+            text: `To proceed, please complete our onboarding form: https://wsdglobalpay.com/onboarding/ All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
             time: formatTimeWithRange(day2, 13, 33)
         });
     } else {
@@ -1016,7 +1016,7 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Here's the link: https://onboarding.geoswift.com Submit as soon as possible and we'll review it right away.`,
+            text: `Here's the link: https://wsdglobalpay.com/onboarding/ Submit as soon as possible and we'll review it right away.`,
             time: formatTimeWithRange(day2, 9, 15)
         });
     } else {
@@ -1146,7 +1146,7 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `You can access the form here: https://onboarding.geoswift.com Let me know if you have any questions while filling it out - I'm here to help!`,
+            text: `You can access the form here: https://wsdglobalpay.com/onboarding/ Let me know if you have any questions while filling it out - I'm here to help!`,
             time: formatTimeWithRange(day2, 14, 20)
         });
     } else {
@@ -1252,7 +1252,7 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
-            text: `Please complete the onboarding form at: https://onboarding.geoswift.com Upon submission, our compliance team will review your application and initiate the verification process.`,
+            text: `Please complete the onboarding form at: https://wsdglobalpay.com/onboarding/ Upon submission, our compliance team will review your application and initiate the verification process.`,
             time: formatTimeWithRange(day2, 14, 3)
         });
     } else {
