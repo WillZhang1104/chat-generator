@@ -5171,7 +5171,7 @@ async function callOpenAIAPI(prompt, apiKey) {
             messages: [
                 {
                     role: 'system',
-                    content: '你是一个专业的对话优化助手，擅长将对话优化得更自然、更像真人。'
+                    content: 'You are a professional conversation optimization assistant. Your task is to refine English conversations to make them more natural and human-like, while keeping them in English. DO NOT translate to Chinese or any other language.'
                 },
                 {
                     role: 'user',
