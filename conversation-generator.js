@@ -4903,9 +4903,9 @@ async function optimizeConversationWithAI(conversation, customerName, platform, 
 
     try {
         // 构建提示词
-        const platformContext = platform === 'whatsapp' ? 'WhatsApp消息' : 
-                               platform === 'telegram' ? 'Telegram消息' : 
-                               '邮件';
+        const platformContext = platform === 'whatsapp' ? 'WhatsApp' : 
+                               platform === 'telegram' ? 'Telegram' : 
+                               'Email';
         
         const conversationText = conversation.map(msg => {
             const sender = msg.sender === 'customer' ? 'Customer' : 'Company';
