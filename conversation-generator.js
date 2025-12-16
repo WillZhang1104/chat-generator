@@ -818,32 +818,32 @@ function generateConciseConversation(customerName, purposeDetails, formMethod, p
         messages.push({
             sender: 'company',
             text: `Here's the link: https://wsdglobalpay.com/onboarding/ Let me know once you've submitted it.`,
-            time: formatTimeWithRange(day2, 14, 22)
+            time: formatTimeWithRange(conversationDate, 14, 22)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF form to your email. Please return it when completed.`,
-            time: formatTimeWithRange(day2, 14, 22)
+            time: formatTimeWithRange(conversationDate, 14, 22)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Will do. How long for approval?`,
-        time: formatTimeWithRange(day2, 14, 25)
+        time: formatTimeWithRange(conversationDate, 14, 25)
     });
 
     messages.push({
         sender: 'company',
         text: `Usually 1-2 business days after we receive your completed form.`,
-        time: formatTimeWithRange(day2, 14, 27)
+        time: formatTimeWithRange(conversationDate, 14, 27)
     });
 
     messages.push({
         sender: 'customer',
         text: `Thanks.`,
-        time: formatTimeWithRange(day2, 14, 30)
+        time: formatTimeWithRange(conversationDate, 14, 30)
     });
 
     return messages;
@@ -920,39 +920,39 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     messages.push({
         sender: 'customer',
         text: `Good. So what's the next step?`,
-        time: formatTimeWithRange(day2, 13, 30)
+        time: formatTimeWithRange(conversationDate, 13, 30)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `To proceed, please complete our onboarding form: https://wsdglobalpay.com/onboarding/ All security and compliance details are outlined there, and you can review our privacy policy and terms of service.`,
-            time: formatTimeWithRange(day2, 13, 33)
+            time: formatTimeWithRange(conversationDate, 13, 33)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've emailed you the PDF onboarding form with all security and compliance information, plus our privacy policy. Please review everything carefully and return it when ready.`,
-            time: formatTimeWithRange(day2, 13, 33)
+            time: formatTimeWithRange(conversationDate, 13, 33)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Thank you. I'll review everything carefully before submitting. How long does the review process take?`,
-        time: formatTimeWithRange(day2, 13, 37)
+        time: formatTimeWithRange(conversationDate, 13, 37)
     });
 
     messages.push({
         sender: 'company',
         text: `Typically 1-2 business days. Our compliance team reviews each application thoroughly to ensure everything is in order.`,
-        time: formatTimeWithRange(day2, 13, 40)
+        time: formatTimeWithRange(conversationDate, 13, 40)
     });
 
     messages.push({
         sender: 'customer',
         text: `Understood. Let me review everything first and I'll probably submit it by end of week. Thanks for answering all my questions.`,
-        time: formatTimeWithRange(day2, 13, 43)
+        time: formatTimeWithRange(conversationDate, 13, 43)
     });
 
     return messages;
@@ -1006,56 +1006,56 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
         messages.push({
             sender: 'company',
             text: `Here's the link: https://wsdglobalpay.com/onboarding/ Submit as soon as possible and we'll review it right away.`,
-            time: formatTimeWithRange(day2, 9, 15)
+            time: formatTimeWithRange(conversationDate, 9, 15)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF form to your email. Please complete and return it immediately - we're monitoring for your submission.`,
-            time: formatTimeWithRange(day2, 9, 15)
+            time: formatTimeWithRange(conversationDate, 9, 15)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Working on it now. What documents do I need ready?`,
-        time: formatTimeWithRange(day2, 9, 20)
+        time: formatTimeWithRange(conversationDate, 9, 20)
     });
 
     messages.push({
         sender: 'company',
         text: `Government ID, proof of address (utility bill or bank statement), and if it's a large transaction, source of funds documentation. Have those ready and you'll be good to go.`,
-        time: formatTimeWithRange(day2, 9, 23)
+        time: formatTimeWithRange(conversationDate, 9, 23)
     });
 
     messages.push({
         sender: 'customer',
         text: `Got it. Almost done with the form.`,
-        time: formatTimeWithRange(day2, 9, 35)
+        time: formatTimeWithRange(conversationDate, 9, 35)
     });
 
     messages.push({
         sender: 'company',
         text: `Perfect! Once you submit, we'll start the review process immediately.`,
-        time: formatTimeWithRange(day2, 9, 37)
+        time: formatTimeWithRange(conversationDate, 9, 37)
     });
 
     messages.push({
         sender: 'customer',
         text: `Done! Submitted. How long until approval?`,
-        time: formatTimeWithRange(day2, 9, 45)
+        time: formatTimeWithRange(conversationDate, 9, 45)
     });
 
     messages.push({
         sender: 'company',
         text: `We'll review it within 24 hours. You'll receive an email notification once approved. If we need any additional information, we'll reach out right away.`,
-        time: formatTimeWithRange(day2, 9, 48)
+        time: formatTimeWithRange(conversationDate, 9, 48)
     });
 
     messages.push({
         sender: 'customer',
         text: `Thanks! Please keep me updated.`,
-        time: formatTimeWithRange(day2, 9, 50)
+        time: formatTimeWithRange(conversationDate, 9, 50)
     });
 
     return messages;
@@ -1120,51 +1120,51 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     messages.push({
         sender: 'customer',
         text: `Sounds manageable! What documents will I need?`,
-        time: formatTimeWithRange(day2, 14, 15)
+        time: formatTimeWithRange(conversationDate, 14, 15)
     });
 
     messages.push({
         sender: 'company',
         text: `Just standard stuff - government ID and proof of address. Nothing complicated!`,
-        time: formatTimeWithRange(day2, 14, 18)
+        time: formatTimeWithRange(conversationDate, 14, 18)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `You can access the form here: https://wsdglobalpay.com/onboarding/ Let me know if you have any questions while filling it out - I'm here to help!`,
-            time: formatTimeWithRange(day2, 14, 20)
+            time: formatTimeWithRange(conversationDate, 14, 20)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the PDF form to your email. Feel free to reach out if you need any assistance - don't hesitate to ask!`,
-            time: formatTimeWithRange(day2, 14, 20)
+            time: formatTimeWithRange(conversationDate, 14, 20)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Got it. Let me review everything first. How long does approval usually take?`,
-        time: formatTimeWithRange(day2, 14, 25)
+        time: formatTimeWithRange(conversationDate, 14, 25)
     });
 
     messages.push({
         sender: 'company',
         text: `Usually 1-2 business days. We'll send you an email as soon as you're approved!`,
-        time: formatTimeWithRange(day2, 14, 28)
+        time: formatTimeWithRange(conversationDate, 14, 28)
     });
 
     messages.push({
         sender: 'customer',
         text: `Great! Thanks for being so helpful. I'll probably submit it in the next day or two after I look everything over.`,
-        time: formatTimeWithRange(day2, 14, 31)
+        time: formatTimeWithRange(conversationDate, 14, 31)
     });
 
     messages.push({
         sender: 'company',
         text: `You're welcome! We're excited to have you on board. Feel free to reach out anytime if you have questions. Have a great day!`,
-        time: formatTimeWithRange(day2, 14, 34)
+        time: formatTimeWithRange(conversationDate, 14, 34)
     });
 
     return messages;
@@ -1229,45 +1229,45 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     messages.push({
         sender: 'customer',
         text: `Very well. What's the next step in the onboarding process?`,
-        time: formatTimeWithRange(day2, 14, 0)
+        time: formatTimeWithRange(conversationDate, 14, 0)
     });
     
     if (formMethod === 'online') {
         messages.push({
             sender: 'company',
             text: `Please complete the onboarding form at: https://wsdglobalpay.com/onboarding/ Upon submission, our compliance team will review your application and initiate the verification process.`,
-            time: formatTimeWithRange(day2, 14, 3)
+            time: formatTimeWithRange(conversationDate, 14, 3)
         });
     } else {
         messages.push({
             sender: 'company',
             text: `I've sent the onboarding form to your registered email address. Please complete all required sections and return it at your earliest convenience. Our compliance team will review upon receipt.`,
-            time: formatTimeWithRange(day2, 14, 3)
+            time: formatTimeWithRange(conversationDate, 14, 3)
         });
     }
 
     messages.push({
         sender: 'customer',
         text: `Understood. What's the expected timeline for account approval?`,
-        time: formatTimeWithRange(day2, 14, 6)
+        time: formatTimeWithRange(conversationDate, 14, 6)
     });
 
     messages.push({
         sender: 'company',
         text: `Typically 1-2 business days after we receive complete documentation. We'll notify you via email upon approval.`,
-        time: formatTimeWithRange(day2, 14, 9)
+        time: formatTimeWithRange(conversationDate, 14, 9)
     });
 
     messages.push({
         sender: 'customer',
         text: `Excellent. I'll review the documentation and likely submit it by end of week.`,
-        time: formatTimeWithRange(day2, 14, 12)
+        time: formatTimeWithRange(conversationDate, 14, 12)
     });
 
     messages.push({
         sender: 'company',
         text: `Perfect. We look forward to working with you. Should you have any questions during the process, please don't hesitate to reach out.`,
-        time: formatTimeWithRange(day2, 14, 15)
+        time: formatTimeWithRange(conversationDate, 14, 15)
     });
 
     return messages;
@@ -4162,13 +4162,13 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
         messages.push({
             sender: 'customer',
             text: `Let me think about this. I'll need to discuss it with my family first.`,
-            time: formatTimeWithRange(day2, 14, 20)
+            time: formatTimeWithRange(conversationDate, 14, 20)
         });
 
         messages.push({
             sender: 'company',
             text: `Of course, take your time. We're here to answer any questions you might have. Please let us know when you've made a decision.`,
-            time: formatTimeWithRange(day2, 14, 23)
+            time: formatTimeWithRange(conversationDate, 14, 23)
         });
     }
 
