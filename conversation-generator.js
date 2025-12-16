@@ -907,13 +907,13 @@ function generateCautiousConversation(customerName, purposeDetails, formMethod, 
     messages.push({
         sender: 'customer',
         text: `The purpose is ${purposeText}. Are there any restrictions based on use case?`,
-        time: formatTime(day1, 11, 12)
+        time: formatTimeWithRange(conversationDate, 11, 12)
     });
 
     messages.push({
         sender: 'company',
         text: `No restrictions - we support various use cases as long as they're legal and compliant. That use case is perfectly fine with us.`,
-        time: formatTime(day1, 11, 15)
+        time: formatTimeWithRange(conversationDate, 11, 15)
     });
 
     
@@ -967,38 +967,38 @@ function generateUrgentConversation(customerName, purposeDetails, formMethod, pl
     messages.push({
         sender: 'customer',
         text: generateConversationStart(customerName, purposeDetails, conversationStart),
-        time: formatTime(day1, 8, 30)
+        time: formatTimeWithRange(conversationDate, 8, 30)
     });
 
     messages.push({
         sender: 'company',
         text: `Hello ${customerName}! We can expedite the process. What's the primary purpose of your account?`,
-        time: formatTime(day1, 8, 32)
+        time: formatTimeWithRange(conversationDate, 8, 32)
     });
 
     const purposeText = buildPurposeText(purposeDetails);
     messages.push({
         sender: 'customer',
         text: `${purposeText} I really need this done today if possible - is that realistic?`,
-        time: formatTime(day1, 8, 35)
+        time: formatTimeWithRange(conversationDate, 8, 35)
     });
 
     messages.push({
         sender: 'company',
         text: `I understand the urgency. We can fast-track your application, but we still need to complete KYC verification which typically takes 1-2 business days. If you submit everything today, we can have you approved by tomorrow or the day after.`,
-        time: formatTime(day1, 8, 38)
+        time: formatTimeWithRange(conversationDate, 8, 38)
     });
 
     messages.push({
         sender: 'customer',
         text: `Okay, that works. What do I need to do?`,
-        time: formatTime(day1, 8, 41)
+        time: formatTimeWithRange(conversationDate, 8, 41)
     });
 
     messages.push({
         sender: 'company',
         text: `Please complete the onboarding form immediately - make sure all information is accurate to avoid delays. We'll prioritize your review once submitted.`,
-        time: formatTime(day1, 8, 44)
+        time: formatTimeWithRange(conversationDate, 8, 44)
     });
 
     
@@ -1070,50 +1070,50 @@ function generateFriendlyConversation(customerName, purposeDetails, formMethod, 
     messages.push({
         sender: 'customer',
         text: generateConversationStart(customerName, purposeDetails, conversationStart),
-        time: formatTime(day1, 10, 20)
+        time: formatTimeWithRange(conversationDate, 10, 20)
     });
 
     messages.push({
         sender: 'company',
         text: `Hello ${customerName}! Thank you, same to you! We'd be happy to help you set up an account. What brings you to us today?`,
-        time: formatTime(day1, 10, 23)
+        time: formatTimeWithRange(conversationDate, 10, 23)
     });
 
     messages.push({
         sender: 'customer',
         text: `I'm looking to get into crypto and need a reliable way to convert my USD. I've heard good things about your service from a friend.`,
-        time: formatTime(day1, 10, 26)
+        time: formatTimeWithRange(conversationDate, 10, 26)
     });
 
     messages.push({
         sender: 'company',
         text: `That's wonderful! We're glad your friend recommended us. We pride ourselves on being reliable and user-friendly. What will be the main purpose of your account?`,
-        time: formatTime(day1, 10, 29)
+        time: formatTimeWithRange(conversationDate, 10, 29)
     });
 
     const purposeText = buildPurposeText(purposeDetails);
     messages.push({
         sender: 'customer',
         text: `${purposeText} I'm pretty new to this whole crypto thing, so I'm still learning.`,
-        time: formatTime(day1, 10, 32)
+        time: formatTimeWithRange(conversationDate, 10, 32)
     });
 
     messages.push({
         sender: 'company',
         text: `No worries at all! We're here to help. That's a great use case and we support it fully. The process is pretty straightforward - we'll guide you through everything.`,
-        time: formatTime(day1, 10, 35)
+        time: formatTimeWithRange(conversationDate, 10, 35)
     });
 
     messages.push({
         sender: 'customer',
         text: `That's reassuring! What's involved in the signup process?`,
-        time: formatTime(day1, 10, 38)
+        time: formatTimeWithRange(conversationDate, 10, 38)
     });
 
     messages.push({
         sender: 'company',
         text: `We'll need you to complete our onboarding form - it collects basic info and helps us verify your identity for compliance. Should take about 10-15 minutes.`,
-        time: formatTime(day1, 10, 41)
+        time: formatTimeWithRange(conversationDate, 10, 41)
     });
 
     
@@ -1179,50 +1179,50 @@ function generateProfessionalConversation(customerName, purposeDetails, formMeth
     messages.push({
         sender: 'customer',
         text: generateConversationStart(customerName, purposeDetails, conversationStart),
-        time: formatTime(day1, 9, 0)
+        time: formatTimeWithRange(conversationDate, 9, 0)
     });
 
     messages.push({
         sender: 'company',
         text: `Good morning ${customerName}. We offer USD to USDT onramp services with institutional-grade infrastructure. To proceed with account setup, please specify the intended use case for this account.`,
-        time: formatTime(day1, 9, 3)
+        time: formatTimeWithRange(conversationDate, 9, 3)
     });
 
     const purposeText = buildPurposeText(purposeDetails);
     messages.push({
         sender: 'customer',
         text: `The account will be used for ${purposeText}. What are the compliance requirements and what documentation will be needed?`,
-        time: formatTime(day1, 9, 6)
+        time: formatTimeWithRange(conversationDate, 9, 6)
     });
 
     messages.push({
         sender: 'company',
         text: `We adhere to all applicable regulatory requirements including KYC/AML procedures. Standard documentation includes government-issued identification, proof of address, and potentially source of funds documentation depending on transaction volume.`,
-        time: formatTime(day1, 9, 9)
+        time: formatTimeWithRange(conversationDate, 9, 9)
     });
 
     messages.push({
         sender: 'customer',
         text: `Understood. What are your transaction limits and fee structure?`,
-        time: formatTime(day1, 9, 12)
+        time: formatTimeWithRange(conversationDate, 9, 12)
     });
 
     messages.push({
         sender: 'company',
         text: `Transaction limits are tiered based on verification level - we'll provide specific limits upon account approval. Our fee structure is competitive, typically 0.5-1% depending on volume. We can discuss custom rates for larger transactions.`,
-        time: formatTime(day1, 9, 15)
+        time: formatTimeWithRange(conversationDate, 9, 15)
     });
 
     messages.push({
         sender: 'customer',
         text: `That's acceptable. What's the typical processing time for transactions?`,
-        time: formatTime(day1, 9, 18)
+        time: formatTimeWithRange(conversationDate, 9, 18)
     });
 
     messages.push({
         sender: 'company',
         text: `Most transactions process within 24-48 hours post-approval. For larger amounts, additional compliance checks may extend this slightly, but we maintain transparency throughout the process.`,
-        time: formatTime(day1, 9, 21)
+        time: formatTimeWithRange(conversationDate, 9, 21)
     });
 
     
@@ -4333,37 +4333,37 @@ function generateCautiousKYCConversation(customerName, customerAge, platform, ad
         messages.push({
             sender: 'customer',
             text: refusalReason.text,
-            time: formatTime(day1, 9, 33)
+            time: formatTimeWithRange(conversationDate, 9, 33)
         });
 
         messages.push({
             sender: 'company',
             text: `I understand your privacy concerns. We use bank-level encryption and comply with all data protection regulations. This is a regulatory requirement for enhanced due diligence.`,
-            time: formatTime(day1, 9, 37)
+            time: formatTimeWithRange(conversationDate, 9, 37)
         });
 
         messages.push({
             sender: 'customer',
             text: `Can you show me your data protection policy? And what happens if there's a breach?`,
-            time: formatTime(day1, 9, 41)
+            time: formatTimeWithRange(conversationDate, 9, 41)
         });
 
         messages.push({
             sender: 'company',
             text: `Absolutely. I can send you our privacy policy and data protection documentation. We have comprehensive insurance and protocols in place. However, this documentation is still required for compliance.`,
-            time: formatTime(day1, 9, 45)
+            time: formatTimeWithRange(conversationDate, 9, 45)
         });
 
         messages.push({
             sender: 'customer',
             text: `I need to review everything first before making a decision.`,
-            time: formatTime(day1, 9, 49)
+            time: formatTimeWithRange(conversationDate, 9, 49)
         });
 
         messages.push({
             sender: 'company',
             text: `Of course. I'll send over the documentation. Please review and let us know your decision.`,
-            time: formatTime(day1, 9, 52)
+            time: formatTimeWithRange(conversationDate, 9, 52)
         });
     }
 
@@ -4431,31 +4431,31 @@ function generateUrgentKYCConversation(customerName, customerAge, platform, addi
         messages.push({
             sender: 'customer',
             text: refusalReason.text,
-            time: formatTime(day1, 8, 18)
+            time: formatTimeWithRange(conversationDate, 8, 18)
         });
 
         messages.push({
             sender: 'company',
             text: `I understand, but this is mandatory. Without it, we can't proceed.`,
-            time: formatTime(day1, 8, 21)
+            time: formatTimeWithRange(conversationDate, 8, 21)
         });
 
         messages.push({
             sender: 'customer',
             text: `This is ridiculous. Why do you need this?`,
-            time: formatTime(day1, 8, 24)
+            time: formatTimeWithRange(conversationDate, 8, 24)
         });
 
         messages.push({
             sender: 'company',
             text: `It's a regulatory requirement for enhanced due diligence. We need it to verify your account.`,
-            time: formatTime(day1, 8, 27)
+            time: formatTimeWithRange(conversationDate, 8, 27)
         });
 
         messages.push({
             sender: 'customer',
             text: `Fine, but I'm not happy about this. I'll send them later today.`,
-            time: formatTime(day1, 8, 30)
+            time: formatTimeWithRange(conversationDate, 8, 30)
         });
     }
 
@@ -4534,37 +4534,37 @@ function generateFriendlyKYCConversation(customerName, customerAge, platform, ad
         messages.push({
             sender: 'customer',
             text: refusalReason.text,
-            time: formatTime(day1, 10, 18)
+            time: formatTimeWithRange(conversationDate, 10, 18)
         });
 
         messages.push({
             sender: 'company',
             text: `I totally understand your concerns. We take privacy very seriously and all documents are encrypted. This is just a standard compliance requirement.`,
-            time: formatTime(day1, 10, 22)
+            time: formatTimeWithRange(conversationDate, 10, 22)
         });
 
         messages.push({
             sender: 'customer',
             text: `I appreciate that, but I'm still not comfortable sharing bank statements. Is there any way around this?`,
-            time: formatTime(day1, 10, 26)
+            time: formatTimeWithRange(conversationDate, 10, 26)
         });
 
         messages.push({
             sender: 'company',
             text: `I wish there was, but unfortunately it's mandatory for regulatory compliance. We really need these documents to proceed. Your information will be kept completely confidential.`,
-            time: formatTime(day1, 10, 30)
+            time: formatTimeWithRange(conversationDate, 10, 30)
         });
 
         messages.push({
             sender: 'customer',
             text: `Okay, let me think about it. I'll get back to you.`,
-            time: formatTime(day1, 10, 34)
+            time: formatTimeWithRange(conversationDate, 10, 34)
         });
 
         messages.push({
             sender: 'company',
             text: `Of course! Take your time. Feel free to reach out if you have any questions.`,
-            time: formatTime(day1, 10, 37)
+            time: formatTimeWithRange(conversationDate, 10, 37)
         });
     }
 
@@ -4643,37 +4643,37 @@ function generateProfessionalKYCConversation(customerName, customerAge, platform
         messages.push({
             sender: 'customer',
             text: refusalReason.text,
-            time: formatTime(day1, 9, 3)
+            time: formatTimeWithRange(conversationDate, 9, 3)
         });
 
         messages.push({
             sender: 'company',
             text: `I understand your concerns. This is a mandatory regulatory requirement for enhanced due diligence. All documentation is handled in strict confidence and stored securely per data protection regulations.`,
-            time: formatTime(day1, 9, 7)
+            time: formatTimeWithRange(conversationDate, 9, 7)
         });
 
         messages.push({
             sender: 'customer',
             text: `I need to understand the legal basis for this requirement. Can you provide the specific regulation?`,
-            time: formatTime(day1, 9, 11)
+            time: formatTimeWithRange(conversationDate, 9, 11)
         });
 
         messages.push({
             sender: 'company',
             text: `This falls under AML/KYC regulations requiring enhanced due diligence for certain risk profiles. I can provide you with the relevant regulatory references. However, this documentation remains mandatory for account verification.`,
-            time: formatTime(day1, 9, 15)
+            time: formatTimeWithRange(conversationDate, 9, 15)
         });
 
         messages.push({
             sender: 'customer',
             text: `I'll need to review the regulatory basis before proceeding. I'll get back to you.`,
-            time: formatTime(day1, 9, 19)
+            time: formatTimeWithRange(conversationDate, 9, 19)
         });
 
         messages.push({
             sender: 'company',
             text: `Understood. I'll forward the relevant documentation. Please review and confirm your decision at your earliest convenience.`,
-            time: formatTime(day1, 9, 22)
+            time: formatTimeWithRange(conversationDate, 9, 22)
         });
     }
 
