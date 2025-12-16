@@ -357,6 +357,16 @@
                     </select>
                     <label for="aiApiKey" style="font-size: 13px; color: #666;">API Key：</label>
                     <input type="password" id="aiApiKey" name="aiApiKey" placeholder="输入API Key（Gemini/Groq免费）" style="margin-top: 5px; font-size: 13px; width: 100%;">
+                    <div style="margin-top: 15px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #666;">
+                            <input type="checkbox" id="showCustomPrompt" style="margin-right: 8px; width: auto;">
+                            <span>显示并自定义 AI Prompt（高级选项）</span>
+                        </label>
+                        <textarea id="customAIPrompt" name="customAIPrompt" placeholder="留空则使用默认 prompt。默认 prompt 会保持英文对话，只进行润色优化。" style="margin-top: 10px; font-size: 12px; width: 100%; min-height: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Courier New', monospace; display: none;"></textarea>
+                        <p style="font-size: 11px; color: #999; margin-top: 5px; display: none;" id="promptHint">
+                            提示：在 prompt 中可以使用变量：<code>{platformContext}</code>（平台类型）、<code>{customerName}</code>（客户名称）、<code>{conversationText}</code>（原始对话文本）。留空则使用默认 prompt。
+                        </p>
+                    </div>
                     <p style="font-size: 12px; color: #999; margin-top: 5px;">
                         <strong>免费选项：</strong><br>
                         • <strong>Google Gemini</strong>：访问 <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a> 获取免费API Key<br>

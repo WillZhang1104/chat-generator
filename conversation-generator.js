@@ -4908,29 +4908,44 @@ async function optimizeConversationWithAI(conversation, customerName, platform, 
                                '邮件';
         
         const conversationText = conversation.map(msg => {
-            const sender = msg.sender === 'customer' ? '客户' : '公司';
+            const sender = msg.sender === 'customer' ? 'Customer' : 'Company';
             return `${sender}: ${msg.text}`;
         }).join('\n');
 
-        const prompt = `你是一个对话优化专家。请优化以下${platformContext}对话，使其更加自然、更像真人之间的真实对话。
+        // 获取用户自定义的 prompt，如果没有则使用默认 prompt
+        let customPrompt = getCustomAIPrompt();
+        const defaultPrompt = `You are a conversation optimization expert. Please refine the following ${platformContext} conversation to make it more natural and human-like, while keeping it in English.
 
-要求：
-1. 保持对话的核心信息和目的不变
-2. 使语言更加自然、口语化
-3. 添加适当的语气词、停顿、自然的表达方式
-4. 保持原有的对话风格（如友好、专业等）
-5. 不要改变对话的基本结构和顺序
-6. 保持客户名称：${customerName}
+IMPORTANT REQUIREMENTS:
+1. Keep the conversation in English - DO NOT translate to Chinese or any other language
+2. Maintain the core information and purpose of the conversation
+3. Make the language more natural, conversational, and human-like
+4. Add appropriate conversational elements like natural pauses, casual expressions, and authentic phrasing
+5. Keep the original conversation style (friendly, professional, etc.)
+6. Do not change the basic structure and order of the conversation
+7. Keep the customer name: ${customerName}
+8. Make it sound like real people talking, not robotic or template-like
 
-原始对话：
+Original conversation:
 ${conversationText}
 
-请返回优化后的对话，格式为JSON数组，每个元素包含：
-- sender: "customer" 或 "company"
-- text: 优化后的消息内容
-- time: 保持原有的时间（格式：HH:mm）
+Please return the optimized conversation as a JSON array, where each element contains:
+- sender: "customer" or "company"
+- text: the refined message content (in English, more natural and human-like)
+- time: keep the original time (format: HH:mm)
 
-只返回JSON数组，不要其他内容。`;
+Return ONLY the JSON array, no other content.`;
+
+        // 如果用户提供了自定义 prompt，替换变量
+        let prompt;
+        if (customPrompt) {
+            prompt = customPrompt
+                .replace(/\{platformContext\}/g, platformContext)
+                .replace(/\{customerName\}/g, customerName)
+                .replace(/\{conversationText\}/g, conversationText);
+        } else {
+            prompt = defaultPrompt;
+        }
 
         let optimizedConversation;
         
@@ -5220,4 +5235,12 @@ function getAIApiKey() {
     }
     // 否则使用当前值（可能是用户手动输入的）
     return currentValue || fullKey || '';
+}
+
+// 获取自定义 AI Prompt
+function getCustomAIPrompt() {
+    const textarea = document.getElementById('customAIPrompt');
+    if (!textarea) return null;
+    const customPrompt = textarea.value.trim();
+    return customPrompt || null;
 }
