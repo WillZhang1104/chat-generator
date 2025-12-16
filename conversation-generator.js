@@ -5210,5 +5210,14 @@ function getAIProvider() {
 // 获取AI API Key
 function getAIApiKey() {
     const input = document.getElementById('aiApiKey');
-    return input ? input.value.trim() : '';
+    if (!input) return '';
+    // 优先使用存储的完整 key，如果没有则使用当前值
+    const fullKey = input.dataset.fullKey;
+    const currentValue = input.value.trim();
+    // 如果当前值是隐藏格式（包含 ***），使用完整 key
+    if (fullKey && currentValue.includes('***')) {
+        return fullKey;
+    }
+    // 否则使用当前值（可能是用户手动输入的）
+    return currentValue || fullKey || '';
 }
