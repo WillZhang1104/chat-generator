@@ -1342,34 +1342,68 @@ function generateRefusalReason(customerName) {
 
 // 获取对话时间段设置
 function getConversationTimeRange() {
-    const timeRangeInput = document.querySelector('input[name="conversationTime"]:checked');
-    // 如果时间段选择不存在，返回默认值（早上）
-    if (!timeRangeInput) {
-        return { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 };
-    }
+    // 优先使用新的日期和时间段输入
+    const dateInput = document.getElementById('conversationDate')?.value.trim();
+    const timeRangeInput = document.getElementById('conversationTimeRange')?.value.trim();
     
-    const timeRange = timeRangeInput.value || 'morning';
-    
-    if (timeRange === 'custom') {
-        const customTime = document.getElementById('customStartTime')?.value;
-        if (customTime && customTime.match(/^\d{1,2}:\d{2}$/)) {
-            const [hour, minute] = customTime.split(':').map(Number);
+    if (dateInput && timeRangeInput) {
+        // 解析日期（格式：月/日，如 12/13）
+        const dateMatch = dateInput.match(/^(\d{1,2})\/(\d{1,2})$/);
+        // 解析时间段（格式：HH:mm-HH:mm，如 09:00-17:00）
+        const timeMatch = timeRangeInput.match(/^(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})$/);
+        
+        if (dateMatch && timeMatch) {
+            const month = parseInt(dateMatch[1]);
+            const day = parseInt(dateMatch[2]);
+            const startHour = parseInt(timeMatch[1]);
+            const startMinute = parseInt(timeMatch[2]);
+            const endHour = parseInt(timeMatch[3]);
+            const endMinute = parseInt(timeMatch[4]);
+            
+            // 创建日期对象（使用当前年份）
+            const currentYear = new Date().getFullYear();
+            const conversationDate = new Date(currentYear, month - 1, day);
+            
             return {
-                startHour: hour,
-                startMinute: minute,
-                range: 'custom'
+                date: conversationDate,
+                startHour: startHour,
+                startMinute: startMinute,
+                endHour: endHour,
+                endMinute: endMinute,
+                hasCustomDate: true
             };
         }
     }
     
-    // 默认时间段
-    const ranges = {
-        morning: { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 },
-        afternoon: { startHour: 12, startMinute: 0, endHour: 18, endMinute: 0 },
-        evening: { startHour: 18, startMinute: 0, endHour: 22, endMinute: 0 }
-    };
+    // 如果没有新输入，尝试使用旧的时间段选择（向后兼容）
+    const timeRangeInputOld = document.querySelector('input[name="conversationTime"]:checked');
+    if (timeRangeInputOld) {
+        const timeRange = timeRangeInputOld.value || 'morning';
+        
+        if (timeRange === 'custom') {
+            const customTime = document.getElementById('customStartTime')?.value;
+            if (customTime && customTime.match(/^\d{1,2}:\d{2}$/)) {
+                const [hour, minute] = customTime.split(':').map(Number);
+                return {
+                    startHour: hour,
+                    startMinute: minute,
+                    range: 'custom'
+                };
+            }
+        }
+        
+        // 默认时间段
+        const ranges = {
+            morning: { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 },
+            afternoon: { startHour: 12, startMinute: 0, endHour: 18, endMinute: 0 },
+            evening: { startHour: 18, startMinute: 0, endHour: 22, endMinute: 0 }
+        };
+        
+        return ranges[timeRange] || ranges.morning;
+    }
     
-    return ranges[timeRange] || ranges.morning;
+    // 默认值（早上）
+    return { startHour: 8, startMinute: 0, endHour: 12, endMinute: 0 };
 }
 
 // 根据时间段调整时间
@@ -1409,11 +1443,30 @@ function formatTime(date, hour, minute) {
     return `${month}/${day} ${hours}:${minutes}`;
 }
 
+// 获取对话日期（如果用户指定了自定义日期）
+function getConversationDate() {
+    const timeRange = getConversationTimeRange();
+    if (timeRange.hasCustomDate && timeRange.date) {
+        return timeRange.date;
+    }
+    // 默认使用当前日期
+    return new Date();
+}
+
 // 格式化时间（带时间段调整）
 function formatTimeWithRange(date, baseHour, baseMinute) {
     const timeRange = getConversationTimeRange();
+    
+    // 如果用户指定了自定义日期和时间段
+    if (timeRange.hasCustomDate && timeRange.date) {
+        const adjusted = adjustTimeForRange(baseHour, baseMinute, timeRange);
+        return formatTime(timeRange.date, adjusted.hour, adjusted.minute);
+    }
+    
+    // 使用传入的日期（可能是当前日期或用户指定的日期）
+    const conversationDate = getConversationDate();
     const adjusted = adjustTimeForRange(baseHour, baseMinute, timeRange);
-    return formatTime(date, adjusted.hour, adjusted.minute);
+    return formatTime(conversationDate, adjusted.hour, adjusted.minute);
 }
 
 // 存储当前对话，用于编辑功能
@@ -4914,6 +4967,8 @@ async function optimizeConversationWithAI(conversation, customerName, platform, 
 
         // 获取用户自定义的 prompt，如果没有则使用默认 prompt
         let customPrompt = getCustomAIPrompt();
+        const promptMode = getPromptMode(); // 'append' 或 'replace'
+        
         const defaultPrompt = `You are a conversation optimization expert. Please refine the following ${platformContext} conversation to make it more natural and human-like, while keeping it in English.
 
 IMPORTANT REQUIREMENTS:
@@ -4936,14 +4991,19 @@ Please return the optimized conversation as a JSON array, where each element con
 
 Return ONLY the JSON array, no other content.`;
 
-        // 如果用户提供了自定义 prompt，替换变量
+        // 如果用户提供了自定义 prompt，根据模式处理
         let prompt;
-        if (customPrompt) {
+        if (customPrompt && promptMode === 'replace') {
+            // 替换模式：完全替换默认 prompt
             prompt = customPrompt
                 .replace(/\{platformContext\}/g, platformContext)
                 .replace(/\{customerName\}/g, customerName)
                 .replace(/\{conversationText\}/g, conversationText);
+        } else if (customPrompt && promptMode === 'append') {
+            // 追加模式：在默认 prompt 基础上添加要求
+            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
         } else {
+            // 没有自定义 prompt，使用默认
             prompt = defaultPrompt;
         }
 
@@ -5243,4 +5303,13 @@ function getCustomAIPrompt() {
     if (!textarea) return null;
     const customPrompt = textarea.value.trim();
     return customPrompt || null;
+}
+
+// 获取 Prompt 模式（append 或 replace）
+function getPromptMode() {
+    const replaceRadio = document.querySelector('input[name="promptMode"][value="replace"]');
+    if (replaceRadio && replaceRadio.checked) {
+        return 'replace';
+    }
+    return 'append'; // 默认是追加模式
 }

@@ -342,6 +342,19 @@
                 <textarea id="additionalInfo" name="additionalInfo" placeholder="可以添加其他需要体现在对话中的信息，例如：客户提到的时间、金额、投资历史、贸易伙伴等"></textarea>
             </div>
 
+            <div class="form-group">
+                <label>对话时间设置 *</label>
+                <div style="margin-top: 10px;">
+                    <label for="conversationDate" style="font-size: 13px; color: #666; display: block; margin-bottom: 5px;">日期（格式：月/日，如 12/13）：</label>
+                    <input type="text" id="conversationDate" name="conversationDate" placeholder="例如：12/13" style="width: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+                </div>
+                <div style="margin-top: 10px;">
+                    <label for="conversationTimeRange" style="font-size: 13px; color: #666; display: block; margin-bottom: 5px;">时间段（格式：HH:mm-HH:mm，如 09:00-17:00）：</label>
+                    <input type="text" id="conversationTimeRange" name="conversationTimeRange" placeholder="例如：09:00-17:00" style="width: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+                </div>
+                <p style="font-size: 11px; color: #999; margin-top: 5px;">留空则使用当前日期和默认时间段（早上 8:00-12:00）</p>
+            </div>
+
             <div class="form-group" style="padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e0e0e0;">
                 <label style="display: flex; align-items: center; cursor: pointer;">
                     <input type="checkbox" id="useAIOptimization" style="margin-right: 8px; width: auto;">
@@ -362,10 +375,23 @@
                             <input type="checkbox" id="showCustomPrompt" style="margin-right: 8px; width: auto;">
                             <span>显示并自定义 AI Prompt（高级选项）</span>
                         </label>
-                        <textarea id="customAIPrompt" name="customAIPrompt" placeholder="留空则使用默认 prompt。默认 prompt 会保持英文对话，只进行润色优化。" style="margin-top: 10px; font-size: 12px; width: 100%; min-height: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Courier New', monospace; display: none;"></textarea>
-                        <p style="font-size: 11px; color: #999; margin-top: 5px; display: none;" id="promptHint">
-                            提示：在 prompt 中可以使用变量：<code>{platformContext}</code>（平台类型）、<code>{customerName}</code>（客户名称）、<code>{conversationText}</code>（原始对话文本）。留空则使用默认 prompt。
-                        </p>
+                        <div id="customPromptGroup" style="display: none; margin-top: 10px;">
+                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">Prompt 模式：</label>
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                    <input type="radio" name="promptMode" value="append" checked style="margin-right: 5px; width: auto;">
+                                    <span>追加模式（在默认 prompt 基础上添加要求）</span>
+                                </label>
+                                <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px; margin-top: 5px;">
+                                    <input type="radio" name="promptMode" value="replace" style="margin-right: 5px; width: auto;">
+                                    <span>替换模式（完全替换默认 prompt）</span>
+                                </label>
+                            </div>
+                            <textarea id="customAIPrompt" name="customAIPrompt" placeholder="追加模式：输入要添加的要求，例如：'Please make the conversation more formal.'&#10;替换模式：输入完整的 prompt，可以使用变量：{platformContext}、{customerName}、{conversationText}" style="font-size: 12px; width: 100%; min-height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Courier New', monospace;"></textarea>
+                            <p style="font-size: 11px; color: #999; margin-top: 5px;" id="promptHint">
+                                提示：在 prompt 中可以使用变量：<code>{platformContext}</code>（平台类型）、<code>{customerName}</code>（客户名称）、<code>{conversationText}</code>（原始对话文本）。
+                            </p>
+                        </div>
                     </div>
                     <p style="font-size: 12px; color: #999; margin-top: 5px;">
                         <strong>免费选项：</strong><br>
@@ -675,11 +701,12 @@
         }
 
         // 显示/隐藏自定义 Prompt
-        if (showCustomPromptCheckbox && customAIPromptTextarea && promptHint) {
+        if (showCustomPromptCheckbox) {
+            const customPromptGroup = document.getElementById('customPromptGroup');
             showCustomPromptCheckbox.addEventListener('change', function() {
-                const isVisible = this.checked;
-                customAIPromptTextarea.style.display = isVisible ? 'block' : 'none';
-                promptHint.style.display = isVisible ? 'block' : 'none';
+                if (customPromptGroup) {
+                    customPromptGroup.style.display = this.checked ? 'block' : 'none';
+                }
             });
         }
 
