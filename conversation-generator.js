@@ -3783,19 +3783,19 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
     messages.push({
         sender: 'company',
         text: `Hello ${customerName}, I hope you're doing well. We're conducting an enhanced KYC review for your account to ensure your protection and compliance with regulations.`,
-        time: formatTimeWithRange(day1, 10, 30)
+        time: formatTimeWithRange(conversationDate, 10, 30)
     });
 
     messages.push({
         sender: 'customer',
         text: `Hi, what do you need from me?`,
-        time: formatTimeWithRange(day1, 10, 33)
+        time: formatTimeWithRange(conversationDate, 10, 33)
     });
 
     messages.push({
         sender: 'company',
         text: `As part of our enhanced due diligence process, we need to request your bank statements for the last 2-3 months. This helps us verify your source of funds and ensure everything is in order.`,
-        time: formatTimeWithRange(day1, 10, 36)
+        time: formatTimeWithRange(conversationDate, 10, 36)
     });
 
     if (willProvide) {
@@ -3806,62 +3806,62 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
         messages.push({
             sender: 'customer',
             text: `Okay, I understand. I can provide that. Should I send them via email or upload them somewhere?`,
-                    time: formatTimeWithRange(day1, 10, 40)
+                    time: formatTimeWithRange(conversationDate, 10, 40)
         });
         messages.push({
             sender: 'company',
             text: `You can send them via email to compliance@geoswift.com. Please make sure they're clear and include all pages. Thank you for your cooperation!`,
-                    time: formatTimeWithRange(day1, 10, 43)
+                    time: formatTimeWithRange(conversationDate, 10, 43)
         });
         messages.push({
             sender: 'customer',
                     text: `Got it. Do you need statements from all my accounts or just the main one?`,
-                    time: formatTimeWithRange(day1, 10, 46)
+                    time: formatTimeWithRange(conversationDate, 10, 46)
                 });
                 messages.push({
                     sender: 'company',
                     text: `We need statements from all accounts that you'll be using for transactions with us. This helps us get a complete picture of your financial activity.`,
-                    time: formatTimeWithRange(day1, 10, 49)
+                    time: formatTimeWithRange(conversationDate, 10, 49)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Alright, I have accounts at two different banks. Should I send them separately or together?`,
-                    time: formatTimeWithRange(day1, 10, 52)
+                    time: formatTimeWithRange(conversationDate, 10, 52)
                 });
                 messages.push({
                     sender: 'company',
                     text: `You can send them together in one email, or separately if that's easier for you. Just make sure each statement is clearly labeled with the bank name and account number.`,
-                    time: formatTimeWithRange(day1, 10, 55)
+                    time: formatTimeWithRange(conversationDate, 10, 55)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Perfect. And what format do you prefer? PDF is easiest for me.`,
-                    time: formatTimeWithRange(day1, 10, 58)
+                    time: formatTimeWithRange(conversationDate, 10, 58)
                 });
                 messages.push({
                     sender: 'company',
                     text: `PDF is perfect! That's actually our preferred format. Just make sure the scans are clear and all pages are included, especially if there are multiple pages per statement.`,
-                    time: formatTimeWithRange(day1, 11, 1)
+                    time: formatTimeWithRange(conversationDate, 11, 1)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `No problem. I'll get them scanned and send them over today. How long does the review usually take once you receive them?`,
-                    time: formatTimeWithRange(day1, 11, 4)
+                    time: formatTimeWithRange(conversationDate, 11, 4)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Typically, our compliance team reviews everything within 2-3 business days. We'll send you a confirmation email once we receive the documents, and then another update once the review is complete.`,
-                    time: formatTimeWithRange(day1, 11, 7)
+                    time: formatTimeWithRange(conversationDate, 11, 7)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `That sounds reasonable. I'll make sure to send everything today so the process can move forward quickly.`,
-                    time: formatTimeWithRange(day1, 11, 10)
+                    time: formatTimeWithRange(conversationDate, 11, 10)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Thank you so much for your cooperation, ${customerName}. We really appreciate it. If you have any questions while preparing the documents, feel free to reach out.`,
-                    time: formatTimeWithRange(day1, 11, 13)
+                    time: formatTimeWithRange(conversationDate, 11, 13)
                 });
             },
             // 变体1：客户确认后询问时间要求
@@ -3869,62 +3869,62 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                 messages.push({
                     sender: 'customer',
                     text: `Sure, I can provide those. Is there a deadline for submitting them?`,
-                    time: formatTimeWithRange(day1, 10, 40)
+                    time: formatTimeWithRange(conversationDate, 10, 40)
                 });
                 messages.push({
                     sender: 'company',
                     text: `We'd appreciate it if you could send them within the next 5 business days. This helps us complete the review process without delay.`,
-                    time: formatTimeWithRange(day1, 10, 43)
+                    time: formatTimeWithRange(conversationDate, 10, 43)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `That should be fine. I'll need to request them from my bank first. Do you accept statements downloaded from online banking, or do they need to be stamped by the bank?`,
-                    time: formatTimeWithRange(day1, 10, 46)
+                    time: formatTimeWithRange(conversationDate, 10, 46)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Online banking statements are perfectly acceptable, as long as they show your name, account number, and the transaction history clearly. They don't need to be stamped.`,
-                    time: formatTimeWithRange(day1, 10, 49)
+                    time: formatTimeWithRange(conversationDate, 10, 49)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Great, that makes it much easier. I can download them right now. Should I send them all in one email?`,
-                    time: formatTimeWithRange(day1, 10, 52)
+                    time: formatTimeWithRange(conversationDate, 10, 52)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Yes, one email is perfect. Send them to compliance@geoswift.com. Please include your account number or reference number in the subject line if possible - it helps us process them faster.`,
-                    time: formatTimeWithRange(day1, 10, 55)
+                    time: formatTimeWithRange(conversationDate, 10, 55)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Will do. I'll include my account reference number in the subject line. Is there anything else you need from me at this stage?`,
-                    time: formatTimeWithRange(day1, 10, 58)
+                    time: formatTimeWithRange(conversationDate, 10, 58)
                 });
                 messages.push({
                     sender: 'company',
                     text: `That should be all for now. Once we receive and review the statements, we'll let you know if we need anything additional. Most of the time, these statements are sufficient.`,
-                    time: formatTimeWithRange(day1, 11, 1)
+                    time: formatTimeWithRange(conversationDate, 11, 1)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Perfect. I'll get this done today. Thanks for being so clear about what's needed.`,
-                    time: formatTimeWithRange(day1, 11, 4)
+                    time: formatTimeWithRange(conversationDate, 11, 4)
                 });
                 messages.push({
                     sender: 'company',
                     text: `You're very welcome! We're here to help make this process as smooth as possible. Don't hesitate to reach out if anything comes up.`,
-                    time: formatTimeWithRange(day1, 11, 7)
+                    time: formatTimeWithRange(conversationDate, 11, 7)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `I appreciate that. One more question - will I receive updates during the review process?`,
-                    time: formatTimeWithRange(day1, 11, 10)
+                    time: formatTimeWithRange(conversationDate, 11, 10)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Yes, absolutely. We'll send you a confirmation email when we receive the documents, and then another update once the review is complete. If we need anything additional, we'll contact you right away.`,
-                    time: formatTimeWithRange(day1, 11, 13)
+                    time: formatTimeWithRange(conversationDate, 11, 13)
                 });
             },
             // 变体2：客户确认后询问隐私和安全
@@ -3932,62 +3932,62 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                 messages.push({
                     sender: 'customer',
                     text: `I understand. I can provide the bank statements, but I want to make sure my information will be secure. How do you handle sensitive financial documents?`,
-                    time: formatTimeWithRange(day1, 10, 40)
+                    time: formatTimeWithRange(conversationDate, 10, 40)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Absolutely, and I'm glad you're asking. All documents are encrypted both in transit and at rest. We use bank-level security protocols, and only authorized compliance staff have access to them. They're stored securely and deleted according to our data retention policy.`,
-                    time: formatTimeWithRange(day1, 10, 43)
+                    time: formatTimeWithRange(conversationDate, 10, 43)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `That's reassuring. And you won't share this information with third parties, right?`,
-                    time: formatTimeWithRange(day1, 10, 46)
+                    time: formatTimeWithRange(conversationDate, 10, 46)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Correct. We only share information when legally required, such as with regulatory authorities for compliance purposes. We never sell or share your data with marketing companies or other third parties.`,
-                    time: formatTimeWithRange(day1, 10, 49)
+                    time: formatTimeWithRange(conversationDate, 10, 49)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Good to know. What about data breaches? Do you have insurance coverage?`,
-                    time: formatTimeWithRange(day1, 10, 52)
+                    time: formatTimeWithRange(conversationDate, 10, 52)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Yes, we have comprehensive cyber insurance and follow industry best practices. We've never had a breach, but we're fully prepared with protocols if one were to occur.`,
-                    time: formatTimeWithRange(day1, 10, 55)
+                    time: formatTimeWithRange(conversationDate, 10, 55)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `That's good to hear. Alright, I'll send them over. What's the email address again?`,
-                    time: formatTimeWithRange(day1, 10, 58)
+                    time: formatTimeWithRange(conversationDate, 10, 58)
                 });
                 messages.push({
                     sender: 'company',
                     text: `compliance@geoswift.com. And please make sure the statements cover the last 2-3 months and include all pages.`,
-                    time: formatTimeWithRange(day1, 11, 1)
+                    time: formatTimeWithRange(conversationDate, 11, 1)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Got it. I'll send them within the next day or two. Will I receive a confirmation when you get them?`,
-                    time: formatTimeWithRange(day1, 11, 4)
+                    time: formatTimeWithRange(conversationDate, 11, 4)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Yes, we'll send you an automated confirmation email as soon as we receive them. Then our team will review everything and get back to you within 2-3 business days.`,
-                    time: formatTimeWithRange(day1, 11, 7)
+                    time: formatTimeWithRange(conversationDate, 11, 7)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Perfect. Thanks for answering all my questions. I'll get those statements sent over soon.`,
-                    time: formatTimeWithRange(day1, 11, 10)
+                    time: formatTimeWithRange(conversationDate, 11, 10)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Thank you, ${customerName}. We appreciate your cooperation and patience with this process.`,
-                    time: formatTimeWithRange(day1, 11, 13)
+                    time: formatTimeWithRange(conversationDate, 11, 13)
                 });
             },
             // 变体3：客户快速同意，询问后续步骤
@@ -3995,62 +3995,62 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                 messages.push({
                     sender: 'customer',
                     text: `No problem, I can provide those. Where should I send them?`,
-                    time: formatTimeWithRange(day1, 10, 40)
+                    time: formatTimeWithRange(conversationDate, 10, 40)
                 });
                 messages.push({
                     sender: 'company',
                     text: `You can email them to compliance@geoswift.com. Please make sure they're clear and include all pages from the last 2-3 months.`,
-                    time: formatTimeWithRange(day1, 10, 43)
+                    time: formatTimeWithRange(conversationDate, 10, 43)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Okay, I'll send them today. What happens after you receive them?`,
-                    time: formatTimeWithRange(day1, 10, 46)
+                    time: formatTimeWithRange(conversationDate, 10, 46)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Our compliance team will review them, which usually takes 2-3 business days. Once approved, your account will be fully verified and you can proceed with your transactions.`,
-                    time: formatTimeWithRange(day1, 10, 49)
+                    time: formatTimeWithRange(conversationDate, 10, 49)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Sounds good. And if there are any issues or you need more information, you'll let me know, right?`,
-                    time: formatTimeWithRange(day1, 10, 52)
+                    time: formatTimeWithRange(conversationDate, 10, 52)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Absolutely. We'll contact you immediately if we need any clarification or additional documents. Most of the time, everything goes smoothly.`,
-                    time: formatTimeWithRange(day1, 10, 55)
+                    time: formatTimeWithRange(conversationDate, 10, 55)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `That's reassuring. What format should the statements be in? PDF is easiest for me.`,
-                    time: formatTimeWithRange(day1, 10, 58)
+                    time: formatTimeWithRange(conversationDate, 10, 58)
                 });
                 messages.push({
                     sender: 'company',
                     text: `PDF is perfect! That's our preferred format. Just make sure all pages are included and the scans are clear and readable.`,
-                    time: formatTimeWithRange(day1, 11, 1)
+                    time: formatTimeWithRange(conversationDate, 11, 1)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Got it. I'll make sure everything is clear and complete. Should I include anything specific in the email subject line?`,
-                    time: formatTimeWithRange(day1, 11, 4)
+                    time: formatTimeWithRange(conversationDate, 11, 4)
                 });
                 messages.push({
                     sender: 'company',
                     text: `It would be helpful if you could include your account reference number or your name in the subject line. That helps us process everything more efficiently.`,
-                    time: formatTimeWithRange(day1, 11, 7)
+                    time: formatTimeWithRange(conversationDate, 11, 7)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Perfect. I'll get those sent over right away. Thanks for the quick response and clear instructions.`,
-                    time: formatTimeWithRange(day1, 11, 10)
+                    time: formatTimeWithRange(conversationDate, 11, 10)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Thank you for your cooperation! We'll be in touch soon with confirmation and updates.`,
-                    time: formatTimeWithRange(day1, 11, 13)
+                    time: formatTimeWithRange(conversationDate, 11, 13)
                 });
             },
             // 变体4：客户需要时间准备，询问具体要求
@@ -4058,62 +4058,62 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
                 messages.push({
                     sender: 'customer',
                     text: `I understand. I'll need a couple of days to get those together. Are there any specific requirements I should know about?`,
-                    time: formatTimeWithRange(day1, 10, 40)
+                    time: formatTimeWithRange(conversationDate, 10, 40)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Of course, take your time. The statements need to show your name, account number, and transaction history for the last 2-3 months. PDF format is preferred, and make sure all pages are included.`,
-                    time: formatTimeWithRange(day1, 10, 43)
+                    time: formatTimeWithRange(conversationDate, 10, 43)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Okay. What if my statements are in a different language? Will that be a problem?`,
-                    time: formatTimeWithRange(day1, 10, 46)
+                    time: formatTimeWithRange(conversationDate, 10, 46)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Not at all. We can work with statements in any language. Our team is multilingual and can review documents in various languages.`,
-                    time: formatTimeWithRange(day1, 10, 49)
+                    time: formatTimeWithRange(conversationDate, 10, 49)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Great. And should I send statements from all my accounts, or just the one I'll be using for transactions?`,
-                    time: formatTimeWithRange(day1, 10, 52)
+                    time: formatTimeWithRange(conversationDate, 10, 52)
                 });
                 messages.push({
                     sender: 'company',
                     text: `We need statements from all accounts that will be used for transactions with us. This gives us a complete view of your financial activity and helps with the verification process.`,
-                    time: formatTimeWithRange(day1, 10, 55)
+                    time: formatTimeWithRange(conversationDate, 10, 55)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Understood. I'll gather everything and send it to compliance@geoswift.com, right?`,
-                    time: formatTimeWithRange(day1, 10, 58)
+                    time: formatTimeWithRange(conversationDate, 10, 58)
                 });
                 messages.push({
                     sender: 'company',
                     text: `That's correct. We appreciate you taking the time to provide these documents. Once we receive them, we'll review everything and get back to you within 2-3 business days.`,
-                    time: formatTimeWithRange(day1, 11, 1)
+                    time: formatTimeWithRange(conversationDate, 11, 1)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Good to know. What happens if the statements don't meet your requirements? Will you ask me to resubmit?`,
-                    time: formatTimeWithRange(day1, 11, 4)
+                    time: formatTimeWithRange(conversationDate, 11, 4)
                 });
                 messages.push({
                     sender: 'company',
                     text: `If there are any issues, we'll contact you right away to clarify what's needed. Most of the time, as long as the statements are clear and complete, everything goes smoothly.`,
-                    time: formatTimeWithRange(day1, 11, 7)
+                    time: formatTimeWithRange(conversationDate, 11, 7)
                 });
                 messages.push({
                     sender: 'customer',
                     text: `Perfect. I'll make sure to send everything by the end of the week. Thanks for your help and patience.`,
-                    time: formatTimeWithRange(day1, 11, 10)
+                    time: formatTimeWithRange(conversationDate, 11, 10)
                 });
                 messages.push({
                     sender: 'company',
                     text: `Thank you, ${customerName}. We look forward to receiving the documents and completing your account verification.`,
-                    time: formatTimeWithRange(day1, 11, 13)
+                    time: formatTimeWithRange(conversationDate, 11, 13)
                 });
             }
         ];
@@ -4125,37 +4125,37 @@ function generateVerboseKYCConversation(customerName, customerAge, platform, add
         messages.push({
             sender: 'customer',
             text: refusalReason.text,
-            time: formatTimeWithRange(day1, 10, 40)
+            time: formatTimeWithRange(conversationDate, 10, 40)
         });
 
         messages.push({
             sender: 'company',
             text: `I completely understand your concerns. This is a standard requirement for enhanced due diligence, especially for accounts with certain risk profiles. We take data security very seriously - all documents are encrypted and stored securely.`,
-            time: formatTimeWithRange(day1, 10, 44)
+            time: formatTimeWithRange(conversationDate, 10, 44)
         });
 
         messages.push({
             sender: 'customer',
             text: `But why specifically for people over 60? That doesn't seem fair.`,
-            time: formatTimeWithRange(day1, 10, 48)
+            time: formatTimeWithRange(conversationDate, 10, 48)
         });
 
         messages.push({
             sender: 'company',
             text: `I understand how this might feel. It's not about age discrimination - it's about ensuring we have adequate protection measures for all our clients. This is a regulatory requirement to help prevent fraud and protect your interests.`,
-            time: formatTimeWithRange(day1, 10, 52)
+            time: formatTimeWithRange(conversationDate, 10, 52)
         });
 
         messages.push({
             sender: 'customer',
             text: `I'm still not comfortable with this. Is there really no alternative?`,
-            time: formatTimeWithRange(day1, 10, 56)
+            time: formatTimeWithRange(conversationDate, 10, 56)
         });
 
         messages.push({
             sender: 'company',
             text: `I appreciate your position. Unfortunately, this is a mandatory requirement for account verification. Without these documents, we won't be able to proceed with your account. However, I can assure you that your information will be handled with the utmost confidentiality.`,
-            time: formatTimeWithRange(day1, 11, 0)
+            time: formatTimeWithRange(conversationDate, 11, 0)
         });
 
         
@@ -4184,51 +4184,51 @@ function generateConciseKYCConversation(customerName, customerAge, platform, add
     messages.push({
         sender: 'company',
         text: `Hi ${customerName}, we need bank statements for the last 2-3 months for enhanced KYC.`,
-        time: formatTimeWithRange(day1, 11, 0)
+        time: formatTimeWithRange(conversationDate, 11, 0)
     });
 
     if (willProvide) {
         const variants = [
             () => {
-                messages.push({ sender: 'customer', text: `Okay, where should I send them?`, time: formatTimeWithRange(day1, 11, 3) });
-                messages.push({ sender: 'company', text: `Email to compliance@geoswift.com. Thanks.`, time: formatTimeWithRange(day1, 11, 5) });
-                messages.push({ sender: 'customer', text: `Got it. PDF format okay?`, time: formatTimeWithRange(day1, 11, 7) });
-                messages.push({ sender: 'company', text: `Yes, PDF is perfect.`, time: formatTimeWithRange(day1, 11, 9) });
-                messages.push({ sender: 'customer', text: `Sending them now.`, time: formatTimeWithRange(day1, 11, 11) });
-                messages.push({ sender: 'company', text: `Received. We'll review within 2-3 days.`, time: formatTimeWithRange(day1, 11, 13) });
-                messages.push({ sender: 'customer', text: `Thanks.`, time: formatTimeWithRange(day1, 11, 15) });
+                messages.push({ sender: 'customer', text: `Okay, where should I send them?`, time: formatTimeWithRange(conversationDate, 11, 3) });
+                messages.push({ sender: 'company', text: `Email to compliance@geoswift.com. Thanks.`, time: formatTimeWithRange(conversationDate, 11, 5) });
+                messages.push({ sender: 'customer', text: `Got it. PDF format okay?`, time: formatTimeWithRange(conversationDate, 11, 7) });
+                messages.push({ sender: 'company', text: `Yes, PDF is perfect.`, time: formatTimeWithRange(conversationDate, 11, 9) });
+                messages.push({ sender: 'customer', text: `Sending them now.`, time: formatTimeWithRange(conversationDate, 11, 11) });
+                messages.push({ sender: 'company', text: `Received. We'll review within 2-3 days.`, time: formatTimeWithRange(conversationDate, 11, 13) });
+                messages.push({ sender: 'customer', text: `Thanks.`, time: formatTimeWithRange(conversationDate, 11, 15) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Sure. Email address?`, time: formatTimeWithRange(day1, 11, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(day1, 11, 5) });
-                messages.push({ sender: 'customer', text: `How many months?`, time: formatTimeWithRange(day1, 11, 7) });
-                messages.push({ sender: 'company', text: `2-3 months.`, time: formatTimeWithRange(day1, 11, 9) });
-                messages.push({ sender: 'customer', text: `Will send today.`, time: formatTimeWithRange(day1, 11, 11) });
-                messages.push({ sender: 'company', text: `Appreciate it.`, time: formatTimeWithRange(day1, 11, 13) });
+                messages.push({ sender: 'customer', text: `Sure. Email address?`, time: formatTimeWithRange(conversationDate, 11, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(conversationDate, 11, 5) });
+                messages.push({ sender: 'customer', text: `How many months?`, time: formatTimeWithRange(conversationDate, 11, 7) });
+                messages.push({ sender: 'company', text: `2-3 months.`, time: formatTimeWithRange(conversationDate, 11, 9) });
+                messages.push({ sender: 'customer', text: `Will send today.`, time: formatTimeWithRange(conversationDate, 11, 11) });
+                messages.push({ sender: 'company', text: `Appreciate it.`, time: formatTimeWithRange(conversationDate, 11, 13) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `No problem. Where to send?`, time: formatTimeWithRange(day1, 11, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(day1, 11, 5) });
-                messages.push({ sender: 'customer', text: `All pages needed?`, time: formatTimeWithRange(day1, 11, 7) });
-                messages.push({ sender: 'company', text: `Yes, all pages please.`, time: formatTimeWithRange(day1, 11, 9) });
-                messages.push({ sender: 'customer', text: `Okay, sending now.`, time: formatTimeWithRange(day1, 11, 11) });
-                messages.push({ sender: 'company', text: `Thanks. Review takes 2-3 days.`, time: formatTimeWithRange(day1, 11, 13) });
+                messages.push({ sender: 'customer', text: `No problem. Where to send?`, time: formatTimeWithRange(conversationDate, 11, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(conversationDate, 11, 5) });
+                messages.push({ sender: 'customer', text: `All pages needed?`, time: formatTimeWithRange(conversationDate, 11, 7) });
+                messages.push({ sender: 'company', text: `Yes, all pages please.`, time: formatTimeWithRange(conversationDate, 11, 9) });
+                messages.push({ sender: 'customer', text: `Okay, sending now.`, time: formatTimeWithRange(conversationDate, 11, 11) });
+                messages.push({ sender: 'company', text: `Thanks. Review takes 2-3 days.`, time: formatTimeWithRange(conversationDate, 11, 13) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Okay. Email?`, time: formatTimeWithRange(day1, 11, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(day1, 11, 5) });
-                messages.push({ sender: 'customer', text: `When do you need them?`, time: formatTimeWithRange(day1, 11, 7) });
-                messages.push({ sender: 'company', text: `Within 5 days is fine.`, time: formatTimeWithRange(day1, 11, 9) });
-                messages.push({ sender: 'customer', text: `Will send by tomorrow.`, time: formatTimeWithRange(day1, 11, 11) });
-                messages.push({ sender: 'company', text: `Perfect. Thanks.`, time: formatTimeWithRange(day1, 11, 13) });
+                messages.push({ sender: 'customer', text: `Okay. Email?`, time: formatTimeWithRange(conversationDate, 11, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(conversationDate, 11, 5) });
+                messages.push({ sender: 'customer', text: `When do you need them?`, time: formatTimeWithRange(conversationDate, 11, 7) });
+                messages.push({ sender: 'company', text: `Within 5 days is fine.`, time: formatTimeWithRange(conversationDate, 11, 9) });
+                messages.push({ sender: 'customer', text: `Will send by tomorrow.`, time: formatTimeWithRange(conversationDate, 11, 11) });
+                messages.push({ sender: 'company', text: `Perfect. Thanks.`, time: formatTimeWithRange(conversationDate, 11, 13) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Can do. Where?`, time: formatTimeWithRange(day1, 11, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(day1, 11, 5) });
-                messages.push({ sender: 'customer', text: `PDF okay?`, time: formatTimeWithRange(day1, 11, 7) });
-                messages.push({ sender: 'company', text: `Yes, PDF preferred.`, time: formatTimeWithRange(day1, 11, 9) });
-                messages.push({ sender: 'customer', text: `Sending shortly.`, time: formatTimeWithRange(day1, 11, 11) });
-                messages.push({ sender: 'company', text: `Great. We'll confirm receipt.`, time: formatTimeWithRange(day1, 11, 13) });
+                messages.push({ sender: 'customer', text: `Can do. Where?`, time: formatTimeWithRange(conversationDate, 11, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com`, time: formatTimeWithRange(conversationDate, 11, 5) });
+                messages.push({ sender: 'customer', text: `PDF okay?`, time: formatTimeWithRange(conversationDate, 11, 7) });
+                messages.push({ sender: 'company', text: `Yes, PDF preferred.`, time: formatTimeWithRange(conversationDate, 11, 9) });
+                messages.push({ sender: 'customer', text: `Sending shortly.`, time: formatTimeWithRange(conversationDate, 11, 11) });
+                messages.push({ sender: 'company', text: `Great. We'll confirm receipt.`, time: formatTimeWithRange(conversationDate, 11, 13) });
             }
         ];
         const selectedVariant = variants[variant % variants.length];
@@ -4238,19 +4238,19 @@ function generateConciseKYCConversation(customerName, customerAge, platform, add
         messages.push({
             sender: 'customer',
             text: refusalReason.text,
-            time: formatTimeWithRange(day1, 11, 3)
+            time: formatTimeWithRange(conversationDate, 11, 3)
         });
 
         messages.push({
             sender: 'company',
             text: `I understand, but this is required for compliance. Your data is secure.`,
-            time: formatTimeWithRange(day1, 11, 6)
+            time: formatTimeWithRange(conversationDate, 11, 6)
         });
 
         messages.push({
             sender: 'customer',
             text: `I'll think about it.`,
-            time: formatTimeWithRange(day1, 11, 9)
+            time: formatTimeWithRange(conversationDate, 11, 9)
         });
     }
 
@@ -4266,64 +4266,64 @@ function generateCautiousKYCConversation(customerName, customerAge, platform, ad
     messages.push({
         sender: 'company',
         text: `Hello ${customerName}, we're conducting an enhanced KYC review. We need your bank statements for the last 2-3 months to verify source of funds.`,
-        time: formatTimeWithRange(day1, 9, 30)
+        time: formatTimeWithRange(conversationDate, 9, 30)
     });
 
     if (willProvide) {
         const variants = [
             () => {
-                messages.push({ sender: 'customer', text: `I understand. What security measures do you have in place for storing these documents?`, time: formatTimeWithRange(day1, 9, 33) });
-                messages.push({ sender: 'company', text: `All documents are encrypted and stored in secure, compliant systems. We follow strict data protection protocols and comply with GDPR and other regulations.`, time: formatTimeWithRange(day1, 9, 36) });
-                messages.push({ sender: 'customer', text: `And who has access to these documents?`, time: formatTimeWithRange(day1, 9, 39) });
-                messages.push({ sender: 'company', text: `Only authorized compliance staff have access, and all access is logged and monitored. We never share documents with third parties unless legally required.`, time: formatTimeWithRange(day1, 9, 42) });
-                messages.push({ sender: 'customer', text: `Okay, that's reassuring. How should I send them?`, time: formatTimeWithRange(day1, 9, 45) });
-                messages.push({ sender: 'company', text: `Please email them to compliance@geoswift.com. Make sure they're password-protected if possible, or we can provide a secure upload link.`, time: formatTimeWithRange(day1, 9, 48) });
-                messages.push({ sender: 'customer', text: `A secure upload link would be better. Can you send that?`, time: formatTimeWithRange(day1, 9, 51) });
-                messages.push({ sender: 'company', text: `Of course. I'll send you a secure link via email. It will expire after 24 hours for security.`, time: formatTimeWithRange(day1, 9, 54) });
-                messages.push({ sender: 'customer', text: `Perfect. And how long will you keep these documents?`, time: formatTimeWithRange(day1, 9, 57) });
-                messages.push({ sender: 'company', text: `We retain them according to regulatory requirements, typically 5-7 years, then they're securely deleted.`, time: formatTimeWithRange(day1, 10, 0) });
-                messages.push({ sender: 'customer', text: `I see. I'll upload them once I receive the link.`, time: formatTimeWithRange(day1, 10, 3) });
-                messages.push({ sender: 'company', text: `Thank you for your cooperation. We'll send the link shortly.`, time: formatTimeWithRange(day1, 10, 6) });
+                messages.push({ sender: 'customer', text: `I understand. What security measures do you have in place for storing these documents?`, time: formatTimeWithRange(conversationDate, 9, 33) });
+                messages.push({ sender: 'company', text: `All documents are encrypted and stored in secure, compliant systems. We follow strict data protection protocols and comply with GDPR and other regulations.`, time: formatTimeWithRange(conversationDate, 9, 36) });
+                messages.push({ sender: 'customer', text: `And who has access to these documents?`, time: formatTimeWithRange(conversationDate, 9, 39) });
+                messages.push({ sender: 'company', text: `Only authorized compliance staff have access, and all access is logged and monitored. We never share documents with third parties unless legally required.`, time: formatTimeWithRange(conversationDate, 9, 42) });
+                messages.push({ sender: 'customer', text: `Okay, that's reassuring. How should I send them?`, time: formatTimeWithRange(conversationDate, 9, 45) });
+                messages.push({ sender: 'company', text: `Please email them to compliance@geoswift.com. Make sure they're password-protected if possible, or we can provide a secure upload link.`, time: formatTimeWithRange(conversationDate, 9, 48) });
+                messages.push({ sender: 'customer', text: `A secure upload link would be better. Can you send that?`, time: formatTimeWithRange(conversationDate, 9, 51) });
+                messages.push({ sender: 'company', text: `Of course. I'll send you a secure link via email. It will expire after 24 hours for security.`, time: formatTimeWithRange(conversationDate, 9, 54) });
+                messages.push({ sender: 'customer', text: `Perfect. And how long will you keep these documents?`, time: formatTimeWithRange(conversationDate, 9, 57) });
+                messages.push({ sender: 'company', text: `We retain them according to regulatory requirements, typically 5-7 years, then they're securely deleted.`, time: formatTimeWithRange(conversationDate, 10, 0) });
+                messages.push({ sender: 'customer', text: `I see. I'll upload them once I receive the link.`, time: formatTimeWithRange(conversationDate, 10, 3) });
+                messages.push({ sender: 'company', text: `Thank you for your cooperation. We'll send the link shortly.`, time: formatTimeWithRange(conversationDate, 10, 6) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `I can provide them, but I want to make sure my information is protected. What encryption do you use?`, time: formatTimeWithRange(day1, 9, 33) });
-                messages.push({ sender: 'company', text: `We use AES-256 encryption, which is bank-level security. All data is encrypted both in transit and at rest.`, time: formatTimeWithRange(day1, 9, 36) });
-                messages.push({ sender: 'customer', text: `And what about data breaches? Do you have insurance?`, time: formatTimeWithRange(day1, 9, 39) });
-                messages.push({ sender: 'company', text: `Yes, we have comprehensive cyber insurance and follow industry best practices. We've never had a breach, but we're fully prepared if one were to occur.`, time: formatTimeWithRange(day1, 9, 42) });
-                messages.push({ sender: 'customer', text: `That's good to know. Where should I send the statements?`, time: formatTimeWithRange(day1, 9, 45) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. You can password-protect the PDF if you'd like for extra security.`, time: formatTimeWithRange(day1, 9, 48) });
-                messages.push({ sender: 'customer', text: `I'll do that. How will I know you've received them?`, time: formatTimeWithRange(day1, 9, 51) });
-                messages.push({ sender: 'company', text: `We'll send an automated confirmation email immediately upon receipt.`, time: formatTimeWithRange(day1, 9, 54) });
-                messages.push({ sender: 'customer', text: `Good. I'll send them today with password protection.`, time: formatTimeWithRange(day1, 9, 57) });
-                messages.push({ sender: 'company', text: `Thank you. We'll send you the password confirmation separately for security.`, time: formatTimeWithRange(day1, 10, 0) });
+                messages.push({ sender: 'customer', text: `I can provide them, but I want to make sure my information is protected. What encryption do you use?`, time: formatTimeWithRange(conversationDate, 9, 33) });
+                messages.push({ sender: 'company', text: `We use AES-256 encryption, which is bank-level security. All data is encrypted both in transit and at rest.`, time: formatTimeWithRange(conversationDate, 9, 36) });
+                messages.push({ sender: 'customer', text: `And what about data breaches? Do you have insurance?`, time: formatTimeWithRange(conversationDate, 9, 39) });
+                messages.push({ sender: 'company', text: `Yes, we have comprehensive cyber insurance and follow industry best practices. We've never had a breach, but we're fully prepared if one were to occur.`, time: formatTimeWithRange(conversationDate, 9, 42) });
+                messages.push({ sender: 'customer', text: `That's good to know. Where should I send the statements?`, time: formatTimeWithRange(conversationDate, 9, 45) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. You can password-protect the PDF if you'd like for extra security.`, time: formatTimeWithRange(conversationDate, 9, 48) });
+                messages.push({ sender: 'customer', text: `I'll do that. How will I know you've received them?`, time: formatTimeWithRange(conversationDate, 9, 51) });
+                messages.push({ sender: 'company', text: `We'll send an automated confirmation email immediately upon receipt.`, time: formatTimeWithRange(conversationDate, 9, 54) });
+                messages.push({ sender: 'customer', text: `Good. I'll send them today with password protection.`, time: formatTimeWithRange(conversationDate, 9, 57) });
+                messages.push({ sender: 'company', text: `Thank you. We'll send you the password confirmation separately for security.`, time: formatTimeWithRange(conversationDate, 10, 0) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `I understand the requirement. Before I send them, can you tell me about your data retention policy?`, time: formatTimeWithRange(day1, 9, 33) });
-                messages.push({ sender: 'company', text: `We retain documents per regulatory requirements, typically 5-7 years. After that, they're securely destroyed. We never use them for marketing or share them unnecessarily.`, time: formatTimeWithRange(day1, 9, 36) });
-                messages.push({ sender: 'customer', text: `And if I want my data deleted earlier, is that possible?`, time: formatTimeWithRange(day1, 9, 39) });
-                messages.push({ sender: 'company', text: `We can discuss that after the verification is complete, though regulatory requirements may require us to retain certain documents.`, time: formatTimeWithRange(day1, 9, 42) });
-                messages.push({ sender: 'customer', text: `I see. Alright, I'll send them. What's the email?`, time: formatTimeWithRange(day1, 9, 45) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. Please include your account reference number in the subject line.`, time: formatTimeWithRange(day1, 9, 48) });
-                messages.push({ sender: 'customer', text: `Will do. I'll send them within the next day or two.`, time: formatTimeWithRange(day1, 9, 51) });
-                messages.push({ sender: 'company', text: `Thank you. We appreciate your cooperation with this process.`, time: formatTimeWithRange(day1, 9, 54) });
+                messages.push({ sender: 'customer', text: `I understand the requirement. Before I send them, can you tell me about your data retention policy?`, time: formatTimeWithRange(conversationDate, 9, 33) });
+                messages.push({ sender: 'company', text: `We retain documents per regulatory requirements, typically 5-7 years. After that, they're securely destroyed. We never use them for marketing or share them unnecessarily.`, time: formatTimeWithRange(conversationDate, 9, 36) });
+                messages.push({ sender: 'customer', text: `And if I want my data deleted earlier, is that possible?`, time: formatTimeWithRange(conversationDate, 9, 39) });
+                messages.push({ sender: 'company', text: `We can discuss that after the verification is complete, though regulatory requirements may require us to retain certain documents.`, time: formatTimeWithRange(conversationDate, 9, 42) });
+                messages.push({ sender: 'customer', text: `I see. Alright, I'll send them. What's the email?`, time: formatTimeWithRange(conversationDate, 9, 45) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. Please include your account reference number in the subject line.`, time: formatTimeWithRange(conversationDate, 9, 48) });
+                messages.push({ sender: 'customer', text: `Will do. I'll send them within the next day or two.`, time: formatTimeWithRange(conversationDate, 9, 51) });
+                messages.push({ sender: 'company', text: `Thank you. We appreciate your cooperation with this process.`, time: formatTimeWithRange(conversationDate, 9, 54) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Okay, I can provide them. But I want confirmation that you follow GDPR and other privacy laws.`, time: formatTimeWithRange(day1, 9, 33) });
-                messages.push({ sender: 'company', text: `Absolutely. We're fully GDPR compliant and follow all applicable privacy laws. You have the right to access, correct, or delete your data subject to regulatory requirements.`, time: formatTimeWithRange(day1, 9, 36) });
-                messages.push({ sender: 'customer', text: `Good. How should I send the statements?`, time: formatTimeWithRange(day1, 9, 39) });
-                messages.push({ sender: 'company', text: `Email to compliance@geoswift.com. PDF format preferred.`, time: formatTimeWithRange(day1, 9, 42) });
-                messages.push({ sender: 'customer', text: `I'll send them today. Will I get a receipt confirmation?`, time: formatTimeWithRange(day1, 9, 45) });
-                messages.push({ sender: 'company', text: `Yes, automated confirmation will be sent immediately.`, time: formatTimeWithRange(day1, 9, 48) });
-                messages.push({ sender: 'customer', text: `Perfect. Thanks for the information.`, time: formatTimeWithRange(day1, 9, 51) });
-                messages.push({ sender: 'company', text: `You're welcome. We'll be in touch once we've reviewed everything.`, time: formatTimeWithRange(day1, 9, 54) });
+                messages.push({ sender: 'customer', text: `Okay, I can provide them. But I want confirmation that you follow GDPR and other privacy laws.`, time: formatTimeWithRange(conversationDate, 9, 33) });
+                messages.push({ sender: 'company', text: `Absolutely. We're fully GDPR compliant and follow all applicable privacy laws. You have the right to access, correct, or delete your data subject to regulatory requirements.`, time: formatTimeWithRange(conversationDate, 9, 36) });
+                messages.push({ sender: 'customer', text: `Good. How should I send the statements?`, time: formatTimeWithRange(conversationDate, 9, 39) });
+                messages.push({ sender: 'company', text: `Email to compliance@geoswift.com. PDF format preferred.`, time: formatTimeWithRange(conversationDate, 9, 42) });
+                messages.push({ sender: 'customer', text: `I'll send them today. Will I get a receipt confirmation?`, time: formatTimeWithRange(conversationDate, 9, 45) });
+                messages.push({ sender: 'company', text: `Yes, automated confirmation will be sent immediately.`, time: formatTimeWithRange(conversationDate, 9, 48) });
+                messages.push({ sender: 'customer', text: `Perfect. Thanks for the information.`, time: formatTimeWithRange(conversationDate, 9, 51) });
+                messages.push({ sender: 'company', text: `You're welcome. We'll be in touch once we've reviewed everything.`, time: formatTimeWithRange(conversationDate, 9, 54) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `I understand. Can you send me your privacy policy first so I can review it?`, time: formatTimeWithRange(day1, 9, 33) });
-                messages.push({ sender: 'company', text: `Of course. I'll send you our privacy policy and data protection documentation right away.`, time: formatTimeWithRange(day1, 9, 36) });
-                messages.push({ sender: 'customer', text: `Thank you. Once I've reviewed it, I'll send the statements.`, time: formatTimeWithRange(day1, 9, 39) });
-                messages.push({ sender: 'company', text: `Perfect. Take your time. The email address is compliance@geoswift.com when you're ready.`, time: formatTimeWithRange(day1, 9, 42) });
-                messages.push({ sender: 'customer', text: `Got it. I'll review the policy and send everything by tomorrow.`, time: formatTimeWithRange(day1, 9, 45) });
-                messages.push({ sender: 'company', text: `Thank you. We appreciate your diligence.`, time: formatTimeWithRange(day1, 9, 48) });
+                messages.push({ sender: 'customer', text: `I understand. Can you send me your privacy policy first so I can review it?`, time: formatTimeWithRange(conversationDate, 9, 33) });
+                messages.push({ sender: 'company', text: `Of course. I'll send you our privacy policy and data protection documentation right away.`, time: formatTimeWithRange(conversationDate, 9, 36) });
+                messages.push({ sender: 'customer', text: `Thank you. Once I've reviewed it, I'll send the statements.`, time: formatTimeWithRange(conversationDate, 9, 39) });
+                messages.push({ sender: 'company', text: `Perfect. Take your time. The email address is compliance@geoswift.com when you're ready.`, time: formatTimeWithRange(conversationDate, 9, 42) });
+                messages.push({ sender: 'customer', text: `Got it. I'll review the policy and send everything by tomorrow.`, time: formatTimeWithRange(conversationDate, 9, 45) });
+                messages.push({ sender: 'company', text: `Thank you. We appreciate your diligence.`, time: formatTimeWithRange(conversationDate, 9, 48) });
             }
         ];
         const selectedVariant = variants[variant % variants.length];
@@ -4379,49 +4379,49 @@ function generateUrgentKYCConversation(customerName, customerAge, platform, addi
     messages.push({
         sender: 'company',
         text: `Hi ${customerName}, we need your bank statements ASAP - last 2-3 months for KYC.`,
-        time: formatTimeWithRange(day1, 14, 0)
+        time: formatTimeWithRange(conversationDate, 14, 0)
     });
 
     if (willProvide) {
         const variants = [
             () => {
-                messages.push({ sender: 'customer', text: `Okay, where do I send them?`, time: formatTimeWithRange(day1, 14, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. Please send today if possible.`, time: formatTimeWithRange(day1, 14, 5) });
-                messages.push({ sender: 'customer', text: `Sending now. How quickly will you review?`, time: formatTimeWithRange(day1, 14, 7) });
-                messages.push({ sender: 'company', text: `We'll prioritize it. Should be reviewed within 24-48 hours.`, time: formatTimeWithRange(day1, 14, 9) });
-                messages.push({ sender: 'customer', text: `Great, I need this done fast.`, time: formatTimeWithRange(day1, 14, 11) });
-                messages.push({ sender: 'company', text: `Understood. We'll expedite the review.`, time: formatTimeWithRange(day1, 14, 13) });
+                messages.push({ sender: 'customer', text: `Okay, where do I send them?`, time: formatTimeWithRange(conversationDate, 14, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. Please send today if possible.`, time: formatTimeWithRange(conversationDate, 14, 5) });
+                messages.push({ sender: 'customer', text: `Sending now. How quickly will you review?`, time: formatTimeWithRange(conversationDate, 14, 7) });
+                messages.push({ sender: 'company', text: `We'll prioritize it. Should be reviewed within 24-48 hours.`, time: formatTimeWithRange(conversationDate, 14, 9) });
+                messages.push({ sender: 'customer', text: `Great, I need this done fast.`, time: formatTimeWithRange(conversationDate, 14, 11) });
+                messages.push({ sender: 'company', text: `Understood. We'll expedite the review.`, time: formatTimeWithRange(conversationDate, 14, 13) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `No problem. Email address?`, time: formatTimeWithRange(day1, 14, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. Urgent - please send ASAP.`, time: formatTimeWithRange(day1, 14, 5) });
-                messages.push({ sender: 'customer', text: `Sending immediately. When will I hear back?`, time: formatTimeWithRange(day1, 14, 7) });
-                messages.push({ sender: 'company', text: `We'll confirm receipt today and review within 24 hours.`, time: formatTimeWithRange(day1, 14, 9) });
-                messages.push({ sender: 'customer', text: `Perfect. I've sent them.`, time: formatTimeWithRange(day1, 14, 11) });
-                messages.push({ sender: 'company', text: `Received. Processing now.`, time: formatTimeWithRange(day1, 14, 13) });
+                messages.push({ sender: 'customer', text: `No problem. Email address?`, time: formatTimeWithRange(conversationDate, 14, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. Urgent - please send ASAP.`, time: formatTimeWithRange(conversationDate, 14, 5) });
+                messages.push({ sender: 'customer', text: `Sending immediately. When will I hear back?`, time: formatTimeWithRange(conversationDate, 14, 7) });
+                messages.push({ sender: 'company', text: `We'll confirm receipt today and review within 24 hours.`, time: formatTimeWithRange(conversationDate, 14, 9) });
+                messages.push({ sender: 'customer', text: `Perfect. I've sent them.`, time: formatTimeWithRange(conversationDate, 14, 11) });
+                messages.push({ sender: 'company', text: `Received. Processing now.`, time: formatTimeWithRange(conversationDate, 14, 13) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Got it. Where to send?`, time: formatTimeWithRange(day1, 14, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. Today please.`, time: formatTimeWithRange(day1, 14, 5) });
-                messages.push({ sender: 'customer', text: `On it. Can you fast-track the review?`, time: formatTimeWithRange(day1, 14, 7) });
-                messages.push({ sender: 'company', text: `Yes, we'll prioritize your case.`, time: formatTimeWithRange(day1, 14, 9) });
-                messages.push({ sender: 'customer', text: `Thanks. Sending now.`, time: formatTimeWithRange(day1, 14, 11) });
-                messages.push({ sender: 'company', text: `Appreciate the quick response.`, time: formatTimeWithRange(day1, 14, 13) });
+                messages.push({ sender: 'customer', text: `Got it. Where to send?`, time: formatTimeWithRange(conversationDate, 14, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. Today please.`, time: formatTimeWithRange(conversationDate, 14, 5) });
+                messages.push({ sender: 'customer', text: `On it. Can you fast-track the review?`, time: formatTimeWithRange(conversationDate, 14, 7) });
+                messages.push({ sender: 'company', text: `Yes, we'll prioritize your case.`, time: formatTimeWithRange(conversationDate, 14, 9) });
+                messages.push({ sender: 'customer', text: `Thanks. Sending now.`, time: formatTimeWithRange(conversationDate, 14, 11) });
+                messages.push({ sender: 'company', text: `Appreciate the quick response.`, time: formatTimeWithRange(conversationDate, 14, 13) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Sure. Email?`, time: formatTimeWithRange(day1, 14, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. Urgent.`, time: formatTimeWithRange(day1, 14, 5) });
-                messages.push({ sender: 'customer', text: `Sending right away. How long for approval?`, time: formatTimeWithRange(day1, 14, 7) });
-                messages.push({ sender: 'company', text: `24-48 hours max. We'll rush it.`, time: formatTimeWithRange(day1, 14, 9) });
-                messages.push({ sender: 'customer', text: `Perfect. Done.`, time: formatTimeWithRange(day1, 14, 11) });
-                messages.push({ sender: 'company', text: `Got it. Reviewing now.`, time: formatTimeWithRange(day1, 14, 13) });
+                messages.push({ sender: 'customer', text: `Sure. Email?`, time: formatTimeWithRange(conversationDate, 14, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. Urgent.`, time: formatTimeWithRange(conversationDate, 14, 5) });
+                messages.push({ sender: 'customer', text: `Sending right away. How long for approval?`, time: formatTimeWithRange(conversationDate, 14, 7) });
+                messages.push({ sender: 'company', text: `24-48 hours max. We'll rush it.`, time: formatTimeWithRange(conversationDate, 14, 9) });
+                messages.push({ sender: 'customer', text: `Perfect. Done.`, time: formatTimeWithRange(conversationDate, 14, 11) });
+                messages.push({ sender: 'company', text: `Got it. Reviewing now.`, time: formatTimeWithRange(conversationDate, 14, 13) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Okay, sending now. Where?`, time: formatTimeWithRange(day1, 14, 3) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. ASAP please.`, time: formatTimeWithRange(day1, 14, 5) });
-                messages.push({ sender: 'customer', text: `Done. When approved?`, time: formatTimeWithRange(day1, 14, 7) });
-                messages.push({ sender: 'company', text: `Within 24 hours. We'll notify you immediately.`, time: formatTimeWithRange(day1, 14, 9) });
-                messages.push({ sender: 'customer', text: `Great, thanks.`, time: formatTimeWithRange(day1, 14, 11) });
+                messages.push({ sender: 'customer', text: `Okay, sending now. Where?`, time: formatTimeWithRange(conversationDate, 14, 3) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. ASAP please.`, time: formatTimeWithRange(conversationDate, 14, 5) });
+                messages.push({ sender: 'customer', text: `Done. When approved?`, time: formatTimeWithRange(conversationDate, 14, 7) });
+                messages.push({ sender: 'company', text: `Within 24 hours. We'll notify you immediately.`, time: formatTimeWithRange(conversationDate, 14, 9) });
+                messages.push({ sender: 'customer', text: `Great, thanks.`, time: formatTimeWithRange(conversationDate, 14, 11) });
             }
         ];
         const selectedVariant = variants[variant % variants.length];
@@ -4471,60 +4471,60 @@ function generateFriendlyKYCConversation(customerName, customerAge, platform, ad
     messages.push({
         sender: 'company',
         text: `Hi ${customerName}! Hope you're doing well. We need to do a quick enhanced KYC check - could you provide bank statements for the last 2-3 months?`,
-        time: formatTimeWithRange(day1, 10, 15)
+        time: formatTimeWithRange(conversationDate, 10, 15)
     });
 
     if (willProvide) {
         const variants = [
             () => {
-                messages.push({ sender: 'customer', text: `Sure, no problem! How should I send them?`, time: formatTimeWithRange(day1, 10, 18) });
-                messages.push({ sender: 'company', text: `You can email them to compliance@geoswift.com. Thanks so much!`, time: formatTimeWithRange(day1, 10, 21) });
-                messages.push({ sender: 'customer', text: `Perfect! PDF format okay?`, time: formatTimeWithRange(day1, 10, 24) });
-                messages.push({ sender: 'company', text: `Yes, PDF is perfect! Just make sure all pages are included.`, time: formatTimeWithRange(day1, 10, 27) });
-                messages.push({ sender: 'customer', text: `Got it! I'll send them over in the next hour.`, time: formatTimeWithRange(day1, 10, 30) });
-                messages.push({ sender: 'company', text: `Awesome! We'll review them within 2-3 business days and let you know.`, time: formatTimeWithRange(day1, 10, 33) });
-                messages.push({ sender: 'customer', text: `Sounds good! Thanks for making this easy.`, time: formatTimeWithRange(day1, 10, 36) });
-                messages.push({ sender: 'company', text: `You're welcome! We're here to help. Have a great day!`, time: formatTimeWithRange(day1, 10, 39) });
+                messages.push({ sender: 'customer', text: `Sure, no problem! How should I send them?`, time: formatTimeWithRange(conversationDate, 10, 18) });
+                messages.push({ sender: 'company', text: `You can email them to compliance@geoswift.com. Thanks so much!`, time: formatTimeWithRange(conversationDate, 10, 21) });
+                messages.push({ sender: 'customer', text: `Perfect! PDF format okay?`, time: formatTimeWithRange(conversationDate, 10, 24) });
+                messages.push({ sender: 'company', text: `Yes, PDF is perfect! Just make sure all pages are included.`, time: formatTimeWithRange(conversationDate, 10, 27) });
+                messages.push({ sender: 'customer', text: `Got it! I'll send them over in the next hour.`, time: formatTimeWithRange(conversationDate, 10, 30) });
+                messages.push({ sender: 'company', text: `Awesome! We'll review them within 2-3 business days and let you know.`, time: formatTimeWithRange(conversationDate, 10, 33) });
+                messages.push({ sender: 'customer', text: `Sounds good! Thanks for making this easy.`, time: formatTimeWithRange(conversationDate, 10, 36) });
+                messages.push({ sender: 'company', text: `You're welcome! We're here to help. Have a great day!`, time: formatTimeWithRange(conversationDate, 10, 39) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Absolutely! Where should I send them?`, time: formatTimeWithRange(day1, 10, 18) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com would be great!`, time: formatTimeWithRange(day1, 10, 21) });
-                messages.push({ sender: 'customer', text: `Perfect! I'll get them together and send them today.`, time: formatTimeWithRange(day1, 10, 24) });
-                messages.push({ sender: 'company', text: `That would be wonderful! We really appreciate your cooperation.`, time: formatTimeWithRange(day1, 10, 27) });
-                messages.push({ sender: 'customer', text: `No worries at all! Is there anything specific I should include?`, time: formatTimeWithRange(day1, 10, 30) });
-                messages.push({ sender: 'company', text: `Just make sure the statements show your name, account number, and cover the last 2-3 months. That's all we need!`, time: formatTimeWithRange(day1, 10, 33) });
-                messages.push({ sender: 'customer', text: `Easy enough! I'll send them shortly.`, time: formatTimeWithRange(day1, 10, 36) });
-                messages.push({ sender: 'company', text: `Thank you so much! We'll be in touch once everything's reviewed.`, time: formatTimeWithRange(day1, 10, 39) });
+                messages.push({ sender: 'customer', text: `Absolutely! Where should I send them?`, time: formatTimeWithRange(conversationDate, 10, 18) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com would be great!`, time: formatTimeWithRange(conversationDate, 10, 21) });
+                messages.push({ sender: 'customer', text: `Perfect! I'll get them together and send them today.`, time: formatTimeWithRange(conversationDate, 10, 24) });
+                messages.push({ sender: 'company', text: `That would be wonderful! We really appreciate your cooperation.`, time: formatTimeWithRange(conversationDate, 10, 27) });
+                messages.push({ sender: 'customer', text: `No worries at all! Is there anything specific I should include?`, time: formatTimeWithRange(conversationDate, 10, 30) });
+                messages.push({ sender: 'company', text: `Just make sure the statements show your name, account number, and cover the last 2-3 months. That's all we need!`, time: formatTimeWithRange(conversationDate, 10, 33) });
+                messages.push({ sender: 'customer', text: `Easy enough! I'll send them shortly.`, time: formatTimeWithRange(conversationDate, 10, 36) });
+                messages.push({ sender: 'company', text: `Thank you so much! We'll be in touch once everything's reviewed.`, time: formatTimeWithRange(conversationDate, 10, 39) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Of course! Happy to help. What's the email address?`, time: formatTimeWithRange(day1, 10, 18) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. You're the best!`, time: formatTimeWithRange(day1, 10, 21) });
-                messages.push({ sender: 'customer', text: `Haha, thanks! I'll send them over right now.`, time: formatTimeWithRange(day1, 10, 24) });
-                messages.push({ sender: 'company', text: `Perfect! We'll send you a confirmation email once we receive them.`, time: formatTimeWithRange(day1, 10, 27) });
-                messages.push({ sender: 'customer', text: `Great! And how long does the review usually take?`, time: formatTimeWithRange(day1, 10, 30) });
-                messages.push({ sender: 'company', text: `Typically 2-3 business days. We'll keep you updated throughout the process!`, time: formatTimeWithRange(day1, 10, 33) });
-                messages.push({ sender: 'customer', text: `Perfect! Thanks for being so helpful.`, time: formatTimeWithRange(day1, 10, 36) });
-                messages.push({ sender: 'company', text: `Our pleasure! Have a wonderful day!`, time: formatTimeWithRange(day1, 10, 39) });
+                messages.push({ sender: 'customer', text: `Of course! Happy to help. What's the email address?`, time: formatTimeWithRange(conversationDate, 10, 18) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. You're the best!`, time: formatTimeWithRange(conversationDate, 10, 21) });
+                messages.push({ sender: 'customer', text: `Haha, thanks! I'll send them over right now.`, time: formatTimeWithRange(conversationDate, 10, 24) });
+                messages.push({ sender: 'company', text: `Perfect! We'll send you a confirmation email once we receive them.`, time: formatTimeWithRange(conversationDate, 10, 27) });
+                messages.push({ sender: 'customer', text: `Great! And how long does the review usually take?`, time: formatTimeWithRange(conversationDate, 10, 30) });
+                messages.push({ sender: 'company', text: `Typically 2-3 business days. We'll keep you updated throughout the process!`, time: formatTimeWithRange(conversationDate, 10, 33) });
+                messages.push({ sender: 'customer', text: `Perfect! Thanks for being so helpful.`, time: formatTimeWithRange(conversationDate, 10, 36) });
+                messages.push({ sender: 'company', text: `Our pleasure! Have a wonderful day!`, time: formatTimeWithRange(conversationDate, 10, 39) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Sure thing! How do you want me to send them?`, time: formatTimeWithRange(day1, 10, 18) });
-                messages.push({ sender: 'company', text: `Email works great - compliance@geoswift.com. Thank you!`, time: formatTimeWithRange(day1, 10, 21) });
-                messages.push({ sender: 'customer', text: `No problem! I'll send them today.`, time: formatTimeWithRange(day1, 10, 24) });
-                messages.push({ sender: 'company', text: `That's fantastic! We really appreciate it.`, time: formatTimeWithRange(day1, 10, 27) });
-                messages.push({ sender: 'customer', text: `My pleasure! Anything else you need from me?`, time: formatTimeWithRange(day1, 10, 30) });
-                messages.push({ sender: 'company', text: `That should be everything for now! We'll let you know if we need anything else.`, time: formatTimeWithRange(day1, 10, 33) });
-                messages.push({ sender: 'customer', text: `Sounds good! I'll get those sent over now.`, time: formatTimeWithRange(day1, 10, 36) });
-                messages.push({ sender: 'company', text: `Thank you! We'll be in touch soon.`, time: formatTimeWithRange(day1, 10, 39) });
+                messages.push({ sender: 'customer', text: `Sure thing! How do you want me to send them?`, time: formatTimeWithRange(conversationDate, 10, 18) });
+                messages.push({ sender: 'company', text: `Email works great - compliance@geoswift.com. Thank you!`, time: formatTimeWithRange(conversationDate, 10, 21) });
+                messages.push({ sender: 'customer', text: `No problem! I'll send them today.`, time: formatTimeWithRange(conversationDate, 10, 24) });
+                messages.push({ sender: 'company', text: `That's fantastic! We really appreciate it.`, time: formatTimeWithRange(conversationDate, 10, 27) });
+                messages.push({ sender: 'customer', text: `My pleasure! Anything else you need from me?`, time: formatTimeWithRange(conversationDate, 10, 30) });
+                messages.push({ sender: 'company', text: `That should be everything for now! We'll let you know if we need anything else.`, time: formatTimeWithRange(conversationDate, 10, 33) });
+                messages.push({ sender: 'customer', text: `Sounds good! I'll get those sent over now.`, time: formatTimeWithRange(conversationDate, 10, 36) });
+                messages.push({ sender: 'company', text: `Thank you! We'll be in touch soon.`, time: formatTimeWithRange(conversationDate, 10, 39) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `Absolutely! Where should I email them?`, time: formatTimeWithRange(day1, 10, 18) });
-                messages.push({ sender: 'company', text: `compliance@geoswift.com. You're awesome for being so quick!`, time: formatTimeWithRange(day1, 10, 21) });
-                messages.push({ sender: 'customer', text: `Thanks! I'll send them in a bit.`, time: formatTimeWithRange(day1, 10, 24) });
-                messages.push({ sender: 'company', text: `Perfect! We'll confirm receipt as soon as we get them.`, time: formatTimeWithRange(day1, 10, 27) });
-                messages.push({ sender: 'customer', text: `Great! Looking forward to getting this sorted.`, time: formatTimeWithRange(day1, 10, 30) });
-                messages.push({ sender: 'company', text: `Same here! We'll make sure everything goes smoothly.`, time: formatTimeWithRange(day1, 10, 33) });
-                messages.push({ sender: 'customer', text: `Perfect! Thanks again.`, time: formatTimeWithRange(day1, 10, 36) });
-                messages.push({ sender: 'company', text: `You're very welcome! Have a great day!`, time: formatTimeWithRange(day1, 10, 39) });
+                messages.push({ sender: 'customer', text: `Absolutely! Where should I email them?`, time: formatTimeWithRange(conversationDate, 10, 18) });
+                messages.push({ sender: 'company', text: `compliance@geoswift.com. You're awesome for being so quick!`, time: formatTimeWithRange(conversationDate, 10, 21) });
+                messages.push({ sender: 'customer', text: `Thanks! I'll send them in a bit.`, time: formatTimeWithRange(conversationDate, 10, 24) });
+                messages.push({ sender: 'company', text: `Perfect! We'll confirm receipt as soon as we get them.`, time: formatTimeWithRange(conversationDate, 10, 27) });
+                messages.push({ sender: 'customer', text: `Great! Looking forward to getting this sorted.`, time: formatTimeWithRange(conversationDate, 10, 30) });
+                messages.push({ sender: 'company', text: `Same here! We'll make sure everything goes smoothly.`, time: formatTimeWithRange(conversationDate, 10, 33) });
+                messages.push({ sender: 'customer', text: `Perfect! Thanks again.`, time: formatTimeWithRange(conversationDate, 10, 36) });
+                messages.push({ sender: 'company', text: `You're very welcome! Have a great day!`, time: formatTimeWithRange(conversationDate, 10, 39) });
             }
         ];
         const selectedVariant = variants[variant % variants.length];
@@ -4580,60 +4580,60 @@ function generateProfessionalKYCConversation(customerName, customerAge, platform
     messages.push({
         sender: 'company',
         text: `Good morning ${customerName}. We're conducting an enhanced due diligence review per regulatory requirements. We require bank statements for the last 2-3 months to verify source of funds.`,
-        time: formatTimeWithRange(day1, 9, 0)
+        time: formatTimeWithRange(conversationDate, 9, 0)
     });
 
     if (willProvide) {
         const variants = [
             () => {
-                messages.push({ sender: 'customer', text: `Understood. What's the preferred method of submission?`, time: formatTimeWithRange(day1, 9, 3) });
-                messages.push({ sender: 'company', text: `Please submit via email to compliance@geoswift.com. Ensure all pages are included and clearly legible.`, time: formatTimeWithRange(day1, 9, 6) });
-                messages.push({ sender: 'customer', text: `Understood. Are there any specific formatting requirements?`, time: formatTimeWithRange(day1, 9, 9) });
-                messages.push({ sender: 'company', text: `PDF format is preferred. The statements must clearly show your name, account number, and transaction history for the specified period.`, time: formatTimeWithRange(day1, 9, 12) });
-                messages.push({ sender: 'customer', text: `Noted. I'll submit them today. What is the expected timeline for review?`, time: formatTimeWithRange(day1, 9, 15) });
-                messages.push({ sender: 'company', text: `Our compliance team typically completes the review within 2-3 business days. You'll receive confirmation upon receipt and notification once the review is complete.`, time: formatTimeWithRange(day1, 9, 18) });
-                messages.push({ sender: 'customer', text: `Thank you for the clarification. I'll ensure everything is submitted promptly.`, time: formatTimeWithRange(day1, 9, 21) });
-                messages.push({ sender: 'company', text: `We appreciate your cooperation. Should you have any questions during the process, please don't hesitate to contact us.`, time: formatTimeWithRange(day1, 9, 24) });
+                messages.push({ sender: 'customer', text: `Understood. What's the preferred method of submission?`, time: formatTimeWithRange(conversationDate, 9, 3) });
+                messages.push({ sender: 'company', text: `Please submit via email to compliance@geoswift.com. Ensure all pages are included and clearly legible.`, time: formatTimeWithRange(conversationDate, 9, 6) });
+                messages.push({ sender: 'customer', text: `Understood. Are there any specific formatting requirements?`, time: formatTimeWithRange(conversationDate, 9, 9) });
+                messages.push({ sender: 'company', text: `PDF format is preferred. The statements must clearly show your name, account number, and transaction history for the specified period.`, time: formatTimeWithRange(conversationDate, 9, 12) });
+                messages.push({ sender: 'customer', text: `Noted. I'll submit them today. What is the expected timeline for review?`, time: formatTimeWithRange(conversationDate, 9, 15) });
+                messages.push({ sender: 'company', text: `Our compliance team typically completes the review within 2-3 business days. You'll receive confirmation upon receipt and notification once the review is complete.`, time: formatTimeWithRange(conversationDate, 9, 18) });
+                messages.push({ sender: 'customer', text: `Thank you for the clarification. I'll ensure everything is submitted promptly.`, time: formatTimeWithRange(conversationDate, 9, 21) });
+                messages.push({ sender: 'company', text: `We appreciate your cooperation. Should you have any questions during the process, please don't hesitate to contact us.`, time: formatTimeWithRange(conversationDate, 9, 24) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `I can provide those documents. What is the submission deadline?`, time: formatTimeWithRange(day1, 9, 3) });
-                messages.push({ sender: 'company', text: `We request submission within 5 business days to avoid delays in the verification process.`, time: formatTimeWithRange(day1, 9, 6) });
-                messages.push({ sender: 'customer', text: `Understood. Will online banking statements be acceptable, or do they require bank stamping?`, time: formatTimeWithRange(day1, 9, 9) });
-                messages.push({ sender: 'company', text: `Online banking statements are acceptable provided they display your name, account number, and transaction details clearly. Bank stamping is not required.`, time: formatTimeWithRange(day1, 9, 12) });
-                messages.push({ sender: 'customer', text: `Excellent. I'll prepare and submit them via email to compliance@geoswift.com.`, time: formatTimeWithRange(day1, 9, 15) });
-                messages.push({ sender: 'company', text: `Perfect. Please include your account reference number in the subject line to facilitate processing.`, time: formatTimeWithRange(day1, 9, 18) });
-                messages.push({ sender: 'customer', text: `Will do. I'll submit them by end of business today.`, time: formatTimeWithRange(day1, 9, 21) });
-                messages.push({ sender: 'company', text: `Thank you for your prompt response. We'll acknowledge receipt and proceed with the review.`, time: formatTimeWithRange(day1, 9, 24) });
+                messages.push({ sender: 'customer', text: `I can provide those documents. What is the submission deadline?`, time: formatTimeWithRange(conversationDate, 9, 3) });
+                messages.push({ sender: 'company', text: `We request submission within 5 business days to avoid delays in the verification process.`, time: formatTimeWithRange(conversationDate, 9, 6) });
+                messages.push({ sender: 'customer', text: `Understood. Will online banking statements be acceptable, or do they require bank stamping?`, time: formatTimeWithRange(conversationDate, 9, 9) });
+                messages.push({ sender: 'company', text: `Online banking statements are acceptable provided they display your name, account number, and transaction details clearly. Bank stamping is not required.`, time: formatTimeWithRange(conversationDate, 9, 12) });
+                messages.push({ sender: 'customer', text: `Excellent. I'll prepare and submit them via email to compliance@geoswift.com.`, time: formatTimeWithRange(conversationDate, 9, 15) });
+                messages.push({ sender: 'company', text: `Perfect. Please include your account reference number in the subject line to facilitate processing.`, time: formatTimeWithRange(conversationDate, 9, 18) });
+                messages.push({ sender: 'customer', text: `Will do. I'll submit them by end of business today.`, time: formatTimeWithRange(conversationDate, 9, 21) });
+                messages.push({ sender: 'company', text: `Thank you for your prompt response. We'll acknowledge receipt and proceed with the review.`, time: formatTimeWithRange(conversationDate, 9, 24) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `I can provide the requested documentation. What format do you require?`, time: formatTimeWithRange(day1, 9, 3) });
-                messages.push({ sender: 'company', text: `PDF format is preferred. Please ensure all pages are included and the documents are clearly readable.`, time: formatTimeWithRange(day1, 9, 6) });
-                messages.push({ sender: 'customer', text: `Understood. Should I send statements from all accounts or only the primary account?`, time: formatTimeWithRange(day1, 9, 9) });
-                messages.push({ sender: 'company', text: `We require statements from all accounts that will be used for transactions with our platform. This ensures comprehensive verification.`, time: formatTimeWithRange(day1, 9, 12) });
-                messages.push({ sender: 'customer', text: `Noted. I'll compile all relevant statements and submit them together.`, time: formatTimeWithRange(day1, 9, 15) });
-                messages.push({ sender: 'company', text: `That would be ideal. Please send to compliance@geoswift.com with your account reference in the subject line.`, time: formatTimeWithRange(day1, 9, 18) });
-                messages.push({ sender: 'customer', text: `Understood. I'll submit them within the next 24 hours.`, time: formatTimeWithRange(day1, 9, 21) });
-                messages.push({ sender: 'company', text: `Thank you. We'll confirm receipt and provide updates on the review timeline.`, time: formatTimeWithRange(day1, 9, 24) });
+                messages.push({ sender: 'customer', text: `I can provide the requested documentation. What format do you require?`, time: formatTimeWithRange(conversationDate, 9, 3) });
+                messages.push({ sender: 'company', text: `PDF format is preferred. Please ensure all pages are included and the documents are clearly readable.`, time: formatTimeWithRange(conversationDate, 9, 6) });
+                messages.push({ sender: 'customer', text: `Understood. Should I send statements from all accounts or only the primary account?`, time: formatTimeWithRange(conversationDate, 9, 9) });
+                messages.push({ sender: 'company', text: `We require statements from all accounts that will be used for transactions with our platform. This ensures comprehensive verification.`, time: formatTimeWithRange(conversationDate, 9, 12) });
+                messages.push({ sender: 'customer', text: `Noted. I'll compile all relevant statements and submit them together.`, time: formatTimeWithRange(conversationDate, 9, 15) });
+                messages.push({ sender: 'company', text: `That would be ideal. Please send to compliance@geoswift.com with your account reference in the subject line.`, time: formatTimeWithRange(conversationDate, 9, 18) });
+                messages.push({ sender: 'customer', text: `Understood. I'll submit them within the next 24 hours.`, time: formatTimeWithRange(conversationDate, 9, 21) });
+                messages.push({ sender: 'company', text: `Thank you. We'll confirm receipt and provide updates on the review timeline.`, time: formatTimeWithRange(conversationDate, 9, 24) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `I'll provide the requested bank statements. What is the submission process?`, time: formatTimeWithRange(day1, 9, 3) });
-                messages.push({ sender: 'company', text: `Please email the documents to compliance@geoswift.com. Include your account reference number in the subject line for efficient processing.`, time: formatTimeWithRange(day1, 9, 6) });
-                messages.push({ sender: 'customer', text: `Understood. Will I receive confirmation of receipt?`, time: formatTimeWithRange(day1, 9, 9) });
-                messages.push({ sender: 'company', text: `Yes, you'll receive an automated confirmation email upon receipt. Our compliance team will then review the documents within 2-3 business days.`, time: formatTimeWithRange(day1, 9, 12) });
-                messages.push({ sender: 'customer', text: `Thank you. I'll submit the documents today.`, time: formatTimeWithRange(day1, 9, 15) });
-                messages.push({ sender: 'company', text: `We appreciate your cooperation. Should we require any additional documentation, we'll contact you promptly.`, time: formatTimeWithRange(day1, 9, 18) });
-                messages.push({ sender: 'customer', text: `Understood. I'll ensure everything is submitted correctly.`, time: formatTimeWithRange(day1, 9, 21) });
-                messages.push({ sender: 'company', text: `Thank you. We'll be in touch once the review is complete.`, time: formatTimeWithRange(day1, 9, 24) });
+                messages.push({ sender: 'customer', text: `I'll provide the requested bank statements. What is the submission process?`, time: formatTimeWithRange(conversationDate, 9, 3) });
+                messages.push({ sender: 'company', text: `Please email the documents to compliance@geoswift.com. Include your account reference number in the subject line for efficient processing.`, time: formatTimeWithRange(conversationDate, 9, 6) });
+                messages.push({ sender: 'customer', text: `Understood. Will I receive confirmation of receipt?`, time: formatTimeWithRange(conversationDate, 9, 9) });
+                messages.push({ sender: 'company', text: `Yes, you'll receive an automated confirmation email upon receipt. Our compliance team will then review the documents within 2-3 business days.`, time: formatTimeWithRange(conversationDate, 9, 12) });
+                messages.push({ sender: 'customer', text: `Thank you. I'll submit the documents today.`, time: formatTimeWithRange(conversationDate, 9, 15) });
+                messages.push({ sender: 'company', text: `We appreciate your cooperation. Should we require any additional documentation, we'll contact you promptly.`, time: formatTimeWithRange(conversationDate, 9, 18) });
+                messages.push({ sender: 'customer', text: `Understood. I'll ensure everything is submitted correctly.`, time: formatTimeWithRange(conversationDate, 9, 21) });
+                messages.push({ sender: 'company', text: `Thank you. We'll be in touch once the review is complete.`, time: formatTimeWithRange(conversationDate, 9, 24) });
             },
             () => {
-                messages.push({ sender: 'customer', text: `I can provide the bank statements. What specific information must be visible on the statements?`, time: formatTimeWithRange(day1, 9, 3) });
-                messages.push({ sender: 'company', text: `The statements must clearly display your full name, account number, bank name, and transaction history for the last 2-3 months. All pages must be included.`, time: formatTimeWithRange(day1, 9, 6) });
-                messages.push({ sender: 'customer', text: `Understood. I'll ensure all pages are included and clearly legible.`, time: formatTimeWithRange(day1, 9, 9) });
-                messages.push({ sender: 'company', text: `Perfect. Please submit via email to compliance@geoswift.com.`, time: formatTimeWithRange(day1, 9, 12) });
-                messages.push({ sender: 'customer', text: `Will do. What is the expected processing time?`, time: formatTimeWithRange(day1, 9, 15) });
-                messages.push({ sender: 'company', text: `Review typically takes 2-3 business days. You'll receive updates at each stage of the process.`, time: formatTimeWithRange(day1, 9, 18) });
-                messages.push({ sender: 'customer', text: `Thank you for the information. I'll submit the documents promptly.`, time: formatTimeWithRange(day1, 9, 21) });
-                messages.push({ sender: 'company', text: `We appreciate your cooperation with this regulatory requirement.`, time: formatTimeWithRange(day1, 9, 24) });
+                messages.push({ sender: 'customer', text: `I can provide the bank statements. What specific information must be visible on the statements?`, time: formatTimeWithRange(conversationDate, 9, 3) });
+                messages.push({ sender: 'company', text: `The statements must clearly display your full name, account number, bank name, and transaction history for the last 2-3 months. All pages must be included.`, time: formatTimeWithRange(conversationDate, 9, 6) });
+                messages.push({ sender: 'customer', text: `Understood. I'll ensure all pages are included and clearly legible.`, time: formatTimeWithRange(conversationDate, 9, 9) });
+                messages.push({ sender: 'company', text: `Perfect. Please submit via email to compliance@geoswift.com.`, time: formatTimeWithRange(conversationDate, 9, 12) });
+                messages.push({ sender: 'customer', text: `Will do. What is the expected processing time?`, time: formatTimeWithRange(conversationDate, 9, 15) });
+                messages.push({ sender: 'company', text: `Review typically takes 2-3 business days. You'll receive updates at each stage of the process.`, time: formatTimeWithRange(conversationDate, 9, 18) });
+                messages.push({ sender: 'customer', text: `Thank you for the information. I'll submit the documents promptly.`, time: formatTimeWithRange(conversationDate, 9, 21) });
+                messages.push({ sender: 'company', text: `We appreciate your cooperation with this regulatory requirement.`, time: formatTimeWithRange(conversationDate, 9, 24) });
             }
         ];
         const selectedVariant = variants[variant % variants.length];
