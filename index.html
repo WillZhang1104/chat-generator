@@ -625,6 +625,8 @@
         }
         
         const API_KEYS = {
+            // OpenAI API Key (ASCII codes)
+            openai: decodeApiKey([115,107,45,112,114,111,106,45,71,105,79,49,106,97,45,89,51,102,101,115,83,110,95,115,108,119,49,107,68,95,53,79,54,67,52,49,112,116,86,65,112,84,53,101,88,74,53,113,116,109,75,110,67,95,76,107,71,104,95,102,57,121,105,88,69,113,106,119,71,110,74,121,95,65,117,111,100,55,68,50,75,81,84,51,66,108,98,107,70,74,90,73,101,75,66,74,95,74,104,75,99,100,106,114,73,102,119,77,68,81,45,79,71,117,106,69,107,118,108,117,76,68,115,101,119,73,98,115,98,84,56,49,52,76,79,68,100,108,68,50,111,79,102,52,95,119,112,71,73,48,85,57,70,74,118,103,55,84,95,95,56,49,48,65]),
             // Groq API Key (ASCII codes)
             groq: decodeApiKey([103,115,107,95,81,49,53,122,101,118,111,98,74,117,99,89,72,87,67,54,48,76,100,87,87,71,100,121,98,51,70,89,109,112,66,101,66,57,54,120,75,101,48,107,109,74,75,105,118,56,109,78,90,56,51,68]),
             // Gemini API Key (ASCII codes)
@@ -719,7 +721,9 @@
         if (aiProviderSelect && aiApiKeyInput) {
             aiProviderSelect.addEventListener('change', function() {
                 const provider = this.value;
-                if (provider === 'groq' && API_KEYS.groq) {
+                if (provider === 'openai' && API_KEYS.openai) {
+                    setApiKeyWithMask(aiApiKeyInput, API_KEYS.openai, 4, 4);
+                } else if (provider === 'groq' && API_KEYS.groq) {
                     setApiKeyWithMask(aiApiKeyInput, API_KEYS.groq, 4, 4);
                 } else if (provider === 'gemini' && API_KEYS.gemini) {
                     setApiKeyWithMask(aiApiKeyInput, API_KEYS.gemini, 4, 4);
@@ -727,8 +731,10 @@
             });
 
             // 页面加载时，根据默认选择的提供商填充 API Key
-            // 默认是 gemini
-            if (aiProviderSelect.value === 'gemini' && API_KEYS.gemini) {
+            // 默认是 openai
+            if (aiProviderSelect.value === 'openai' && API_KEYS.openai) {
+                setApiKeyWithMask(aiApiKeyInput, API_KEYS.openai, 4, 4);
+            } else if (aiProviderSelect.value === 'gemini' && API_KEYS.gemini) {
                 setApiKeyWithMask(aiApiKeyInput, API_KEYS.gemini, 4, 4);
             } else if (aiProviderSelect.value === 'groq' && API_KEYS.groq) {
                 setApiKeyWithMask(aiApiKeyInput, API_KEYS.groq, 4, 4);
