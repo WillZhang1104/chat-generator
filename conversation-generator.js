@@ -5659,15 +5659,36 @@ Please write the complete email body (including greeting and signature), and ret
     // 如果用户提供了自定义 prompt，根据模式处理
     let prompt;
     if (customPrompt && promptMode === 'replace') {
-        // 替换模式：完全替换默认 prompt
+        // 替换模式：完全替换默认 prompt（支持中文）
         prompt = customPrompt
             .replace(/\{customerName\}/g, customerName)
             .replace(/\{customerAge\}/g, customerAge)
             .replace(/\{customerGreeting\}/g, customerGreeting)
             .replace(/\{additionalInfo\}/g, additionalInfo || '');
+        
+        // 如果用户用中文写prompt，添加说明让AI理解
+        if (/[\u4e00-\u9fa5]/.test(prompt)) {
+            prompt = `You are a professional email writing expert. The user has provided requirements in Chinese. Please understand the requirements and write a natural, human-like email in English based on them.
+
+CONTEXT:
+- Customer Name: ${customerName}
+- Customer Age: ${customerAge} years old
+- Customer Greeting: ${customerGreeting}
+${additionalInfo ? `- Additional Information: ${additionalInfo}` : ''}
+
+USER REQUIREMENTS (may be in Chinese):
+${prompt}
+
+IMPORTANT: Write the email in English, but understand the Chinese requirements. The email should be natural, human-like, and appropriate for a customer aged ${customerAge} years old. Include appropriate email structure: greeting, body paragraphs, closing, and signature with customer name.`;
+        }
     } else if (customPrompt && promptMode === 'append') {
-        // 追加模式：在默认 prompt 基础上添加要求
-        prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
+        // 追加模式：在默认 prompt 基础上添加要求（支持中文）
+        if (/[\u4e00-\u9fa5]/.test(customPrompt)) {
+            // 如果追加的内容是中文，添加说明
+            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS (may be in Chinese, please understand and apply):\n' + customPrompt;
+        } else {
+            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
+        }
     } else {
         // 没有自定义 prompt，使用默认
         prompt = defaultPrompt;
