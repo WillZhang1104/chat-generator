@@ -153,31 +153,33 @@ async function generateConversation() {
         const platform = document.getElementById('platform').value;
         const additionalInfo = document.getElementById('additionalInfo').value;
         
-        // 生成补充材料对话
-        let conversation = createKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide);
-        
-        // 如果启用AI优化，则优化对话
+        // 如果启用AI优化，则直接从零生成对话（带prompt预览）
+        let conversation;
         if (shouldUseAIOptimization()) {
             const provider = getAIProvider();
             const apiKey = getAIApiKey();
             if (!apiKey) {
-                alert('请先输入 API Key 才能使用 AI 优化功能');
+                alert('请先输入 API Key 才能使用 AI 生成功能');
                 return;
             }
             
-            // 显示加载提示
-            const preview = document.getElementById('conversationPreview');
-            if (preview) {
-                preview.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">正在使用 AI 优化对话，请稍候...</div>';
-            }
-            
-            // 异步优化对话
             try {
-                conversation = await optimizeConversationWithAI(conversation, customerName, platform, provider, apiKey);
+                conversation = await generateConversationWithAI(customerName, null, null, platform, additionalInfo, 'kyc', customerAge, willProvide, provider, apiKey);
             } catch (error) {
-                console.error('AI优化失败:', error);
-                alert('AI优化失败，将使用原始对话。错误：' + error.message);
+                console.error('AI生成失败:', error);
+                if (error.message !== '用户取消了AI生成') {
+                    alert('AI生成失败，将使用模板对话。错误：' + error.message);
+                    // 生成失败时使用模板对话
+                    conversation = createKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide);
+                } else {
+                    // 用户取消，使用模板对话
+                    console.log('用户取消了AI生成，使用模板对话');
+                    conversation = createKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide);
+                }
             }
+        } else {
+            // 生成补充材料对话
+            conversation = createKYCConversation(customerName, customerAge, platform, additionalInfo, willProvide);
         }
         
         // 显示预览
@@ -241,29 +243,33 @@ async function generateConversation() {
         // 获取交易目的文本（支持多选）
         const purposeDetails = getPurposeDetails(checkedPurposes, customPurpose);
 
-        // 生成对话
-        let conversation = createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo);
-        
-        // 如果启用AI优化，则优化对话（带prompt预览）
+        // 如果启用AI优化，则直接从零生成对话（带prompt预览）
+        let conversation;
         if (shouldUseAIOptimization()) {
             const provider = getAIProvider();
             const apiKey = getAIApiKey();
             if (!apiKey) {
-                alert('请先输入 API Key 才能使用 AI 优化功能');
+                alert('请先输入 API Key 才能使用 AI 生成功能');
                 return;
             }
             
             try {
-                conversation = await optimizeConversationWithAIWithPreview(conversation, customerName, platform, provider, apiKey);
+                conversation = await generateConversationWithAI(customerName, purposeDetails, formMethod, platform, additionalInfo, 'initial', null, null, provider, apiKey);
             } catch (error) {
-                console.error('AI优化失败:', error);
+                console.error('AI生成失败:', error);
                 if (error.message !== '用户取消了AI生成') {
-                    alert('AI优化失败，将使用原始对话。错误：' + error.message);
+                    alert('AI生成失败，将使用模板对话。错误：' + error.message);
+                    // 生成失败时使用模板对话
+                    conversation = createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo);
                 } else {
-                    // 用户取消，使用原始对话
-                    console.log('用户取消了AI优化，使用原始对话');
+                    // 用户取消，使用模板对话
+                    console.log('用户取消了AI生成，使用模板对话');
+                    conversation = createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo);
                 }
             }
+        } else {
+        // 生成对话
+            conversation = createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo);
         }
         
         // 显示预览
@@ -587,24 +593,35 @@ function generateConversationByStyle(customerName, purposeDetails, formMethod, p
     // 如果是WhatsApp平台且选择PDF附件提交，在发送PDF消息后添加附件消息
     if (platform === 'whatsapp' && formMethod === 'pdf') {
         // 找到发送PDF消息的位置，在其后添加附件消息
+        // 改进匹配逻辑：查找包含PDF、form、email、sent等关键词的公司消息
         for (let i = 0; i < conversation.length; i++) {
             const msg = conversation[i];
-            if (msg.sender === 'company' && msg.text && (msg.text.toLowerCase().includes('pdf') || msg.text.toLowerCase().includes('form'))) {
-                // 在找到的消息后添加附件消息
-                const timeParts = msg.time.split(' ');
-                const hour = parseInt(timeParts[1].split(':')[0]);
-                const minute = parseInt(timeParts[1].split(':')[1]);
-                const attachmentTime = formatTimeWithRange(getConversationDate(), hour, hour + 1);
-                conversation.splice(i + 1, 0, {
-                    sender: 'company',
-                    isAttachment: true,
-                    attachmentType: 'pdf',
-                    attachmentName: 'Client Onboarding Form.pdf',
-                    attachmentSize: '655 kB',
-                    attachmentPages: '8頁',
-                    time: attachmentTime
-                });
-                break;
+            if (msg.sender === 'company' && msg.text) {
+                const textLower = msg.text.toLowerCase();
+                // 匹配包含PDF、form、email、sent等关键词的消息
+                if (textLower.includes('pdf') || 
+                    (textLower.includes('form') && (textLower.includes('sent') || textLower.includes('email') || textLower.includes('send'))) ||
+                    (textLower.includes('onboarding') && (textLower.includes('sent') || textLower.includes('email')))) {
+                    // 在找到的消息后添加附件消息
+                    const timeParts = msg.time.split(' ');
+                    if (timeParts.length >= 2) {
+                        const timeStr = timeParts[1];
+                        const hour = parseInt(timeStr.split(':')[0]);
+                        const minute = parseInt(timeStr.split(':')[1]);
+                        // 附件消息时间设置为原消息时间后几分钟
+                        const attachmentTime = formatTimeWithRange(getConversationDate(), hour, minute + 2);
+                        conversation.splice(i + 1, 0, {
+                            sender: 'company',
+                            isAttachment: true,
+                            attachmentType: 'pdf',
+                            attachmentName: 'Client Onboarding Form.pdf',
+                            attachmentSize: '655 kB',
+                            attachmentPages: '8頁',
+                            time: attachmentTime
+                        });
+                        break;
+                    }
+                }
             }
         }
     }
@@ -1558,15 +1575,33 @@ function displayConversation(messages) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${msg.sender}`;
         
+        // 检查是否是附件消息
+        if (msg.isAttachment && msg.attachmentType === 'pdf') {
+            const attachmentDiv = document.createElement('div');
+            attachmentDiv.className = 'message-attachment';
+            attachmentDiv.style.cssText = 'padding: 12px; background: #e5ddd5; border-radius: 8px; margin: 5px 0;';
+            
+            const fileName = document.createElement('div');
+            fileName.style.cssText = 'font-weight: bold; margin-bottom: 5px;';
+            fileName.textContent = msg.attachmentName || 'Client Onboarding Form.pdf';
+            
+            const fileInfo = document.createElement('div');
+            fileInfo.style.cssText = 'font-size: 12px; color: #666;';
+            fileInfo.textContent = `${msg.attachmentPages || '8頁'} • PDF • ${msg.attachmentSize || '655 kB'}`;
+            
+            attachmentDiv.appendChild(fileName);
+            attachmentDiv.appendChild(fileInfo);
+            messageDiv.appendChild(attachmentDiv);
+        } else {
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
-        bubble.textContent = msg.text;
+            bubble.textContent = msg.text || '';
+            messageDiv.appendChild(bubble);
+        }
         
         const time = document.createElement('div');
         time.className = 'message-time';
         time.textContent = msg.time;
-        
-        messageDiv.appendChild(bubble);
         messageDiv.appendChild(time);
         preview.appendChild(messageDiv);
     });
@@ -5175,9 +5210,114 @@ Strategy:
 }
 
 
-// ========== AI 优化对话功能（支持多个免费AI API） ==========
+// ========== AI 生成对话功能（支持多个免费AI API） ==========
 
-// 构建对话优化的prompt（用于预览）
+// 构建从零生成对话的prompt（用于预览）
+function buildConversationGenerationPrompt(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationScene, customerAge = null, willProvide = null) {
+    const platformContext = platform === 'whatsapp' ? 'WhatsApp' : 
+                           platform === 'telegram' ? 'Telegram' : 
+                           'Email';
+    
+    const conversationDate = getConversationDate();
+    const timeRange = getConversationTimeRange();
+    const style = getConversationStyle(customerName);
+    
+    // 构建交易目的文本
+    let purposeText = '';
+    if (purposeDetails && purposeDetails.length > 0) {
+        purposeText = purposeDetails.map(p => {
+            if (typeof p === 'string') return p;
+            return p.main + (p.details && p.details.length > 0 ? ` (${p.details.join(', ')})` : '');
+        }).join(', ');
+    }
+    
+    // 构建时间范围文本
+    let timeRangeText = '';
+    if (timeRange.hasCustomDate && timeRange.date) {
+        const month = String(timeRange.date.getMonth() + 1).padStart(2, '0');
+        const day = String(timeRange.date.getDate()).padStart(2, '0');
+        const startHour = String(timeRange.startHour).padStart(2, '0');
+        const startMin = String(timeRange.startMinute).padStart(2, '0');
+        const endHour = String(timeRange.endHour).padStart(2, '0');
+        const endMin = String(timeRange.endMinute).padStart(2, '0');
+        timeRangeText = `${month}/${day} ${startHour}:${startMin}-${endHour}:${endMin}`;
+    }
+    
+    // 构建场景描述
+    let sceneDescription = '';
+    if (conversationScene === 'kyc') {
+        sceneDescription = `调单场景：客户需要提供KYC补充材料`;
+        if (willProvide !== null) {
+            sceneDescription += willProvide ? '，客户愿意提供材料' : '，客户不愿意提供材料';
+        }
+        if (customerAge) {
+            sceneDescription += `。客户年龄：${customerAge}岁`;
+        }
+    } else {
+        sceneDescription = `开户场景：客户咨询开户，需要完成开户流程`;
+        if (purposeText) {
+            sceneDescription += `。交易目的：${purposeText}`;
+        }
+        if (formMethod === 'online') {
+            sceneDescription += `。表格提交方式：线上填写（需要在对话中包含链接：https://wsdglobalpay.com/onboarding/）`;
+        } else {
+            sceneDescription += `。表格提交方式：附件提交（如果是WhatsApp平台，需要在对话中包含发送PDF附件的消息记录）`;
+        }
+    }
+    
+    // 构建风格描述
+    const styleDescriptions = {
+        verbose: '话多型：对话详细、内容丰富，包含较多信息和问答',
+        concise: '简洁型：对话简短直接，信息精炼',
+        cautious: '谨慎型：语气谨慎，注重安全和合规',
+        urgent: '紧急型：语气急切，强调速度和效率',
+        friendly: '友好型：语气友好亲切，轻松自然',
+        professional: '专业型：语气专业正式，结构清晰',
+        detailed: '详细型：对话详细，包含较多细节',
+        casual: '随意型：语气随意，轻松自然',
+        formal: '正式型：语气正式，结构规范',
+        inquisitive: '好奇型：包含较多问题和询问',
+        straightforward: '直接型：直接明了，不绕弯子',
+        elaborate: '详细阐述型：详细阐述，内容丰富'
+    };
+    const styleDesc = styleDescriptions[style] || '友好自然';
+    
+    const defaultPrompt = `你是一个专业的对话生成专家。请根据以下要求，从零生成一段自然、真实的${platformContext}对话，对话必须用英文。
+
+场景信息：
+${sceneDescription}
+${additionalInfo ? `- 额外信息：${additionalInfo}` : ''}
+
+对话要求：
+1. 客户姓名：${customerName}
+2. 对话风格：${styleDesc}
+3. 对话长度：生成8-15条消息，包含客户和公司的多轮互动
+4. 对话必须用英文，不要翻译成中文
+5. 对话要自然、真实，像真人直接进行的对话
+6. 包含适当的问答互动，让对话更丰富
+7. 对话要符合${platformContext}平台的沟通特点
+${timeRangeText ? `8. 对话时间必须在 ${timeRangeText} 范围内，并且消息时间要按顺序递增（每条消息至少间隔2分钟）` : ''}
+${formMethod === 'online' && conversationScene === 'initial' ? '9. 必须在对话中包含线上填写表格的链接：https://wsdglobalpay.com/onboarding/' : ''}
+${formMethod === 'pdf' && platform === 'whatsapp' && conversationScene === 'initial' ? '9. 如果是WhatsApp平台，在发送PDF消息后，需要包含一条发送PDF附件的消息记录（使用isAttachment标记）' : ''}
+
+请返回生成的对话，格式为JSON数组，每个元素包含：
+- sender: "customer" 或 "company"
+- text: 消息内容（英文，自然真实）
+- time: 消息时间（格式：MM/DD HH:mm，必须在指定时间范围内，按顺序递增）
+
+只返回JSON数组，不要其他内容。`;
+    
+    // 添加AI理解说明（因为prompt是中文）
+    const prompt = `You are a professional conversation generation expert. The user has provided requirements in Chinese. Please understand the requirements and generate a natural, realistic ${platformContext} conversation in English from scratch.
+
+${defaultPrompt}
+
+IMPORTANT: The conversation must be in English, but understand the Chinese requirements. Generate a natural conversation that sounds like real people talking.`;
+    
+    return prompt;
+}
+
+// 构建对话优化的prompt（用于预览）- 已废弃，保留用于向后兼容
 function buildConversationPrompt(conversation, customerName, platform) {
     const platformContext = platform === 'whatsapp' ? 'WhatsApp' : 
                            platform === 'telegram' ? 'Telegram' : 
@@ -5221,7 +5361,125 @@ IMPORTANT: The optimized conversation should be in English, but understand the C
     return prompt;
 }
 
-// 使用 AI API 优化对话（带prompt预览）
+// 使用 AI API 从零生成对话（带prompt预览）
+async function generateConversationWithAI(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationScene, customerAge, willProvide, provider, apiKey) {
+    try {
+        // 构建prompt
+        let prompt = buildConversationGenerationPrompt(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationScene, customerAge, willProvide);
+        
+        // 显示预览并等待用户确认
+        prompt = await showPromptPreview(provider, prompt);
+        
+        // 显示调用状态
+        showAIStatus('loading', '正在调用 AI...', `正在使用 ${provider} 生成对话...`, provider);
+        
+        let generatedConversation;
+        
+        // 根据提供商调用不同的API
+        switch (provider) {
+            case 'gemini':
+                generatedConversation = await callGeminiAPI(prompt, apiKey);
+                break;
+            case 'groq':
+                generatedConversation = await callGroqAPI(prompt, apiKey);
+                break;
+            case 'huggingface':
+                generatedConversation = await callHuggingFaceAPI(prompt, apiKey);
+                break;
+            case 'openai':
+                generatedConversation = await callOpenAIAPI(prompt, apiKey);
+                break;
+            default:
+                throw new Error('不支持的AI提供商');
+        }
+
+        // 验证并处理生成的对话
+        if (Array.isArray(generatedConversation) && generatedConversation.length > 0) {
+            // 确保时间格式正确，并处理附件消息
+            const processedConversation = generatedConversation.map((msg, index) => {
+                // 确保sender字段正确
+                const sender = (msg.sender === 'customer' || msg.sender === 'company') ? msg.sender : 
+                              (index % 2 === 0 ? 'customer' : 'company');
+                
+                // 确保time格式正确（MM/DD HH:mm）
+                let time = msg.time || '';
+                if (!time || !time.match(/^\d{1,2}\/\d{1,2} \d{1,2}:\d{2}$/)) {
+                    // 如果时间格式不正确，使用默认时间
+                    const conversationDate = getConversationDate();
+                    const timeRange = getConversationTimeRange();
+                    if (timeRange.hasCustomDate) {
+                        const adjusted = adjustTimeForRange(9 + Math.floor(index / 2), 0, timeRange);
+                        time = formatTime(timeRange.date, adjusted.hour, adjusted.minute);
+                    } else {
+                        time = formatTime(conversationDate, 9 + Math.floor(index / 2), index * 2);
+                    }
+                }
+                
+                return {
+                    sender: sender,
+                    text: msg.text || '',
+                    time: time,
+                    // 保留附件信息（如果有）
+                    isAttachment: msg.isAttachment || false,
+                    attachmentType: msg.attachmentType || null,
+                    attachmentName: msg.attachmentName || null,
+                    attachmentSize: msg.attachmentSize || null,
+                    attachmentPages: msg.attachmentPages || null
+                };
+            });
+            
+            // 如果是WhatsApp平台且选择PDF附件提交，确保有附件消息
+            if (platform === 'whatsapp' && formMethod === 'pdf' && conversationScene === 'initial') {
+                // 检查是否已有附件消息
+                const hasAttachment = processedConversation.some(msg => msg.isAttachment && msg.attachmentType === 'pdf');
+                if (!hasAttachment) {
+                    // 找到发送PDF消息的位置，在其后添加附件消息
+                    for (let i = 0; i < processedConversation.length; i++) {
+                        const msg = processedConversation[i];
+                        if (msg.sender === 'company' && msg.text) {
+                            const textLower = msg.text.toLowerCase();
+                            if (textLower.includes('pdf') || 
+                                (textLower.includes('form') && (textLower.includes('sent') || textLower.includes('email') || textLower.includes('send'))) ||
+                                (textLower.includes('onboarding') && (textLower.includes('sent') || textLower.includes('email')))) {
+                                // 在找到的消息后添加附件消息
+                                const timeParts = msg.time.split(' ');
+                                if (timeParts.length >= 2) {
+                                    const timeStr = timeParts[1];
+                                    const hour = parseInt(timeStr.split(':')[0]);
+                                    const minute = parseInt(timeStr.split(':')[1]);
+                                    const attachmentTime = formatTimeWithRange(getConversationDate(), hour, minute + 2);
+                                    processedConversation.splice(i + 1, 0, {
+                                        sender: 'company',
+                                        isAttachment: true,
+                                        attachmentType: 'pdf',
+                                        attachmentName: 'Client Onboarding Form.pdf',
+                                        attachmentSize: '655 kB',
+                                        attachmentPages: '8頁',
+                                        time: attachmentTime
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            showAIStatus('success', 'AI 生成成功', `对话已生成，共 ${processedConversation.length} 条消息`, provider);
+            return processedConversation;
+        } else {
+            console.warn('AI返回的对话格式不正确');
+            showAIStatus('error', 'AI 生成失败', '返回格式不正确', provider);
+            throw new Error('AI返回的对话格式不正确');
+        }
+    } catch (error) {
+        console.error('AI生成对话时出错:', error);
+        showAIStatus('error', 'AI 生成失败', error.message, provider);
+        throw error;
+    }
+}
+
+// 使用 AI API 优化对话（带prompt预览）- 已废弃，保留用于向后兼容
 async function optimizeConversationWithAIWithPreview(conversation, customerName, platform, provider, apiKey) {
     if (!conversation || conversation.length === 0) {
         return conversation;
