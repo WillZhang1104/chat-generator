@@ -244,7 +244,7 @@ async function generateConversation() {
         // 生成对话
         let conversation = createConversation(customerName, purposeDetails, formMethod, platform, additionalInfo);
         
-        // 如果启用AI优化，则优化对话
+        // 如果启用AI优化，则优化对话（带prompt预览）
         if (shouldUseAIOptimization()) {
             const provider = getAIProvider();
             const apiKey = getAIApiKey();
@@ -253,18 +253,16 @@ async function generateConversation() {
                 return;
             }
             
-            // 显示加载提示
-            const preview = document.getElementById('conversationPreview');
-            if (preview) {
-                preview.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">正在使用 AI 优化对话，请稍候...</div>';
-            }
-            
-            // 异步优化对话
             try {
-                conversation = await optimizeConversationWithAI(conversation, customerName, platform, provider, apiKey);
+                conversation = await optimizeConversationWithAIWithPreview(conversation, customerName, platform, provider, apiKey);
             } catch (error) {
                 console.error('AI优化失败:', error);
-                alert('AI优化失败，将使用原始对话。错误：' + error.message);
+                if (error.message !== '用户取消了AI生成') {
+                    alert('AI优化失败，将使用原始对话。错误：' + error.message);
+                } else {
+                    // 用户取消，使用原始对话
+                    console.log('用户取消了AI优化，使用原始对话');
+                }
             }
         }
         
