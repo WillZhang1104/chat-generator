@@ -1997,13 +1997,14 @@ async function generateKYCProvisionEmailByStyle(customerName, customerGreeting, 
         const apiKey = getAIApiKey();
         if (apiKey) {
             try {
-                // 直接使用AI生成邮件，而不是先生成模板再优化
-                const emailBody = await generateEmailWithAI(customerName, customerGreeting, customerAge, additionalInfo, provider, apiKey);
+                // 先构建prompt并显示预览，用户确认后再调用AI
+                const emailBody = await generateEmailWithAIWithPreview(customerName, customerGreeting, customerAge, additionalInfo, provider, apiKey);
                 if (emailBody && emailBody.trim()) {
                     return emailBody;
                 }
             } catch (error) {
                 console.error('AI生成邮件失败，将使用基础模板:', error);
+                showAIStatus('error', 'AI生成失败，已回退到基础模板', error.message, provider);
                 // AI生成失败，继续使用基础模板
             }
         }
@@ -5629,18 +5630,12 @@ async function callOpenAIAPI(prompt, apiKey) {
     return parseAIResponse(optimizedText);
 }
 
-// 直接使用AI生成邮件（根据所有元素生成）
-async function generateEmailWithAI(customerName, customerGreeting, customerAge, additionalInfo, provider, apiKey) {
-    if (!customerName || !customerGreeting) {
-        throw new Error('缺少必要参数');
-    }
-
-    try {
-        // 构建提示词
-        const customPrompt = getCustomAIPrompt();
-        const promptMode = getPromptMode();
-        
-        const defaultPrompt = `You are a professional email writing expert. Please write a natural, human-like email in English based on the following requirements:
+// 构建prompt（用于预览）
+function buildEmailPrompt(customerName, customerGreeting, customerAge, additionalInfo) {
+    const customPrompt = getCustomAIPrompt();
+    const promptMode = getPromptMode();
+    
+    const defaultPrompt = `You are a professional email writing expert. Please write a natural, human-like email in English based on the following requirements:
 
 CONTEXT:
 - Customer Name: ${customerName}
@@ -5661,22 +5656,197 @@ EMAIL REQUIREMENTS:
 
 Please write the complete email body (including greeting and signature), and return ONLY the email text, no explanations or comments.`;
 
-        // 如果用户提供了自定义 prompt，根据模式处理
-        let prompt;
-        if (customPrompt && promptMode === 'replace') {
-            // 替换模式：完全替换默认 prompt
-            prompt = customPrompt
-                .replace(/\{customerName\}/g, customerName)
-                .replace(/\{customerAge\}/g, customerAge)
-                .replace(/\{customerGreeting\}/g, customerGreeting)
-                .replace(/\{additionalInfo\}/g, additionalInfo || '');
-        } else if (customPrompt && promptMode === 'append') {
-            // 追加模式：在默认 prompt 基础上添加要求
-            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
-        } else {
-            // 没有自定义 prompt，使用默认
-            prompt = defaultPrompt;
+    // 如果用户提供了自定义 prompt，根据模式处理
+    let prompt;
+    if (customPrompt && promptMode === 'replace') {
+        // 替换模式：完全替换默认 prompt
+        prompt = customPrompt
+            .replace(/\{customerName\}/g, customerName)
+            .replace(/\{customerAge\}/g, customerAge)
+            .replace(/\{customerGreeting\}/g, customerGreeting)
+            .replace(/\{additionalInfo\}/g, additionalInfo || '');
+    } else if (customPrompt && promptMode === 'append') {
+        // 追加模式：在默认 prompt 基础上添加要求
+        prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
+    } else {
+        // 没有自定义 prompt，使用默认
+        prompt = defaultPrompt;
+    }
+    
+    return prompt;
+}
+
+// 显示prompt预览模态框
+function showPromptPreview(provider, prompt) {
+    return new Promise((resolve, reject) => {
+        const modal = document.getElementById('promptPreviewModal');
+        const previewProvider = document.getElementById('previewProvider');
+        const previewPromptText = document.getElementById('previewPromptText');
+        const confirmBtn = document.getElementById('confirmPromptBtn');
+        const cancelBtn = document.getElementById('cancelPromptBtn');
+        
+        if (!modal || !previewProvider || !previewPromptText || !confirmBtn || !cancelBtn) {
+            // 如果模态框不存在，直接resolve（向后兼容）
+            resolve(prompt);
+            return;
         }
+        
+        // 设置提供商名称
+        const providerNames = {
+            'openai': 'OpenAI',
+            'gemini': 'Google Gemini',
+            'groq': 'Groq',
+            'huggingface': 'Hugging Face'
+        };
+        previewProvider.textContent = providerNames[provider] || provider;
+        
+        // 设置prompt内容
+        previewPromptText.value = prompt;
+        
+        // 显示模态框
+        modal.style.display = 'block';
+        
+        // 确认按钮
+        const handleConfirm = () => {
+            const editedPrompt = previewPromptText.value.trim();
+            modal.style.display = 'none';
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+            resolve(editedPrompt);
+        };
+        
+        // 取消按钮
+        const handleCancel = () => {
+            modal.style.display = 'none';
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+            reject(new Error('用户取消了AI生成'));
+        };
+        
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+    });
+}
+
+// 显示AI调用状态
+function showAIStatus(status, title, message, provider) {
+    const toast = document.getElementById('aiStatusToast');
+    const icon = document.getElementById('aiStatusIcon');
+    const text = document.getElementById('aiStatusText');
+    const msg = document.getElementById('aiStatusMessage');
+    const links = document.getElementById('aiStatusLinks');
+    const closeBtn = document.getElementById('closeStatusBtn');
+    
+    if (!toast) return;
+    
+    // 设置状态
+    if (status === 'success') {
+        icon.textContent = '✅';
+        text.textContent = title || 'AI 调用成功';
+        text.style.color = '#28a745';
+    } else if (status === 'error') {
+        icon.textContent = '❌';
+        text.textContent = title || 'AI 调用失败';
+        text.style.color = '#dc3545';
+    } else {
+        icon.textContent = '⏳';
+        text.textContent = title || 'AI 调用中...';
+        text.style.color = '#007bff';
+    }
+    
+    msg.textContent = message || '';
+    
+    // 设置日志链接
+    const logLinks = {
+        'openai': '<a href="https://platform.openai.com/usage" target="_blank" style="color: #007bff; text-decoration: none;">查看 OpenAI 使用日志</a>',
+        'gemini': '<a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #007bff; text-decoration: none;">查看 Gemini API 使用情况</a>',
+        'groq': '<a href="https://console.groq.com/usage" target="_blank" style="color: #007bff; text-decoration: none;">查看 Groq 使用日志</a>',
+        'huggingface': '<a href="https://huggingface.co/settings/tokens" target="_blank" style="color: #007bff; text-decoration: none;">查看 Hugging Face Token 使用情况</a>'
+    };
+    
+    if (provider && logLinks[provider]) {
+        links.innerHTML = logLinks[provider];
+    } else {
+        links.innerHTML = '';
+    }
+    
+    // 显示toast
+    toast.style.display = 'block';
+    
+    // 关闭按钮
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            toast.style.display = 'none';
+        };
+    }
+    
+    // 3秒后自动关闭（成功时）
+    if (status === 'success') {
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// 直接使用AI生成邮件（根据所有元素生成）- 带预览功能
+async function generateEmailWithAIWithPreview(customerName, customerGreeting, customerAge, additionalInfo, provider, apiKey) {
+    if (!customerName || !customerGreeting) {
+        throw new Error('缺少必要参数');
+    }
+
+    try {
+        // 构建prompt
+        let prompt = buildEmailPrompt(customerName, customerGreeting, customerAge, additionalInfo);
+        
+        // 显示预览并等待用户确认
+        prompt = await showPromptPreview(provider, prompt);
+        
+        // 显示调用状态
+        showAIStatus('loading', '正在调用 AI...', `正在使用 ${provider} 生成邮件...`, provider);
+        
+        let emailBody;
+        
+        // 根据提供商调用不同的API
+        switch (provider) {
+            case 'gemini':
+                emailBody = await callGeminiAPIForEmail(prompt, apiKey);
+                break;
+            case 'groq':
+                emailBody = await callGroqAPIForEmail(prompt, apiKey);
+                break;
+            case 'huggingface':
+                emailBody = await callHuggingFaceAPIForEmail(prompt, apiKey);
+                break;
+            case 'openai':
+                emailBody = await callOpenAIAPIForEmail(prompt, apiKey);
+                break;
+            default:
+                throw new Error('不支持的AI提供商');
+        }
+
+        // 验证返回的内容
+        if (emailBody && emailBody.trim()) {
+            showAIStatus('success', 'AI 生成成功', '邮件已成功生成', provider);
+            return emailBody.trim();
+        } else {
+            throw new Error('AI返回的邮件内容为空');
+        }
+    } catch (error) {
+        console.error('AI生成邮件时出错:', error);
+        showAIStatus('error', 'AI 生成失败', error.message, provider);
+        throw error;
+    }
+}
+
+// 直接使用AI生成邮件（根据所有元素生成）- 原函数保留用于微调
+async function generateEmailWithAI(customerName, customerGreeting, customerAge, additionalInfo, provider, apiKey) {
+    if (!customerName || !customerGreeting) {
+        throw new Error('缺少必要参数');
+    }
+
+    try {
+        // 构建prompt
+        const prompt = buildEmailPrompt(customerName, customerGreeting, customerAge, additionalInfo);
 
         let emailBody;
         

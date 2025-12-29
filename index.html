@@ -410,6 +410,36 @@
             <button type="button" class="btn btn-secondary" onclick="clearForm()">清空表单</button>
         </form>
 
+        <!-- AI Prompt 预览模态框 -->
+        <div id="promptPreviewModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; overflow-y: auto;">
+            <div style="position: relative; max-width: 900px; margin: 50px auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                <h2 style="margin-top: 0; margin-bottom: 20px; color: #333;">AI Prompt 预览与编辑</h2>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #666;">AI 提供商：</label>
+                    <span id="previewProvider" style="font-size: 14px; color: #333;"></span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #666;">将要发送的 Prompt：</label>
+                    <textarea id="previewPromptText" style="width: 100%; min-height: 300px; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; resize: vertical;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button id="cancelPromptBtn" class="btn btn-secondary" style="padding: 10px 20px;">取消</button>
+                    <button id="confirmPromptBtn" class="btn" style="padding: 10px 20px; background: #28a745;">确认并提交 AI</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI 调用状态提示 -->
+        <div id="aiStatusToast" style="display: none; position: fixed; top: 20px; right: 20px; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10001; max-width: 400px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <span id="aiStatusIcon" style="font-size: 24px;">⏳</span>
+                <span id="aiStatusText" style="font-weight: 600; font-size: 14px;">AI 调用中...</span>
+            </div>
+            <div id="aiStatusMessage" style="font-size: 13px; color: #666; margin-bottom: 10px;"></div>
+            <div id="aiStatusLinks" style="font-size: 12px;"></div>
+            <button id="closeStatusBtn" style="margin-top: 10px; padding: 6px 12px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">关闭</button>
+        </div>
+
         <div class="preview-section" id="previewSection" style="display: none;">
             <h2 class="preview-title">对话预览</h2>
             <div style="margin-bottom: 15px;">
