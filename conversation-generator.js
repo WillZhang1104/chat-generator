@@ -582,7 +582,34 @@ function generateConversationByStyle(customerName, purposeDetails, formMethod, p
     const generator = conversationTemplates[style] || generateFriendlyConversation;
     const variant = getConversationVariant(customerName);
     const seed = getRandomSeed(customerName);
-    return generator(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
+    const conversation = generator(customerName, purposeDetails, formMethod, platform, additionalInfo, conversationStart, variant, seed);
+    
+    // 如果是WhatsApp平台且选择PDF附件提交，在发送PDF消息后添加附件消息
+    if (platform === 'whatsapp' && formMethod === 'pdf') {
+        // 找到发送PDF消息的位置，在其后添加附件消息
+        for (let i = 0; i < conversation.length; i++) {
+            const msg = conversation[i];
+            if (msg.sender === 'company' && msg.text && (msg.text.toLowerCase().includes('pdf') || msg.text.toLowerCase().includes('form'))) {
+                // 在找到的消息后添加附件消息
+                const timeParts = msg.time.split(' ');
+                const hour = parseInt(timeParts[1].split(':')[0]);
+                const minute = parseInt(timeParts[1].split(':')[1]);
+                const attachmentTime = formatTimeWithRange(getConversationDate(), hour, hour + 1);
+                conversation.splice(i + 1, 0, {
+                    sender: 'company',
+                    isAttachment: true,
+                    attachmentType: 'pdf',
+                    attachmentName: 'Client Onboarding Form.pdf',
+                    attachmentSize: '655 kB',
+                    attachmentPages: '8頁',
+                    time: attachmentTime
+                });
+                break;
+            }
+        }
+    }
+    
+    return conversation;
 }
 
 // 构建目的文本，融入细节
@@ -1548,6 +1575,8 @@ function displayConversation(messages) {
 function generateBrowserScript(conversation, platform) {
     // 生成可以直接复制粘贴的HTML代码
     const customerName = document.getElementById('customerName').value;
+    const formMethod = document.querySelector('input[name="formMethod"]:checked')?.value;
+    
     const htmlMessages = conversation.map((msg, index) => {
         let html = '';
         // 如果是WhatsApp平台，检查是否需要添加间隔
@@ -1558,7 +1587,11 @@ function generateBrowserScript(conversation, platform) {
                 html += '<div style="height: 8px;"></div>\n';
             }
         }
-        if (platform === 'telegram') {
+        
+        // 检查是否是PDF附件消息（仅在WhatsApp平台）
+        if (platform === 'whatsapp' && msg.isAttachment && msg.attachmentType === 'pdf') {
+            html += generateWhatsAppAttachmentHTML(msg, customerName, index);
+        } else if (platform === 'telegram') {
             html += generateTelegramMessageHTML(msg, customerName, index, conversation);
         } else {
             html += generateWhatsAppMessageHTML(msg, customerName, index);
@@ -3758,6 +3791,28 @@ function generateWhatsAppMessageHTML(msg, customerName, index) {
     
     let html = `<div class="x1n2onr6"><div tabindex="-1" class="" role="row"><div tabindex="-1" class="${className}" data-id="${messageId}"><div class="x78zum5 xdt5ytf" data-virtualized="false"><div class=""><div class="${messageClass} focusable-list-item _amjy _amjz _amjw x1klvx2g xahtqtb"><span class=""></span><div class="_amk4 false _amkd _amk5 false"><span aria-hidden="true" data-icon="${tailIcon}" class="_amk7"><svg viewBox="0 0 8 13" height="13" width="8" preserveAspectRatio="xMidYMid meet" class="" version="1.1" x="0px" y="0px" enable-background="new 0 0 8 13"><title>${tailIcon}</title>${tailPath}</svg></span><div class="_amk6 _amlo false false"><span aria-label="${ariaLabel}"></span><div><div class="x9f619 x1hx0egp x1yrsyyn xizg8k xu9hqtb xwib8y2"><div class="copyable-text" data-pre-plain-text="${timeFull} ${senderName}: "><div class="_akbu x6ikm8r x10wlt62"><span dir="ltr" class="x1f6kntn xjb2p0i x8r4c90 xo1l8bm x1ic7a3i x12xpedu _ao3e selectable-text copyable-text" style="min-height: 0px;"><span class="">${escapedText}</span></span><span class=""><span class="x3nfvp2 xxymvpz xlshs6z xqtp20y xexx8yu x1uc92m x18d9i69 x181vq82 x12lo8hy x152skdk" aria-hidden="true">${isCustomer ? '<span class="x1c4vz4f x2lah0s"></span>' : '<span class="x1c4vz4f x2lah0s xn6xy2s"></span>'}<span class="x1c4vz4f x2lah0s">${timeDisplay}</span></span></span></div></div><div class="x1n2onr6 x1n327nk x18mqm2i xhsvlbd x14z9mp xz62fqu x1wbi8v6"><div class="x1bvqhpb xx3o462 xuxw1ft x78zum5 x6s0dn4 x12lo8hy x152skdk"><span class="x1rg5ohu x16dsc37" dir="auto"><span class="x193iq5w xeuugli x13faqbe x1vvkbs xt0psk2 x1fj9vlw xhslqc4 x1hx0egp x1pg5gke xjb2p0i xo1l8bm xl2ypbo x1ic7a3i" style="--x-fontSize: 12px; --x-lineHeight: 8.5137px;">${timeDisplay}</span></span>${isCustomer ? '' : '<div class="xhslqc4 x1rg5ohu x7phf20"><span aria-hidden="false" aria-label=" Read " data-icon="msg-dblcheck" class="x1rv0e52"><svg viewBox="0 0 16 11" height="11" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>msg-dblcheck</title><path d="M11.0714 0.652832C10.991 0.585124 10.8894 0.55127 10.7667 0.55127C10.6186 0.55127 10.4916 0.610514 10.3858 0.729004L4.19688 8.36523L1.79112 6.09277C1.7488 6.04622 1.69802 6.01025 1.63877 5.98486C1.57953 5.95947 1.51817 5.94678 1.45469 5.94678C1.32351 5.94678 1.20925 5.99544 1.11192 6.09277L0.800883 6.40381C0.707784 6.49268 0.661235 6.60482 0.661235 6.74023C0.661235 6.87565 0.707784 6.98991 0.800883 7.08301L3.79698 10.0791C3.94509 10.2145 4.11224 10.2822 4.29844 10.2822C4.40424 10.2822 4.5058 10.259 4.60313 10.2124C4.70046 10.1659 4.78086 10.1003 4.84434 10.0156L11.4903 1.59863C11.5623 1.5013 11.5982 1.40186 11.5982 1.30029C11.5982 1.14372 11.5348 1.01888 11.4078 0.925781L11.0714 0.652832ZM8.6212 8.32715C8.43077 8.20866 8.2488 8.09017 8.0753 7.97168C7.99489 7.89128 7.8891 7.85107 7.75791 7.85107C7.6098 7.85107 7.4892 7.90397 7.3961 8.00977L7.10411 8.33984C7.01947 8.43717 6.97715 8.54508 6.97715 8.66357C6.97715 8.79476 7.0237 8.90902 7.1168 9.00635L8.1959 10.0791C8.33132 10.2145 8.49636 10.2822 8.69102 10.2822C8.79681 10.2822 8.89838 10.259 8.99571 10.2124C9.09304 10.1659 9.17556 10.1003 9.24327 10.0156L15.8639 1.62402C15.9358 1.53939 15.9718 1.43994 15.9718 1.32568C15.9718 1.1818 15.9125 1.05697 15.794 0.951172L15.4386 0.678223C15.3582 0.610514 15.2587 0.57666 15.1402 0.57666C14.9964 0.57666 14.8715 0.635905 14.7657 0.754395L8.6212 8.32715Z" fill="currentColor"></path></svg></span></div>'}
 </div></div></div></div><span class=""></span><div class="_amlr"></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j ${bottomDivClass} x1q0g3np x6s0dn4 _amj_"><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 xexx8yu x1im30kd x18d9i69 x1djpfga"><div></div></div></div><span aria-label="This is an auto-delete message"></span></div><div class="x78zum5 xbfrwjf x8k05lb xeq5yr9 x1n2onr6 ${bottomClass}"></div></div></div></div></div></div></div>`;
+    
+    return html;
+}
+
+// 生成WhatsApp附件消息HTML
+function generateWhatsAppAttachmentHTML(msg, customerName, index) {
+    const messageId = `true_${Date.now() + index}@c.us_${generateRandomId()}`;
+    const className = '_amjv xscbp6u';
+    const messageClass = 'message-out focusable-list-item _amjy _amjz _amjw x1klvx2g xahtqtb';
+    
+    // 转换时间格式
+    const timeParts = parseTime(msg.time);
+    const timeDisplay = timeParts.display; // 如 "上午11:42"
+    
+    const attachmentName = msg.attachmentName || 'Client Onboarding Form.pdf';
+    const attachmentPages = msg.attachmentPages || '8頁';
+    const attachmentSize = msg.attachmentSize || '655 kB';
+    
+    // 生成PDF图标的base64（简化版，使用SVG）
+    const pdfIconSVG = `<svg viewBox="0 0 22 26" width="26" preserveAspectRatio="xMidYMid meet" fill="none"><title>document-PDF-icon</title><path fill="currentColor" d="M1 5.8c0-1.68 0-2.52.327-3.162a3 3 0 0 1 1.311-1.311C3.28 1 4.12 1 5.8 1h5.549c.978 0 1.468 0 1.928.11.408.099.798.26 1.156.48.404.247.75.593 1.441 1.285L17 4l2.125 2.125c.692.692 1.038 1.038 1.286 1.442a4 4 0 0 1 .479 1.156c.11.46.11.95.11 1.928V20.2c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C18.72 25 17.88 25 16.2 25H5.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C1 22.72 1 21.88 1 20.2V5.8Z"></path></svg>`;
+    
+    const html = `<div class="x1n2onr6"><div tabindex="-1" class="" role="row"><div tabindex="-1" class="${className}" data-id="${messageId}"><div class="x78zum5 xdt5ytf" data-virtualized="false"><div class=""><div class="${messageClass}"><span class=""></span><div class="_amk4 false _amkm false"><div class="_amk6 _amlo false false"><span aria-label="你："></span><div class="x9f619 x1o095ql x1u9i22x x1gn2fwh x4c6wsc x1yt8dio"><div role="button" tabindex="0" title="下載「${attachmentName}」" class="x9f619 x78zum5 xdt5ytf x1qjc9v5 xh8yej3 x6ikm8r x10wlt62 x1heor9g x16tdsg8 xaejkm2 x1uuy6ko"><div class="x1n2onr6 xpyat2d x1n2onr6 xh8yej3"><div class="x10l6tqk x1agz8ms xiy17q3 x18d0r48 xso031l x1q0q8m5 x1jpdw5n x5yr21d x10l6tqk xh8yej3" style="background-image: url(&quot;data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjIgMjYiIHdpZHRoPSIyNiIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMSA1LjhjMC0xLjY4IDAtMi41Mi4zMjctMy4xNjJhMyAzIDAgMCAxIDEuMzExLTEuMzExQzMuMjggMSA0LjEyIDEgNS44IDFoNS41NDljLjk3OCAwIDEuNDY4IDAgMS45MjguMTEuNDA4LjA5OS43OTguMjYgMS4xNTYuNDguNDA0LjI0Ny43NS41OTMgMS40NDEgMS4yODVMMTcgNGwyLjEyNSAyLjEyNWMuNjkyLjY5MiAxLjAzOCAxLjAzOCAxLjI4NiAxLjQ0MmE0IDQgMCAwIDEgLjQ3OSAxLjE1NmMuMTEuNDYuMTEuOTUuMTEgMS45MjhWMjAuMmMwIDEuNjggMCAyLjUyLS4zMjcgMy4xNjJhMyAzIDAgMCAxLTEuMzExIDEuMzExQzE4LjcyIDI1IDE3Ljg4IDI1IDE2LjIgMjVINS44Yy0xLjY4IDAtMi41MiAwLTMuMTYyLS4zMjdhMyAzIDAgMCAxLTEuMzExLTEuMzExQzEgMjIuNzIgMSAyMS44OCAxIDIwLjJWNS44WiIvPjwvc3ZnPg==&quot;);"></div><div class="x10l6tqk x1agz8ms xiy17q3 x18d0r48 xso031l x1q0q8m5 x1jpdw5n x5yr21d x10l6tqk xh8yej3" style="background-image: url(&quot;blob:https://web.whatsapp.com/ec4a8511-f95b-433e-9fdd-384c2effbf0b&quot;);"></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 x1n2onr6 x1qiirwl xdj266r xat24cr x1sa5p1d x1hm9lzh" style="flex-grow: 1;"><div class="x6ikm8r x10wlt62 xlyipyv x1yn0g08 x104kibb x1h7i4cw x1ua5tub"><span dir="auto" class="x13faqbe _ao3e" style="min-height: 0px;">${attachmentName}</span></div><div class="xx3o462 x1ncwhqj xyqdw3p xyri2b xg8j3zb x1c1uobl x152skdk x1bvqhpb xt1z7ec x1yp9nv9 x186kree x1y04bub x1duis28"><span class="x1rg5ohu x6ikm8r x10wlt62 xlyipyv xuxw1ft xwcf1sq" title="${attachmentPages}">${attachmentPages}</span><span class="x1rg5ohu x6ikm8r x10wlt62 xlyipyv xuxw1ft xwcf1sq xdj266r x7g7pl8 xat24cr x1wbi8v6">•</span><span data-meta-key="type" class="x1rg5ohu x6ikm8r x10wlt62 xlyipyv xuxw1ft xwcf1sq" title="PDF">PDF</span><span class="x1rg5ohu x6ikm8r x10wlt62 xlyipyv xuxw1ft xwcf1sq xdj266r x7g7pl8 xat24cr x1wbi8v6">•</span><span class="x1rg5ohu x6ikm8r x10wlt62 xlyipyv xuxw1ft xwcf1sq" title="${attachmentSize}">${attachmentSize}</span><span class="x1rg5ohu x6ikm8r x10wlt62 xlyipyv xuxw1ft xwcf1sq xdj266r x7g7pl8 xat24cr x1wbi8v6">•</span></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8" style="flex-grow: 0; flex-shrink: 0;"><div class="x1n2onr6 x78zum5 x1okw0bk x6s0dn4 xl56j7k x1691je0 x90ne7k x1sj5et5"><span aria-hidden="true" data-icon="audio-download" class=""><svg viewBox="0 0 34 34" height="34" width="34" preserveAspectRatio="xMidYMid meet" fill="none" version="1.1"><title>audio-download</title><path fill="currentColor" d="M17,2c8.3,0,15,6.7,15,15s-6.7,15-15,15S2,25.3,2,17S8.7,2,17,2 M17,1C8.2,1,1,8.2,1,17 s7.2,16,16,16s16-7.2,16-16S25.8,1,17,1L17,1z"></path><path fill="currentColor" d="M22.4,17.5h-3.2v-6.8c0-0.4-0.3-0.7-0.7-0.7h-3.2c-0.4,0-0.7,0.3-0.7,0.7v6.8h-3.2 c-0.6,0-0.8,0.4-0.4,0.8l5,5.3c0.5,0.7,1,0.5,1.5,0l5-5.3C23.2,17.8,23,17.5,22.4,17.5z"></path></svg></span></div></div></div></div></div><div class="x10l6tqk x1d37e2g x7308am"><div class="x1bvqhpb xx3o462 xuxw1ft x78zum5 x6s0dn4 x12lo8hy x152skdk" role="button"><span class="x1rg5ohu x16dsc37" dir="auto"><span class="x193iq5w xeuugli x13faqbe x1vvkbs xt0psk2 x1fj9vlw xhslqc4 x1hx0egp x1pg5gke xjb2p0i xo1l8bm xl2ypbo x1ic7a3i" style="--x-fontSize: 12px; --x-lineHeight: 8.5137px;">${timeDisplay}</span></span><div class="xhslqc4 x1rg5ohu x7phf20"><span aria-hidden="false" aria-label=" 已讀 " data-icon="msg-dblcheck" class="x1rv0e52"><svg viewBox="0 0 16 11" height="11" width="16" preserveAspectRatio="xMidYMid meet" fill="none"><title>msg-dblcheck</title><path d="M11.0714 0.652832C10.991 0.585124 10.8894 0.55127 10.7667 0.55127C10.6186 0.55127 10.4916 0.610514 10.3858 0.729004L4.19688 8.36523L1.79112 6.09277C1.7488 6.04622 1.69802 6.01025 1.63877 5.98486C1.57953 5.95947 1.51817 5.94678 1.45469 5.94678C1.32351 5.94678 1.20925 5.99544 1.11192 6.09277L0.800883 6.40381C0.707784 6.49268 0.661235 6.60482 0.661235 6.74023C0.661235 6.87565 0.707784 6.98991 0.800883 7.08301L3.79698 10.0791C3.94509 10.2145 4.11224 10.2822 4.29844 10.2822C4.40424 10.2822 4.5058 10.259 4.60313 10.2124C4.70046 10.1659 4.78086 10.1003 4.84434 10.0156L11.4903 1.59863C11.5623 1.5013 11.5982 1.40186 11.5982 1.30029C11.5982 1.14372 11.5348 1.01888 11.4078 0.925781L11.0714 0.652832ZM8.6212 8.32715C8.43077 8.20866 8.2488 8.09017 8.0753 7.97168C7.99489 7.89128 7.8891 7.85107 7.75791 7.85107C7.6098 7.85107 7.4892 7.90397 7.3961 8.00977L7.10411 8.33984C7.01947 8.43717 6.97715 8.54508 6.97715 8.66357C6.97715 8.79476 7.0237 8.90902 7.1168 9.00635L8.1959 10.0791C8.33132 10.2145 8.49636 10.2822 8.69102 10.2822C8.79681 10.2822 8.89838 10.259 8.99571 10.2124C9.09304 10.1659 9.17556 10.1003 9.24327 10.0156L15.8639 1.62402C15.9358 1.53939 15.9718 1.43994 15.9718 1.32568C15.9718 1.1818 15.9125 1.05697 15.794 0.951172L15.4386 0.678223C15.3582 0.610514 15.2587 0.57666 15.1402 0.57666C14.9964 0.57666 14.8715 0.635905 14.7657 0.754395L8.6212 8.32715Z" fill="currentColor"></path></svg></span></div></div></div></div><span class=""></span><div class="x10l6tqk xyc4j8s xceh6e4"></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x13a6bvl x1q0g3np x6s0dn4 _amj_"><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 xexx8yu x1im30kd x18d9i69 x1djpfga"><div></div></div><div class="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 xexx8yu x1im30kd x18d9i69 x1djpfga"><div role="button" tabindex="0" aria-label="轉寄媒體" class="x78zum5 x6s0dn4 xl56j7k xeusxvb x1pahc9y x1ertn4p xx43kwn"><span aria-hidden="true" data-icon="forward-refreshed" class="xhslqc4"><svg viewBox="0 0 24 24" height="20" preserveAspectRatio="xMidYMid meet" fill="none"><title>forward-refreshed</title><path d="M19.175 11L15.3 7.12505C15.1 6.92505 15 6.68755 15 6.41255C15 6.13755 15.1 5.90005 15.3 5.70005C15.5 5.51672 15.7375 5.42505 16.0125 5.42505C16.2875 5.42505 16.5167 5.51672 16.7 5.70005L21.3 10.3C21.4 10.4 21.4708 10.5084 21.5125 10.625C21.5542 10.7417 21.575 10.8667 21.575 11C21.575 11.1334 21.5542 11.2584 21.5125 11.375C21.4708 11.4917 21.4 11.6 21.3 11.7L16.7 16.3C16.5 16.5 16.2667 16.5959 16 16.5875C15.7333 16.5792 15.5 16.4834 15.3 16.3C15.1 16.1 14.9958 15.8667 14.9875 15.6C14.9792 15.3334 15.075 15.1 15.275 14.9L19.175 11ZM13.175 12H7C6.16667 12 5.45833 12.2917 4.875 12.875C4.29167 13.4584 4 14.1667 4 15V18C4 18.2834 3.90417 18.5209 3.7125 18.7125C3.52083 18.9042 3.28333 19 3 19C2.71667 19 2.47917 18.9042 2.2875 18.7125C2.09583 18.5209 2 18.2834 2 18V15C2 13.6167 2.4875 12.4375 3.4625 11.4625C4.4375 10.4875 5.61667 10 7 10H13.175L10.3 7.12505C10.1 6.92505 10 6.68755 10 6.41255C10 6.13755 10.1 5.90005 10.3 5.70005C10.5 5.51672 10.7375 5.42505 11.0125 5.42505C11.2875 5.42505 11.5167 5.51672 11.7 5.70005L16.3 10.3C16.4 10.4 16.4708 10.5084 16.5125 10.625C16.5542 10.7417 16.575 10.8667 16.575 11C16.575 11.1334 16.5542 11.2584 16.5125 11.375C16.4708 11.4917 16.4 11.6 16.3 11.7L11.7 16.3C11.5 16.5 11.2667 16.5959 11 16.5875C10.7333 16.5792 10.5 16.4834 10.3 16.3C10.1 16.1 9.99583 15.8667 9.9875 15.6C9.97917 15.3334 10.075 15.1 10.275 14.9L13.175 12Z" fill="currentColor"></path></svg></span></div></div></div></div><div class="x78zum5 xbfrwjf x8k05lb xeq5yr9 x1n2onr6 x1f889gz xpvyfi4"></div></div></div></div></div></div></div>`;
     
     return html;
 }
