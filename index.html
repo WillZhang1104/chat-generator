@@ -390,9 +390,9 @@
                                     <span>替换模式（完全替换默认 prompt）</span>
                                 </label>
                             </div>
-                            <textarea id="customAIPrompt" name="customAIPrompt" placeholder="追加模式：输入要添加的要求，例如：'Please make the conversation more formal.'&#10;替换模式：输入完整的 prompt，可以使用变量：{platformContext}、{customerName}、{conversationText}" style="font-size: 12px; width: 100%; min-height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Courier New', monospace;"></textarea>
+                            <textarea id="customAIPrompt" name="customAIPrompt" placeholder="追加模式：输入要添加的要求，可以用中文或英文，例如：'请让邮件更正式一些' 或 'Please make the conversation more formal.'&#10;替换模式：输入完整的 prompt（可以用中文），可以使用变量：{customerName}、{customerAge}、{customerGreeting}、{additionalInfo}" style="font-size: 12px; width: 100%; min-height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Courier New', monospace;"></textarea>
                             <p style="font-size: 11px; color: #999; margin-top: 5px;" id="promptHint">
-                                提示：在 prompt 中可以使用变量：<code>{platformContext}</code>（平台类型）、<code>{customerName}</code>（客户名称）、<code>{conversationText}</code>（原始对话文本）。
+                                提示：<strong>可以用中文写prompt</strong>，AI会自动理解并生成英文邮件。在 prompt 中可以使用变量：<code>{customerName}</code>（客户名称）、<code>{customerAge}</code>（客户年龄）、<code>{customerGreeting}</code>（客户称呼）、<code>{additionalInfo}</code>（额外信息）。
                             </p>
                         </div>
                     </div>

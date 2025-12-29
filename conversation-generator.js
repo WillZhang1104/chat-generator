@@ -5644,8 +5644,8 @@ CONTEXT:
 ${additionalInfo ? `- Additional Information: ${additionalInfo}` : ''}
 
 EMAIL REQUIREMENTS:
-1. This is a reply email from the customer to WSP Team regarding an enhanced KYC documentation request
-2. The customer is willing to provide bank statements for the last 2-3 months
+1. This is a reply email from the customer to WSP Team regarding a request for transaction proof documents
+2. The customer has already provided the required documents, see attachments
 3. Write the email in English - DO NOT translate to Chinese
 4. Adjust the language style naturally based on the customer's age (${customerAge} years old). Consider how people of this age typically communicate - their tone, formality level, and communication preferences. Make it authentic and natural.
 5. If additional information is provided, naturally integrate it into the email (translate to English if needed, and weave it naturally into the context, don't just insert it directly)
