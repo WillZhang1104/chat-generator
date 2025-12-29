@@ -5706,25 +5706,37 @@ function showPromptPreview(provider, prompt) {
         // 显示模态框
         modal.style.display = 'block';
         
-        // 确认按钮
-        const handleConfirm = () => {
-            const editedPrompt = previewPromptText.value.trim();
+        // 关闭函数
+        const closeModal = () => {
             modal.style.display = 'none';
             confirmBtn.removeEventListener('click', handleConfirm);
             cancelBtn.removeEventListener('click', handleCancel);
+            modal.removeEventListener('click', handleBackgroundClick);
+        };
+        
+        // 确认按钮
+        const handleConfirm = () => {
+            const editedPrompt = previewPromptText.value.trim();
+            closeModal();
             resolve(editedPrompt);
         };
         
         // 取消按钮
         const handleCancel = () => {
-            modal.style.display = 'none';
-            confirmBtn.removeEventListener('click', handleConfirm);
-            cancelBtn.removeEventListener('click', handleCancel);
+            closeModal();
             reject(new Error('用户取消了AI生成'));
+        };
+        
+        // 点击背景关闭
+        const handleBackgroundClick = (e) => {
+            if (e.target === modal) {
+                handleCancel();
+            }
         };
         
         confirmBtn.addEventListener('click', handleConfirm);
         cancelBtn.addEventListener('click', handleCancel);
+        modal.addEventListener('click', handleBackgroundClick);
     });
 }
 
