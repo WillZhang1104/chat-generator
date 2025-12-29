@@ -200,7 +200,7 @@ async function generateConversation() {
                 alert('邮件场景需要填写邮件日期');
                 return;
             }
-            generateEmailHTML(conversation, customerName, senderEmail, null, customerGreeting, emailDate);
+            await generateEmailHTML(conversation, customerName, senderEmail, null, customerGreeting, emailDate);
             // 显示邮件使用说明
             document.getElementById('whatsappInstructions').style.display = 'none';
             document.getElementById('emailInstructions').style.display = 'block';
@@ -288,7 +288,7 @@ async function generateConversation() {
                 alert('邮件场景需要填写邮件日期');
                 return;
             }
-            generateEmailHTML(conversation, customerName, senderEmail, purposeDetails, customerGreeting, emailDate);
+            await generateEmailHTML(conversation, customerName, senderEmail, purposeDetails, customerGreeting, emailDate);
             // 显示邮件使用说明
             document.getElementById('whatsappInstructions').style.display = 'none';
             document.getElementById('emailInstructions').style.display = 'block';
@@ -1573,7 +1573,7 @@ function generateBrowserScript(conversation, platform) {
 }
 
 // 生成邮件格式的对话（正式邮件格式，但更自然多样化）
-function generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting, additionalInfo) {
+async function generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting, additionalInfo, customerAge = null) {
     const emails = [];
     const now = new Date();
     const style = getConversationStyle(customerName); // 根据客户名称确定风格
@@ -1599,7 +1599,7 @@ function generateEmailConversation(customerName, purposeDetails, conversationSce
         // 补充材料场景
         if (willProvide) {
             // 愿意提供 - 根据风格生成不同格式的同意邮件
-            const emailBody = generateKYCProvisionEmailByStyle(customerName, customerGreeting, style, variant, seed, additionalInfo);
+            const emailBody = await generateKYCProvisionEmailByStyle(customerName, customerGreeting, style, variant, seed, additionalInfo, customerAge);
             
             emails.push({
                 sender: 'customer',
@@ -1990,7 +1990,7 @@ function generateKYCRefusalEmailByStyle(customerName, customerGreeting, style, v
 }
 
 // 根据风格生成KYC同意提供邮件（多样化）
-function generateKYCProvisionEmailByStyle(customerName, customerGreeting, style, variant = 0, seed = 0, additionalInfo = '') {
+async function generateKYCProvisionEmailByStyle(customerName, customerGreeting, style, variant = 0, seed = 0, additionalInfo = '', customerAge = null) {
     const emailTemplates = {
         verbose: generateVerboseKYCProvisionEmail,
         concise: generateConciseKYCProvisionEmail,
@@ -2001,7 +2001,23 @@ function generateKYCProvisionEmailByStyle(customerName, customerGreeting, style,
     };
     
     const generator = emailTemplates[style] || generateFriendlyKYCProvisionEmail;
-    return generator(customerName, customerGreeting, variant, seed, additionalInfo);
+    let emailBody = generator(customerName, customerGreeting, variant, seed, additionalInfo);
+    
+    // 如果是补充材料场景且客户愿意提供，且启用了AI优化，则进行AI优化
+    if (customerAge && customerAge >= 60 && shouldUseAIOptimization()) {
+        const provider = getAIProvider();
+        const apiKey = getAIApiKey();
+        if (apiKey) {
+            try {
+                emailBody = await optimizeEmailWithAI(emailBody, customerName, customerAge, additionalInfo, provider, apiKey);
+            } catch (error) {
+                console.error('邮件AI优化失败:', error);
+                // 优化失败时使用原始邮件内容
+            }
+        }
+    }
+    
+    return emailBody;
 }
 
 // 话多型KYC拒绝邮件
@@ -2367,7 +2383,7 @@ function generateProfessionalKYCProvisionEmail(customerName, customerGreeting, v
 }
 
 // 生成Titan.email界面HTML
-function generateEmailHTML(conversation, customerName, senderEmail, purposeDetails, customerGreeting, emailDate) {
+async function generateEmailHTML(conversation, customerName, senderEmail, purposeDetails, customerGreeting, emailDate) {
     const conversationScene = document.querySelector('input[name="conversationScene"]:checked').value;
     const willProvide = conversationScene === 'kyc' 
         ? document.querySelector('input[name="willProvide"]:checked')?.value === 'yes'
@@ -2376,8 +2392,17 @@ function generateEmailHTML(conversation, customerName, senderEmail, purposeDetai
     // 获取额外信息
     const additionalInfo = document.getElementById('additionalInfo')?.value || '';
     
-    // 生成邮件格式的对话
-    const emails = generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting, additionalInfo);
+    // 获取客户年龄（仅在补充材料场景需要）
+    let customerAge = null;
+    if (conversationScene === 'kyc') {
+        const ageInput = document.getElementById('customerAge');
+        if (ageInput && ageInput.value) {
+            customerAge = parseInt(ageInput.value);
+        }
+    }
+    
+    // 生成邮件格式的对话（异步，因为可能涉及AI优化）
+    const emails = await generateEmailConversation(customerName, purposeDetails, conversationScene, willProvide, customerGreeting, additionalInfo, customerAge);
     
     // 保存邮件数据用于编辑
     currentEmails = emails;
@@ -2434,10 +2459,12 @@ function generateEmailHTML(conversation, customerName, senderEmail, purposeDetai
 
 // 生成Titan.email界面HTML
 function generateTitanEmailHTML(emails, customerName, senderEmail, conversationScene, emailDate, attachments = []) {
-    // 根据场景生成主题
-    const subject = conversationScene === 'kyc' 
+    // 优先使用邮件中的subject，如果没有则根据场景生成默认主题
+    const subject = emails && emails.length > 0 && emails[0].subject 
+        ? emails[0].subject 
+        : (conversationScene === 'kyc' 
         ? 'Enhanced KYC Documentation Request'
-        : 'Account Opening Inquiry - USD to USDT';
+            : 'Account Opening Inquiry - USD to USDT');
     
     let html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -5064,6 +5091,72 @@ Return ONLY the JSON array, no other content.`;
     }
 }
 
+// Google Gemini API for Email（免费，推荐）
+async function callGeminiAPIForEmail(prompt, apiKey) {
+    const apiConfigs = [
+        {
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+            model: 'gemini-2.5-flash'
+        },
+        {
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
+            model: 'gemini-2.5-pro'
+        },
+        {
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            model: 'gemini-2.0-flash'
+        },
+        {
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${apiKey}`,
+            model: 'gemini-2.0-flash-001'
+        }
+    ];
+    
+    let lastError = null;
+    
+    for (const config of apiConfigs) {
+        try {
+            const response = await fetch(config.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                lastError = new Error(`Gemini API请求失败 (${config.model}): ${response.status} - ${errorData.error?.message || response.statusText}`);
+                if (response.status === 404 && apiConfigs.indexOf(config) < apiConfigs.length - 1) {
+                    continue;
+                }
+                throw lastError;
+            }
+
+            const data = await response.json();
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
+                throw new Error('Gemini API 返回格式不正确');
+            }
+            const optimizedText = data.candidates[0].content.parts[0].text.trim();
+            
+            return parseEmailResponse(optimizedText);
+        } catch (error) {
+            if (apiConfigs.indexOf(config) === apiConfigs.length - 1) {
+                throw error;
+            }
+            lastError = error;
+        }
+    }
+    
+    throw lastError || new Error('所有 Gemini API 配置都不可用，请检查您的 API Key 是否正确');
+}
+
 // Google Gemini API（免费，推荐）
 async function callGeminiAPI(prompt, apiKey) {
     // 根据实际的模型列表，使用支持的模型
@@ -5138,6 +5231,71 @@ async function callGeminiAPI(prompt, apiKey) {
     throw lastError || new Error('所有 Gemini API 配置都不可用，请检查您的 API Key 是否正确');
 }
 
+// Groq API for Email（免费，快速）
+async function callGroqAPIForEmail(prompt, apiKey) {
+    const models = [
+        'llama-3.3-70b-versatile',
+        'llama-3.1-8b-instant',
+        'mixtral-8x7b-32768',
+        'gemma2-9b-it'
+    ];
+    
+    let lastError = null;
+    
+    for (const model of models) {
+        try {
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a professional email optimization assistant. Your task is to refine English emails to make them more natural and human-like, while keeping them in English. DO NOT translate to Chinese or any other language.'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 2000
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error?.message || response.statusText;
+                
+                if (response.status === 400 && (errorMessage.includes('decommissioned') || errorMessage.includes('not found'))) {
+                    lastError = new Error(`Groq API请求失败 (${model}): ${response.status} - ${errorMessage}`);
+                    if (models.indexOf(model) < models.length - 1) {
+                        continue;
+                    }
+                }
+                
+                throw new Error(`Groq API请求失败 (${model}): ${response.status} - ${errorMessage}`);
+            }
+
+            const data = await response.json();
+            const optimizedText = data.choices[0].message.content.trim();
+            
+            return parseEmailResponse(optimizedText);
+        } catch (error) {
+            if (models.indexOf(model) === models.length - 1) {
+                throw error;
+            }
+            lastError = error;
+        }
+    }
+    
+    throw lastError || new Error('所有 Groq 模型都不可用');
+}
+
 // Groq API（免费，快速）
 async function callGroqAPI(prompt, apiKey) {
     // Groq 当前支持的模型列表（根据 https://console.groq.com/docs/deprecations）
@@ -5210,6 +5368,36 @@ async function callGroqAPI(prompt, apiKey) {
     throw lastError || new Error('所有 Groq 模型都不可用，请检查您的 API Key 是否正确');
 }
 
+// Hugging Face API for Email（免费）
+async function callHuggingFaceAPIForEmail(prompt, apiKey) {
+    const response = await fetch('https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            inputs: prompt,
+            parameters: {
+                max_new_tokens: 2000,
+                temperature: 0.7
+            }
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Hugging Face API请求失败: ${response.status} - ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (!data || !Array.isArray(data) || !data[0] || !data[0].generated_text) {
+        throw new Error('Hugging Face API 返回格式不正确');
+    }
+    
+    const optimizedText = data[0].generated_text.trim();
+    return parseEmailResponse(optimizedText);
+}
+
 // Hugging Face API（免费）
 async function callHuggingFaceAPI(prompt, apiKey) {
     const response = await fetch('https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf', {
@@ -5236,6 +5424,45 @@ async function callHuggingFaceAPI(prompt, apiKey) {
     const optimizedText = Array.isArray(data) ? data[0].generated_text : data.generated_text;
     
     return parseAIResponse(optimizedText);
+}
+
+// OpenAI API for Email（付费）
+async function callOpenAIAPIForEmail(prompt, apiKey) {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are a professional email optimization assistant. Your task is to refine English emails to make them more natural and human-like, while keeping them in English. DO NOT translate to Chinese or any other language.'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`OpenAI API请求失败: ${response.status} - ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error('OpenAI API 返回格式不正确');
+    }
+    
+    const optimizedText = data.choices[0].message.content.trim();
+    return parseEmailResponse(optimizedText);
 }
 
 // OpenAI API（付费）
@@ -5274,7 +5501,86 @@ async function callOpenAIAPI(prompt, apiKey) {
     return parseAIResponse(optimizedText);
 }
 
-// 解析AI返回的内容
+// 优化邮件内容的AI函数
+async function optimizeEmailWithAI(emailBody, customerName, customerAge, additionalInfo, provider, apiKey) {
+    if (!emailBody || !emailBody.trim()) {
+        return emailBody;
+    }
+
+    try {
+        // 构建提示词
+        const customPrompt = getCustomAIPrompt();
+        const promptMode = getPromptMode();
+        
+        const defaultPrompt = `You are a professional email optimization expert. Please refine the following email to make it more natural and human-like, while keeping it in English.
+
+IMPORTANT REQUIREMENTS:
+1. Keep the email in English - DO NOT translate to Chinese or any other language
+2. Maintain the core information and purpose of the email
+3. Adjust the language style appropriately based on the customer's age (${customerAge} years old). Consider how people of this age typically communicate - their tone, formality level, and communication preferences
+4. If additional information is provided below, naturally integrate it into the email (translate to English if needed, and weave it naturally into the context, don't just insert it directly):
+${additionalInfo ? `Additional Information: ${additionalInfo}` : 'No additional information provided'}
+5. Make the language more natural, conversational, and human-like
+6. Keep the original email structure (greeting, body, closing, signature)
+7. Keep the customer name: ${customerName}
+8. Make it sound like a real person wrote this email, not robotic or template-like
+
+Original email:
+${emailBody}
+
+Please return ONLY the optimized email body text, no other content. Do not include explanations or comments.`;
+
+        // 如果用户提供了自定义 prompt，根据模式处理
+        let prompt;
+        if (customPrompt && promptMode === 'replace') {
+            // 替换模式：完全替换默认 prompt
+            prompt = customPrompt
+                .replace(/\{customerName\}/g, customerName)
+                .replace(/\{customerAge\}/g, customerAge)
+                .replace(/\{additionalInfo\}/g, additionalInfo || '')
+                .replace(/\{emailBody\}/g, emailBody);
+        } else if (customPrompt && promptMode === 'append') {
+            // 追加模式：在默认 prompt 基础上添加要求
+            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
+        } else {
+            // 没有自定义 prompt，使用默认
+            prompt = defaultPrompt;
+        }
+
+        let optimizedEmailBody;
+        
+        // 根据提供商调用不同的API
+        switch (provider) {
+            case 'gemini':
+                optimizedEmailBody = await callGeminiAPIForEmail(prompt, apiKey);
+                break;
+            case 'groq':
+                optimizedEmailBody = await callGroqAPIForEmail(prompt, apiKey);
+                break;
+            case 'huggingface':
+                optimizedEmailBody = await callHuggingFaceAPIForEmail(prompt, apiKey);
+                break;
+            case 'openai':
+                optimizedEmailBody = await callOpenAIAPIForEmail(prompt, apiKey);
+                break;
+            default:
+                throw new Error('不支持的AI提供商');
+        }
+
+        // 验证返回的内容
+        if (optimizedEmailBody && optimizedEmailBody.trim()) {
+            return optimizedEmailBody.trim();
+        } else {
+            console.warn('AI返回的邮件内容为空，使用原始邮件');
+            return emailBody;
+        }
+    } catch (error) {
+        console.error('AI优化邮件时出错:', error);
+        throw error;
+    }
+}
+
+// 解析AI返回的内容（用于对话）
 function parseAIResponse(text) {
     try {
         // 尝试直接解析
@@ -5288,6 +5594,18 @@ function parseAIResponse(text) {
             throw new Error('无法解析AI返回的内容');
         }
     }
+}
+
+// 解析AI返回的邮件内容（纯文本）
+function parseEmailResponse(text) {
+    // 清理文本，移除可能的markdown代码块标记
+    let cleaned = text.trim();
+    
+    // 移除可能的 ```email 或 ``` 标记
+    cleaned = cleaned.replace(/^```[\w]*\n?/g, '');
+    cleaned = cleaned.replace(/```$/g, '');
+    
+    return cleaned.trim();
 }
 
 // 检查是否启用AI优化
