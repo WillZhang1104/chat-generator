@@ -139,7 +139,7 @@ async function generateConversation() {
         // 补充材料场景
         const customerAge = parseInt(document.getElementById('customerAge').value);
         if (!customerAge || customerAge < 60) {
-            alert('补充材料场景需要客户年龄（必须60岁以上）');
+            alert('调单场景需要客户年龄（必须60岁以上）');
             return;
         }
         
@@ -5124,7 +5124,112 @@ Strategy:
 
 // ========== AI 优化对话功能（支持多个免费AI API） ==========
 
-// 使用 AI API 优化对话，使其更自然、更像真人
+// 构建对话优化的prompt（用于预览）
+function buildConversationPrompt(conversation, customerName, platform) {
+    const platformContext = platform === 'whatsapp' ? 'WhatsApp' : 
+                           platform === 'telegram' ? 'Telegram' : 
+                           'Email';
+    
+    const conversationText = conversation.map(msg => {
+        const sender = msg.sender === 'customer' ? 'Customer' : 'Company';
+        return `${sender}: ${msg.text}`;
+    }).join('\n');
+    
+    const defaultPrompt = `你是一个对话优化专家。请对以下${platformContext}对话进行扩写和润色，使其更加自然、更像真人对话，同时保持英文。
+
+对话要求：
+1. 保持对话为英文，不要翻译成中文
+2. 保持对话的核心信息和目的不变
+3. 对语言进行润色，使其更自然、对话式、人性化
+4. 可以适当扩写对话，添加一些自然的问答互动，让对话更像真人直接进行的
+5. 可以添加适当的对话元素，如自然的停顿、随意的表达、真实的措辞
+6. 保持原有的对话风格（友好、专业等）
+7. 保持客户姓名：${customerName}
+8. 让对话听起来像真人在说话，不要机械化或模板化
+9. 可以增加一些自然的问答，让对话更丰富、更真实
+
+原始对话：
+${conversationText}
+
+请返回优化后的对话，格式为JSON数组，每个元素包含：
+- sender: "customer" 或 "company"
+- text: 优化后的消息内容（英文，更自然、人性化）
+- time: 保持原始时间（格式：HH:mm）
+
+只返回JSON数组，不要其他内容。`;
+    
+    // 添加AI理解说明（因为prompt是中文）
+    const prompt = `You are a conversation optimization expert. The user has provided requirements in Chinese. Please understand the requirements and optimize the conversation accordingly.
+
+${defaultPrompt}
+
+IMPORTANT: The optimized conversation should be in English, but understand the Chinese requirements. You can expand the conversation by adding natural Q&A interactions to make it more like a real conversation between people.`;
+    
+    return prompt;
+}
+
+// 使用 AI API 优化对话（带prompt预览）
+async function optimizeConversationWithAIWithPreview(conversation, customerName, platform, provider, apiKey) {
+    if (!conversation || conversation.length === 0) {
+        return conversation;
+    }
+
+    try {
+        // 构建prompt
+        let prompt = buildConversationPrompt(conversation, customerName, platform);
+        
+        // 显示预览并等待用户确认
+        prompt = await showPromptPreview(provider, prompt);
+        
+        // 显示调用状态
+        showAIStatus('loading', '正在调用 AI...', `正在使用 ${provider} 优化对话...`, provider);
+        
+        let optimizedConversation;
+        
+        // 根据提供商调用不同的API
+        switch (provider) {
+            case 'gemini':
+                optimizedConversation = await callGeminiAPI(prompt, apiKey);
+                break;
+            case 'groq':
+                optimizedConversation = await callGroqAPI(prompt, apiKey);
+                break;
+            case 'huggingface':
+                optimizedConversation = await callHuggingFaceAPI(prompt, apiKey);
+                break;
+            case 'openai':
+                optimizedConversation = await callOpenAIAPI(prompt, apiKey);
+                break;
+            default:
+                throw new Error('不支持的AI提供商');
+        }
+
+        // 验证并合并时间信息
+        if (Array.isArray(optimizedConversation)) {
+            // 允许AI扩写对话，所以长度可能不同
+            showAIStatus('success', 'AI 优化成功', `对话已优化，共 ${optimizedConversation.length} 条消息`, provider);
+            return optimizedConversation.map((msg, index) => {
+                // 如果原始对话有对应的时间，使用原始时间；否则使用递增时间
+                const originalTime = conversation[index] ? conversation[index].time : null;
+                return {
+                    sender: msg.sender || (index < conversation.length ? conversation[index].sender : 'customer'),
+                    text: msg.text || (index < conversation.length ? conversation[index].text : ''),
+                    time: originalTime || msg.time || conversation[Math.min(index, conversation.length - 1)].time
+                };
+            });
+        } else {
+            console.warn('AI返回的对话格式不正确，使用原始对话');
+            showAIStatus('error', 'AI 优化失败', '返回格式不正确', provider);
+            return conversation;
+        }
+    } catch (error) {
+        console.error('AI优化对话时出错:', error);
+        showAIStatus('error', 'AI 优化失败', error.message, provider);
+        throw error;
+    }
+}
+
+// 使用 AI API 优化对话，使其更自然、更像真人（原函数保留用于向后兼容）
 async function optimizeConversationWithAI(conversation, customerName, platform, provider, apiKey) {
     if (!conversation || conversation.length === 0) {
         return conversation;
@@ -5140,10 +5245,6 @@ async function optimizeConversationWithAI(conversation, customerName, platform, 
             const sender = msg.sender === 'customer' ? 'Customer' : 'Company';
             return `${sender}: ${msg.text}`;
         }).join('\n');
-
-        // 获取用户自定义的 prompt，如果没有则使用默认 prompt
-        let customPrompt = getCustomAIPrompt();
-        const promptMode = getPromptMode(); // 'append' 或 'replace'
         
         const defaultPrompt = `You are a conversation optimization expert. Please refine the following ${platformContext} conversation to make it more natural and human-like, while keeping it in English.
 
@@ -5167,21 +5268,7 @@ Please return the optimized conversation as a JSON array, where each element con
 
 Return ONLY the JSON array, no other content.`;
 
-        // 如果用户提供了自定义 prompt，根据模式处理
-        let prompt;
-        if (customPrompt && promptMode === 'replace') {
-            // 替换模式：完全替换默认 prompt
-            prompt = customPrompt
-                .replace(/\{platformContext\}/g, platformContext)
-                .replace(/\{customerName\}/g, customerName)
-                .replace(/\{conversationText\}/g, conversationText);
-        } else if (customPrompt && promptMode === 'append') {
-            // 追加模式：在默认 prompt 基础上添加要求
-            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
-        } else {
-            // 没有自定义 prompt，使用默认
-            prompt = defaultPrompt;
-        }
+        let prompt = defaultPrompt;
 
         let optimizedConversation;
         
