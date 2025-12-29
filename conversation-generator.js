@@ -1603,7 +1603,7 @@ async function generateEmailConversation(customerName, purposeDetails, conversat
             
             emails.push({
                 sender: 'customer',
-                subject: 'Re: Enhanced KYC Documentation Request',
+                subject: 'Re: Request for Information',
                 body: emailBody,
                 date: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000) // 1天前
             });
@@ -1613,7 +1613,7 @@ async function generateEmailConversation(customerName, purposeDetails, conversat
             
             emails.push({
                 sender: 'customer',
-                subject: 'Re: Enhanced KYC Documentation Request',
+                subject: 'Re: Request for Information',
                 body: emailBody,
                 date: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000) // 1天前
             });
@@ -2467,7 +2467,7 @@ function generateTitanEmailHTML(emails, customerName, senderEmail, conversationS
     const subject = emails && emails.length > 0 && emails[0].subject 
         ? emails[0].subject 
         : (conversationScene === 'kyc' 
-        ? 'Enhanced KYC Documentation Request'
+            ? 'Request for Information'
             : 'Account Opening Inquiry - USD to USDT');
     
     let html = `<!DOCTYPE html>
@@ -3537,8 +3537,8 @@ function generateEmailFiles(conversation, customerName, senderEmail, recipientEm
         let subject;
         if (conversationScene === 'kyc') {
             subject = isCustomer 
-                ? `Re: Enhanced KYC Documentation Request`
-                : `Enhanced KYC Documentation Request`;
+                ? `Re: Request for Information`
+                : `Request for Information`;
         } else {
             subject = isCustomer
                 ? `Re: Account Opening Inquiry - USD to USDT`
@@ -5643,13 +5643,15 @@ ${additionalInfo ? `- 额外信息：${additionalInfo}` : ''}
 邮件要求：
 1. 这是一封客户回复WSP团队，关于要求交易证明文件的邮件
 2. 客户已经提供了要求的文件，见附件
-3. 邮件要用英文写，不要翻译成中文
-4. 根据客户的年龄（${customerAge}岁）自然地调整语言风格。考虑这个年龄段的人通常如何沟通——他们的语气、正式程度和交流偏好。要真实自然。
-5. 如果提供了额外信息，自然地融入到邮件中（如果需要，翻译成英文，并自然地融入到上下文中，不要直接插入）
-6. 语言要自然、对话式、人性化——就像真人写的邮件
-7. 包含适当的邮件结构：称呼、正文段落、结尾、签名（包含客户姓名）
-8. 邮件应该听起来真实，不要机械化或模板化
-9. 保持专业但自然，适合客户的年龄
+
+其他要求：
+- 邮件要用英文写，不要翻译成中文
+- 根据客户的年龄（${customerAge}岁）自然地调整语言风格。考虑这个年龄段的人通常如何沟通——他们的语气、正式程度和交流偏好。要真实自然。
+- 如果提供了额外信息，自然地融入到邮件中（如果需要，翻译成英文，并自然地融入到上下文中，不要直接插入）
+- 语言要自然、对话式、人性化——就像真人写的邮件
+- 包含适当的邮件结构：称呼、正文段落、结尾、签名（包含客户姓名）
+- 邮件应该听起来真实，不要机械化或模板化
+- 保持专业但自然，适合客户的年龄
 
 请写完整的邮件正文（包括称呼和签名），只返回邮件文本，不要解释或注释。`;
 
