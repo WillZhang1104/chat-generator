@@ -6033,18 +6033,12 @@ function getAIApiKey() {
 }
 
 // 获取自定义 AI Prompt
+// 获取自定义 AI Prompt（已废弃，保留用于向后兼容）
 function getCustomAIPrompt() {
-    const textarea = document.getElementById('customAIPrompt');
-    if (!textarea) return null;
-    const customPrompt = textarea.value.trim();
-    return customPrompt || null;
+    return null; // 不再使用自定义prompt，用户直接在预览中编辑
 }
 
-// 获取 Prompt 模式（append 或 replace）
+// 获取 Prompt 模式（已废弃，保留用于向后兼容）
 function getPromptMode() {
-    const replaceRadio = document.querySelector('input[name="promptMode"][value="replace"]');
-    if (replaceRadio && replaceRadio.checked) {
-        return 'replace';
-    }
-    return 'append'; // 默认是追加模式
+    return 'append'; // 不再使用模式选择
 }
