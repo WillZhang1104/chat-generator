@@ -1991,6 +1991,25 @@ function generateKYCRefusalEmailByStyle(customerName, customerGreeting, style, v
 
 // 根据风格生成KYC同意提供邮件（多样化）
 async function generateKYCProvisionEmailByStyle(customerName, customerGreeting, style, variant = 0, seed = 0, additionalInfo = '', customerAge = null) {
+    // 如果启用了AI优化，优先尝试AI直接生成
+    if (customerAge && customerAge >= 60 && shouldUseAIOptimization()) {
+        const provider = getAIProvider();
+        const apiKey = getAIApiKey();
+        if (apiKey) {
+            try {
+                // 直接使用AI生成邮件，而不是先生成模板再优化
+                const emailBody = await generateEmailWithAI(customerName, customerGreeting, customerAge, additionalInfo, provider, apiKey);
+                if (emailBody && emailBody.trim()) {
+                    return emailBody;
+                }
+            } catch (error) {
+                console.error('AI生成邮件失败，将使用基础模板:', error);
+                // AI生成失败，继续使用基础模板
+            }
+        }
+    }
+    
+    // AI生成失败或未启用AI优化时，使用基础模板
     const emailTemplates = {
         verbose: generateVerboseKYCProvisionEmail,
         concise: generateConciseKYCProvisionEmail,
@@ -2001,23 +2020,7 @@ async function generateKYCProvisionEmailByStyle(customerName, customerGreeting, 
     };
     
     const generator = emailTemplates[style] || generateFriendlyKYCProvisionEmail;
-    let emailBody = generator(customerName, customerGreeting, variant, seed, additionalInfo);
-    
-    // 如果是补充材料场景且客户愿意提供，且启用了AI优化，则进行AI优化
-    if (customerAge && customerAge >= 60 && shouldUseAIOptimization()) {
-        const provider = getAIProvider();
-        const apiKey = getAIApiKey();
-        if (apiKey) {
-            try {
-                emailBody = await optimizeEmailWithAI(emailBody, customerName, customerAge, additionalInfo, provider, apiKey);
-            } catch (error) {
-                console.error('邮件AI优化失败:', error);
-                // 优化失败时使用原始邮件内容
-            }
-        }
-    }
-    
-    return emailBody;
+    return generator(customerName, customerGreeting, variant, seed, additionalInfo);
 }
 
 // 话多型KYC拒绝邮件
@@ -3134,6 +3137,131 @@ function showEditableEmail(emails) {
         
         bodyDiv.appendChild(bodyLabel);
         bodyDiv.appendChild(bodyTextarea);
+        
+        // AI微调功能（仅在邮件平台且是KYC补充材料场景时显示）
+        if (currentPlatform === 'email') {
+            const aiRefineDiv = document.createElement('div');
+            aiRefineDiv.style.marginTop = '10px';
+            aiRefineDiv.style.padding = '10px';
+            aiRefineDiv.style.backgroundColor = '#f0f8ff';
+            aiRefineDiv.style.border = '1px solid #b3d9ff';
+            aiRefineDiv.style.borderRadius = '5px';
+            
+            const aiRefineLabel = document.createElement('label');
+            aiRefineLabel.textContent = '🤖 AI微调提示（可选）: ';
+            aiRefineLabel.style.fontWeight = 'bold';
+            aiRefineLabel.style.display = 'block';
+            aiRefineLabel.style.marginBottom = '5px';
+            aiRefineLabel.style.fontSize = '13px';
+            
+            const aiRefineInput = document.createElement('input');
+            aiRefineInput.type = 'text';
+            aiRefineInput.className = 'ai-refine-input';
+            aiRefineInput.setAttribute('data-index', index);
+            aiRefineInput.placeholder = '例如：更正式一些、更简洁、添加关于时间的信息等';
+            aiRefineInput.style.width = '100%';
+            aiRefineInput.style.padding = '6px';
+            aiRefineInput.style.border = '1px solid #ccc';
+            aiRefineInput.style.borderRadius = '3px';
+            aiRefineInput.style.fontSize = '13px';
+            
+            const aiRefineBtn = document.createElement('button');
+            aiRefineBtn.textContent = '✨ AI微调';
+            aiRefineBtn.type = 'button';
+            aiRefineBtn.className = 'ai-refine-btn';
+            aiRefineBtn.setAttribute('data-index', index);
+            aiRefineBtn.style.marginTop = '8px';
+            aiRefineBtn.style.padding = '6px 15px';
+            aiRefineBtn.style.backgroundColor = '#007bff';
+            aiRefineBtn.style.color = 'white';
+            aiRefineBtn.style.border = 'none';
+            aiRefineBtn.style.borderRadius = '3px';
+            aiRefineBtn.style.cursor = 'pointer';
+            aiRefineBtn.style.fontSize = '13px';
+            aiRefineBtn.style.fontWeight = 'bold';
+            
+            aiRefineBtn.onclick = async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const refinePrompt = aiRefineInput.value.trim();
+                if (!refinePrompt) {
+                    alert('请输入微调提示');
+                    return;
+                }
+                
+                if (!shouldUseAIOptimization()) {
+                    alert('请先启用AI优化功能');
+                    return;
+                }
+                
+                const provider = getAIProvider();
+                const apiKey = getAIApiKey();
+                if (!apiKey) {
+                    alert('请先输入 API Key');
+                    return;
+                }
+                
+                // 显示加载状态
+                aiRefineBtn.disabled = true;
+                aiRefineBtn.textContent = '⏳ AI处理中...';
+                
+                try {
+                    // 获取当前邮件正文
+                    const currentBody = bodyTextarea.value;
+                    
+                    // 获取客户年龄和额外信息（从全局变量或表单获取）
+                    let customerAge = null;
+                    let additionalInfo = '';
+                    const conversationScene = document.querySelector('input[name="conversationScene"]:checked')?.value;
+                    if (conversationScene === 'kyc') {
+                        const ageInput = document.getElementById('customerAge');
+                        if (ageInput && ageInput.value) {
+                            customerAge = parseInt(ageInput.value);
+                        }
+                        const additionalInfoInput = document.getElementById('additionalInfo');
+                        if (additionalInfoInput) {
+                            additionalInfo = additionalInfoInput.value || '';
+                        }
+                    }
+                    
+                    // 调用AI微调
+                    const optimizedBody = await optimizeEmailWithAI(
+                        currentBody,
+                        currentCustomerName || customerName,
+                        customerAge,
+                        additionalInfo,
+                        provider,
+                        apiKey,
+                        refinePrompt
+                    );
+                    
+                    // 更新邮件正文
+                    bodyTextarea.value = optimizedBody;
+                    
+                    // 更新currentEmails
+                    if (currentEmails && currentEmails[index]) {
+                        currentEmails[index].body = optimizedBody;
+                    }
+                    
+                    aiRefineInput.value = '';
+                    alert('AI微调完成！');
+                } catch (error) {
+                    console.error('AI微调失败:', error);
+                    alert('AI微调失败：' + error.message);
+                } finally {
+                    aiRefineBtn.disabled = false;
+                    aiRefineBtn.textContent = '✨ AI微调';
+                }
+                
+                return false;
+            };
+            
+            aiRefineDiv.appendChild(aiRefineLabel);
+            aiRefineDiv.appendChild(aiRefineInput);
+            aiRefineDiv.appendChild(aiRefineBtn);
+            
+            bodyDiv.appendChild(aiRefineDiv);
+        }
         
         emailDiv.appendChild(headerDiv);
         emailDiv.appendChild(subjectDiv);
@@ -5501,8 +5629,89 @@ async function callOpenAIAPI(prompt, apiKey) {
     return parseAIResponse(optimizedText);
 }
 
-// 优化邮件内容的AI函数
-async function optimizeEmailWithAI(emailBody, customerName, customerAge, additionalInfo, provider, apiKey) {
+// 直接使用AI生成邮件（根据所有元素生成）
+async function generateEmailWithAI(customerName, customerGreeting, customerAge, additionalInfo, provider, apiKey) {
+    if (!customerName || !customerGreeting) {
+        throw new Error('缺少必要参数');
+    }
+
+    try {
+        // 构建提示词
+        const customPrompt = getCustomAIPrompt();
+        const promptMode = getPromptMode();
+        
+        const defaultPrompt = `You are a professional email writing expert. Please write a natural, human-like email in English based on the following requirements:
+
+CONTEXT:
+- Customer Name: ${customerName}
+- Customer Age: ${customerAge} years old
+- Customer Greeting: ${customerGreeting}
+${additionalInfo ? `- Additional Information: ${additionalInfo}` : ''}
+
+EMAIL REQUIREMENTS:
+1. This is a reply email from the customer to WSP Team regarding an enhanced KYC documentation request
+2. The customer is willing to provide bank statements for the last 2-3 months
+3. Write the email in English - DO NOT translate to Chinese
+4. Adjust the language style naturally based on the customer's age (${customerAge} years old). Consider how people of this age typically communicate - their tone, formality level, and communication preferences. Make it authentic and natural.
+5. If additional information is provided, naturally integrate it into the email (translate to English if needed, and weave it naturally into the context, don't just insert it directly)
+6. Make the language natural, conversational, and human-like - like a real person wrote this email
+7. Include appropriate email structure: greeting, body paragraphs, closing, and signature with customer name
+8. The email should sound authentic and not robotic or template-like
+9. Keep it professional but natural, appropriate for the customer's age
+
+Please write the complete email body (including greeting and signature), and return ONLY the email text, no explanations or comments.`;
+
+        // 如果用户提供了自定义 prompt，根据模式处理
+        let prompt;
+        if (customPrompt && promptMode === 'replace') {
+            // 替换模式：完全替换默认 prompt
+            prompt = customPrompt
+                .replace(/\{customerName\}/g, customerName)
+                .replace(/\{customerAge\}/g, customerAge)
+                .replace(/\{customerGreeting\}/g, customerGreeting)
+                .replace(/\{additionalInfo\}/g, additionalInfo || '');
+        } else if (customPrompt && promptMode === 'append') {
+            // 追加模式：在默认 prompt 基础上添加要求
+            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
+        } else {
+            // 没有自定义 prompt，使用默认
+            prompt = defaultPrompt;
+        }
+
+        let emailBody;
+        
+        // 根据提供商调用不同的API
+        switch (provider) {
+            case 'gemini':
+                emailBody = await callGeminiAPIForEmail(prompt, apiKey);
+                break;
+            case 'groq':
+                emailBody = await callGroqAPIForEmail(prompt, apiKey);
+                break;
+            case 'huggingface':
+                emailBody = await callHuggingFaceAPIForEmail(prompt, apiKey);
+                break;
+            case 'openai':
+                emailBody = await callOpenAIAPIForEmail(prompt, apiKey);
+                break;
+            default:
+                throw new Error('不支持的AI提供商');
+        }
+
+        // 验证返回的内容
+        if (emailBody && emailBody.trim()) {
+            return emailBody.trim();
+        } else {
+            throw new Error('AI返回的邮件内容为空');
+        }
+    } catch (error) {
+        console.error('AI生成邮件时出错:', error);
+        throw error;
+    }
+}
+
+// 优化邮件内容的AI函数（用于微调）
+async function optimizeEmailWithAI(emailBody, customerName, customerAge, additionalInfo, provider, apiKey, refinementPrompt = '') {
     if (!emailBody || !emailBody.trim()) {
         return emailBody;
     }
@@ -5512,20 +5721,32 @@ async function optimizeEmailWithAI(emailBody, customerName, customerAge, additio
         const customPrompt = getCustomAIPrompt();
         const promptMode = getPromptMode();
         
-        const defaultPrompt = `You are a professional email optimization expert. Please refine the following email to make it more natural and human-like, while keeping it in English.
+        let defaultPrompt = `You are a professional email optimization expert. Please refine the following email based on the requirements, while keeping it in English.
 
 IMPORTANT REQUIREMENTS:
 1. Keep the email in English - DO NOT translate to Chinese or any other language
 2. Maintain the core information and purpose of the email
-3. Adjust the language style appropriately based on the customer's age (${customerAge} years old). Consider how people of this age typically communicate - their tone, formality level, and communication preferences
-4. If additional information is provided below, naturally integrate it into the email (translate to English if needed, and weave it naturally into the context, don't just insert it directly):
-${additionalInfo ? `Additional Information: ${additionalInfo}` : 'No additional information provided'}
-5. Make the language more natural, conversational, and human-like
-6. Keep the original email structure (greeting, body, closing, signature)
-7. Keep the customer name: ${customerName}
-8. Make it sound like a real person wrote this email, not robotic or template-like
-
-Original email:
+3. Keep the original email structure (greeting, body, closing, signature)
+4. Keep the customer name: ${customerName}`;
+        
+        if (customerAge) {
+            defaultPrompt += `\n5. Adjust the language style appropriately based on the customer's age (${customerAge} years old). Consider how people of this age typically communicate - their tone, formality level, and communication preferences`;
+        }
+        
+        if (additionalInfo) {
+            defaultPrompt += `\n6. If additional information is provided below, naturally integrate it into the email (translate to English if needed, and weave it naturally into the context, don't just insert it directly):
+Additional Information: ${additionalInfo}`;
+        }
+        
+        defaultPrompt += `\n7. Make the language more natural, conversational, and human-like
+8. Make it sound like a real person wrote this email, not robotic or template-like`;
+        
+        if (refinementPrompt) {
+            defaultPrompt += `\n\nSPECIFIC REFINEMENT REQUEST:
+${refinementPrompt}`;
+        }
+        
+        defaultPrompt += `\n\nOriginal email:
 ${emailBody}
 
 Please return ONLY the optimized email body text, no other content. Do not include explanations or comments.`;
@@ -5617,7 +5838,7 @@ function shouldUseAIOptimization() {
 // 获取AI提供商
 function getAIProvider() {
     const select = document.getElementById('aiProvider');
-    return select ? select.value : 'gemini';
+    return select ? select.value : 'openai'; // 默认使用OpenAI（付费，效果更好）
 }
 
 // 获取AI API Key
