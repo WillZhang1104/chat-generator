@@ -5630,69 +5630,42 @@ async function callOpenAIAPI(prompt, apiKey) {
     return parseAIResponse(optimizedText);
 }
 
-// 构建prompt（用于预览）
+// 构建prompt（用于预览）- 默认使用中文prompt
 function buildEmailPrompt(customerName, customerGreeting, customerAge, additionalInfo) {
-    const customPrompt = getCustomAIPrompt();
-    const promptMode = getPromptMode();
+    const defaultPrompt = `你是一个专业的邮件写作专家。请根据以下要求写一封自然、人性化的英文邮件。
+
+背景信息：
+- 客户姓名：${customerName}
+- 客户年龄：${customerAge}岁
+- 客户称呼：${customerGreeting}
+${additionalInfo ? `- 额外信息：${additionalInfo}` : ''}
+
+邮件要求：
+1. 这是一封客户回复WSP团队，关于要求交易证明文件的邮件
+2. 客户已经提供了要求的文件，见附件
+3. 邮件要用英文写，不要翻译成中文
+4. 根据客户的年龄（${customerAge}岁）自然地调整语言风格。考虑这个年龄段的人通常如何沟通——他们的语气、正式程度和交流偏好。要真实自然。
+5. 如果提供了额外信息，自然地融入到邮件中（如果需要，翻译成英文，并自然地融入到上下文中，不要直接插入）
+6. 语言要自然、对话式、人性化——就像真人写的邮件
+7. 包含适当的邮件结构：称呼、正文段落、结尾、签名（包含客户姓名）
+8. 邮件应该听起来真实，不要机械化或模板化
+9. 保持专业但自然，适合客户的年龄
+
+请写完整的邮件正文（包括称呼和签名），只返回邮件文本，不要解释或注释。`;
+
+    // 将变量替换到prompt中
+    let prompt = defaultPrompt
+        .replace(/\{customerName\}/g, customerName)
+        .replace(/\{customerAge\}/g, customerAge)
+        .replace(/\{customerGreeting\}/g, customerGreeting)
+        .replace(/\{additionalInfo\}/g, additionalInfo || '');
     
-    const defaultPrompt = `You are a professional email writing expert. Please write a natural, human-like email in English based on the following requirements:
+    // 添加AI理解说明（因为prompt是中文）
+    prompt = `You are a professional email writing expert. The user has provided requirements in Chinese. Please understand the requirements and write a natural, human-like email in English based on them.
 
-CONTEXT:
-- Customer Name: ${customerName}
-- Customer Age: ${customerAge} years old
-- Customer Greeting: ${customerGreeting}
-${additionalInfo ? `- Additional Information: ${additionalInfo}` : ''}
-
-EMAIL REQUIREMENTS:
-1. This is a reply email from the customer to WSP Team regarding a request for transaction proof documents
-2. The customer has already provided the required documents, see attachments
-3. Write the email in English - DO NOT translate to Chinese
-4. Adjust the language style naturally based on the customer's age (${customerAge} years old). Consider how people of this age typically communicate - their tone, formality level, and communication preferences. Make it authentic and natural.
-5. If additional information is provided, naturally integrate it into the email (translate to English if needed, and weave it naturally into the context, don't just insert it directly)
-6. Make the language natural, conversational, and human-like - like a real person wrote this email
-7. Include appropriate email structure: greeting, body paragraphs, closing, and signature with customer name
-8. The email should sound authentic and not robotic or template-like
-9. Keep it professional but natural, appropriate for the customer's age
-
-Please write the complete email body (including greeting and signature), and return ONLY the email text, no explanations or comments.`;
-
-    // 如果用户提供了自定义 prompt，根据模式处理
-    let prompt;
-    if (customPrompt && promptMode === 'replace') {
-        // 替换模式：完全替换默认 prompt（支持中文）
-        prompt = customPrompt
-            .replace(/\{customerName\}/g, customerName)
-            .replace(/\{customerAge\}/g, customerAge)
-            .replace(/\{customerGreeting\}/g, customerGreeting)
-            .replace(/\{additionalInfo\}/g, additionalInfo || '');
-        
-        // 如果用户用中文写prompt，添加说明让AI理解
-        if (/[\u4e00-\u9fa5]/.test(prompt)) {
-            prompt = `You are a professional email writing expert. The user has provided requirements in Chinese. Please understand the requirements and write a natural, human-like email in English based on them.
-
-CONTEXT:
-- Customer Name: ${customerName}
-- Customer Age: ${customerAge} years old
-- Customer Greeting: ${customerGreeting}
-${additionalInfo ? `- Additional Information: ${additionalInfo}` : ''}
-
-USER REQUIREMENTS (may be in Chinese):
 ${prompt}
 
-IMPORTANT: Write the email in English, but understand the Chinese requirements. The email should be natural, human-like, and appropriate for a customer aged ${customerAge} years old. Include appropriate email structure: greeting, body paragraphs, closing, and signature with customer name.`;
-        }
-    } else if (customPrompt && promptMode === 'append') {
-        // 追加模式：在默认 prompt 基础上添加要求（支持中文）
-        if (/[\u4e00-\u9fa5]/.test(customPrompt)) {
-            // 如果追加的内容是中文，添加说明
-            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS (may be in Chinese, please understand and apply):\n' + customPrompt;
-        } else {
-            prompt = defaultPrompt + '\n\nADDITIONAL REQUIREMENTS:\n' + customPrompt;
-        }
-    } else {
-        // 没有自定义 prompt，使用默认
-        prompt = defaultPrompt;
-    }
+IMPORTANT: Write the email in English, but understand the Chinese requirements. The email should be natural, human-like, and appropriate for a customer aged ${customerAge} years old.`;
     
     return prompt;
 }

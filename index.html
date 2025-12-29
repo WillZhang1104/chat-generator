@@ -373,29 +373,9 @@
                     <p style="font-size: 11px; color: #666; margin-top: 5px; line-height: 1.4;">
                         <strong>提示：</strong>Gemini API本身免费但有配额限制，付费版本可通过Google Cloud获取更高配额和更好的性能。代码会自动优先使用Gemini Pro模型（gemini-2.5-pro），效果更好。
                     </p>
-                    <div style="margin-top: 15px;">
-                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #666;">
-                            <input type="checkbox" id="showCustomPrompt" style="margin-right: 8px; width: auto;">
-                            <span>显示并自定义 AI Prompt（高级选项）</span>
-                        </label>
-                        <div id="customPromptGroup" style="display: none; margin-top: 10px;">
-                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">Prompt 模式：</label>
-                            <div style="margin-bottom: 10px;">
-                                <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                    <input type="radio" name="promptMode" value="append" checked style="margin-right: 5px; width: auto;">
-                                    <span>追加模式（在默认 prompt 基础上添加要求）</span>
-                                </label>
-                                <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px; margin-top: 5px;">
-                                    <input type="radio" name="promptMode" value="replace" style="margin-right: 5px; width: auto;">
-                                    <span>替换模式（完全替换默认 prompt）</span>
-                                </label>
-                            </div>
-                            <textarea id="customAIPrompt" name="customAIPrompt" placeholder="追加模式：输入要添加的要求，可以用中文或英文，例如：'请让邮件更正式一些' 或 'Please make the conversation more formal.'&#10;替换模式：输入完整的 prompt（可以用中文），可以使用变量：{customerName}、{customerAge}、{customerGreeting}、{additionalInfo}" style="font-size: 12px; width: 100%; min-height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Courier New', monospace;"></textarea>
-                            <p style="font-size: 11px; color: #999; margin-top: 5px;" id="promptHint">
-                                提示：<strong>可以用中文写prompt</strong>，AI会自动理解并生成英文邮件。在 prompt 中可以使用变量：<code>{customerName}</code>（客户名称）、<code>{customerAge}</code>（客户年龄）、<code>{customerGreeting}</code>（客户称呼）、<code>{additionalInfo}</code>（额外信息）。
-                            </p>
-                        </div>
-                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        <strong>提示：</strong>生成对话时会显示 Prompt 预览，您可以在预览中直接编辑 Prompt。Prompt 可以用中文编写，AI 会自动理解并生成英文邮件。
+                    </p>
                     <p style="font-size: 12px; color: #999; margin-top: 5px;">
                         <strong>免费选项：</strong><br>
                         • <strong>Google Gemini</strong>：访问 <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a> 获取免费API Key<br>
@@ -727,23 +707,10 @@
         const aiConfigGroup = document.getElementById('aiConfigGroup');
         const aiProviderSelect = document.getElementById('aiProvider');
         const aiApiKeyInput = document.getElementById('aiApiKey');
-        const showCustomPromptCheckbox = document.getElementById('showCustomPrompt');
-        const customAIPromptTextarea = document.getElementById('customAIPrompt');
-        const promptHint = document.getElementById('promptHint');
         
         if (useAIOptimizationCheckbox) {
             useAIOptimizationCheckbox.addEventListener('change', function() {
                 aiConfigGroup.style.display = this.checked ? 'block' : 'none';
-            });
-        }
-
-        // 显示/隐藏自定义 Prompt
-        if (showCustomPromptCheckbox) {
-            const customPromptGroup = document.getElementById('customPromptGroup');
-            showCustomPromptCheckbox.addEventListener('change', function() {
-                if (customPromptGroup) {
-                    customPromptGroup.style.display = this.checked ? 'block' : 'none';
-                }
             });
         }
 
