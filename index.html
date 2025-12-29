@@ -364,12 +364,15 @@
                     <label for="aiProvider" style="font-size: 13px; color: #666; display: block; margin-bottom: 8px;">选择 AI 服务提供商：</label>
                     <select id="aiProvider" name="aiProvider" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; margin-bottom: 10px;">
                         <option value="openai" selected>OpenAI（付费，推荐）</option>
-                        <option value="gemini">Google Gemini（免费）</option>
+                        <option value="gemini">Google Gemini（免费/付费，Gemini Pro效果更好）</option>
                         <option value="groq">Groq（免费，快速）</option>
                         <option value="huggingface">Hugging Face（免费）</option>
                     </select>
                     <label for="aiApiKey" style="font-size: 13px; color: #666;">API Key：</label>
-                    <input type="password" id="aiApiKey" name="aiApiKey" placeholder="输入API Key（Gemini/Groq免费）" style="margin-top: 5px; font-size: 13px; width: 100%;">
+                    <input type="password" id="aiApiKey" name="aiApiKey" placeholder="输入API Key（OpenAI付费/Gemini免费或付费/Groq免费）" style="margin-top: 5px; font-size: 13px; width: 100%;">
+                    <p style="font-size: 11px; color: #666; margin-top: 5px; line-height: 1.4;">
+                        <strong>提示：</strong>Gemini API本身免费但有配额限制，付费版本可通过Google Cloud获取更高配额和更好的性能。代码会自动优先使用Gemini Pro模型（gemini-2.5-pro），效果更好。
+                    </p>
                     <div style="margin-top: 15px;">
                         <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #666;">
                             <input type="checkbox" id="showCustomPrompt" style="margin-right: 8px; width: auto;">
